@@ -35,14 +35,14 @@ function setCart(items: CartItem[]) {
 type CartDrawerProps = {
   open: boolean;
   onClose: () => void;
-  /** Teléfono para WhatsApp sin +, ej "5493885195631" */
+  /** Teléfono para WhatsApp sin +, ej "5492920559780" */
   whatsappPhone?: string;
 };
 
 export default function CartDrawer({
   open,
   onClose,
-  whatsappPhone = "5493885195631",
+  whatsappPhone = "5492920559780",
 }: CartDrawerProps) {
   const [items, setItems] = useState<CartItem[]>([]);
   const firstFocusRef = useRef<HTMLButtonElement | null>(null);
@@ -305,3 +305,4 @@ export default function CartDrawer({
     </AnimatePresence>
   );
 }
+

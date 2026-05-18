@@ -30,10 +30,10 @@ const LOGO_FX_S = 3.2;
 const SOCIALS = {
   instagram: "https://instagram.com/mangata.upcycling",
   email: "hola@mangata.ar",
-  whatsapp: "5493885195631", // sin '+'
+  whatsapp: "5492920559780", // sin '+'
   location: "Córdoba, Argentina",
 };
-const BASE_WA = `https://wa.me/${SOCIALS.whatsapp}`;
+const BASE_WA = `https://wa.me/${SOCIALS.whatsapp}?text=Hola%20Mangata%2C%20vi%20la%20web%20y%20me%20interesa%20hacer%20una%20consulta.%20Quiero%20recibir%20info%20sobre%20disponibilidad%2C%20talles%2C%20medios%20de%20pago%20y%20env%C3%ADo.`;
 
 // Si no hay foto de hero: degradé oscuro
 const HERO_IMG: string | null = null;
@@ -881,3 +881,5 @@ function FullScreenLogoFX({
     </motion.div>
   );
 }
+
+

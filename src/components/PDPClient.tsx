@@ -92,10 +92,9 @@ export default function PDPClient({ product }: { product: Product }) {
 
   // ✅ WhatsApp: mensaje humano, sin links, con saludo y pedido claro
   const waText = useMemo(() => {
-    const saludo = "Hola Mangata, quiero comprar este artículo:";
+    const saludo = "Hola Mangata, vi la web y me interesa este artículo:"
     const nombre = `• ${product.name}`;
-    const cierre =
-      "¿Me pasan los pasos para pagar y coordinar el envío? ¡Gracias!";
+    const cierre = "¿Me pasan disponibilidad, talles, medios de pago y envío? ¡Gracias!";
     return encodeURIComponent([saludo, nombre, "", cierre].join("\n"));
   }, [product.name]);
 
@@ -103,7 +102,6 @@ export default function PDPClient({ product }: { product: Product }) {
     <main className="min-h-[100svh] bg-neutral-950 text-neutral-100">
       <script
         type="application/ld+json"
-        // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <div className="mx-auto max-w-[1400px] px-5 py-8 md:py-10">
@@ -224,7 +222,7 @@ export default function PDPClient({ product }: { product: Product }) {
 
               <a
                 // ✅ Mensaje humano y simple (solo nombre del artículo)
-                href={`https://wa.me/5493885195631?text=${waText}`}
+                href={`https://wa.me/5492920559780?text=${waText}`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center rounded-full border border-white/20 px-5 py-2 text-sm text-white/80 hover:text-white hover:border-white/40"
@@ -275,3 +273,5 @@ function BackButton({ onClick }: { onClick: () => void }) {
     </button>
   );
 }
+
+

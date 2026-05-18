@@ -1,17 +1,47 @@
 // src/app/api/mp/route.ts
 import { NextResponse } from "next/server";
 
+type CartItemInput = {
+  id?: number | string;
+  name?: string;
+  price?: number | string;
+  qty?: number | string;
+};
+
+type MercadoPagoPreferenceResponse = {
+  init_point?: string;
+  sandbox_init_point?: string;
+};
+
+function isCartItemInput(value: unknown): value is CartItemInput {
+  return typeof value === "object" && value !== null;
+}
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  return "Error al crear preferencia";
+}
+
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body: unknown = await req.json();
 
-    // Esperamos items: [{ id:number, name:string, price:number, qty:number }]
-    const items = Array.isArray(body?.items) ? body.items : [];
+    const rawItems =
+      typeof body === "object" &&
+      body !== null &&
+      "items" in body &&
+      Array.isArray((body as { items?: unknown }).items)
+        ? (body as { items: unknown[] }).items
+        : [];
+
+    const items = rawItems.filter(isCartItemInput);
+
     if (!items.length) {
       return NextResponse.json({ error: "Sin items" }, { status: 400 });
     }
 
     const accessToken = process.env.MP_ACCESS_TOKEN;
+
     if (!accessToken) {
       return NextResponse.json(
         { error: "Falta MP_ACCESS_TOKEN en .env.local" },
@@ -22,14 +52,14 @@ export async function POST(req: Request) {
     const siteUrl =
       process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
       "http://localhost:3000";
+
     const currency = (process.env.MP_CURRENCY || "ARS").toUpperCase();
 
-    // Armamos ítems como Mercado Pago espera
-    const mpItems = items.map((it: any) => ({
-      title: String(it.name),
-      quantity: Number(it.qty) || 1,
+    const mpItems = items.map((item) => ({
+      title: String(item.name || "Producto Mangata"),
+      quantity: Math.max(1, Number(item.qty) || 1),
       currency_id: currency,
-      unit_price: Number(it.price), // número con . para decimales (si tuviera)
+      unit_price: Math.max(1, Number(item.price) || 1),
     }));
 
     const preference = {
@@ -39,13 +69,11 @@ export async function POST(req: Request) {
         failure: `${siteUrl}/checkout/failure`,
         pending: `${siteUrl}/checkout/pending`,
       },
-      auto_return: "approved", // ← evita el "invalid_auto_return"
-      // binary_mode: false,    // si lo pones true, solo hay aprobado/rechazado (sin pending)
+      auto_return: "approved",
       statement_descriptor: "MANGATA",
-      // external_reference: "order-xyz", // opcional
     };
 
-    const res = await fetch(
+    const response = await fetch(
       "https://api.mercadopago.com/checkout/preferences",
       {
         method: "POST",
@@ -57,19 +85,33 @@ export async function POST(req: Request) {
       }
     );
 
-    if (!res.ok) {
-      const text = await res.text();
+    if (!response.ok) {
+      const text = await response.text();
       console.error("MercadoPago error:", text);
-      return NextResponse.json({ error: text }, { status: 500 });
+
+      return NextResponse.json(
+        { error: "Mercado Pago rechazó la creación de la preferencia" },
+        { status: 500 }
+      );
     }
 
-    const data = await res.json();
-    // init_point = URL para redirigir (sandbox)
-    return NextResponse.json({ init_point: data.init_point }, { status: 200 });
-  } catch (err: any) {
-    console.error("MP exception:", err);
+    const data = (await response.json()) as MercadoPagoPreferenceResponse;
+
+    const initPoint = data.init_point || data.sandbox_init_point;
+
+    if (!initPoint) {
+      return NextResponse.json(
+        { error: "Mercado Pago no devolvió una URL de pago" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ init_point: initPoint }, { status: 200 });
+  } catch (error: unknown) {
+    console.error("MP exception:", error);
+
     return NextResponse.json(
-      { error: err?.message || "Error al crear preferencia" },
+      { error: getErrorMessage(error) },
       { status: 500 }
     );
   }
