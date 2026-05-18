@@ -28,8 +28,8 @@ const LOGO_SRC = "/brand/logoAnimacionMANGATA.png";
 const LOGO_FX_S = 3.2;
 
 const SOCIALS = {
-  instagram: "https://instagram.com/mangata.upcycling",
-  email: "hola@mangata.ar",
+  instagram: "https://instagram.com/mangata.upcy",
+  email: "Mangataclothing777@gmail.com",
   whatsapp: "5492920559780", // sin '+'
   location: "Córdoba, Argentina",
 };
@@ -748,7 +748,7 @@ function Footer() {
             </li>
             <li>
               <a
-                href={`https://wa.me/${SOCIALS.whatsapp}`}
+                href={BASE_WA}
                 target="_blank"
                 rel="noreferrer"
                 className="hover:text-white"
@@ -759,7 +759,7 @@ function Footer() {
             <li className="text-white/50">Atención: Lun–Vie · 10–18hs</li>
           </ul>
           <a
-            href={`https://wa.me/${SOCIALS.whatsapp}`}
+            href={BASE_WA}
             target="_blank"
             rel="noreferrer"
             className="mt-4 inline-flex items-center rounded-full border border-white/25 px-4 py-2 text-white/85 text-sm hover:bg-white/10"
@@ -775,7 +775,7 @@ function Footer() {
             © {new Date().getFullYear()} MANGATA. Piezas únicas — hecho a mano
             en Argentina.
           </span>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap items-center justify-center gap-4"><span className="text-[10px] uppercase tracking-[0.24em] text-white/20 transition hover:text-white/45">RR · ParaSiempreTech 🖤</span>
             <a href="#" className="hover:text-white/80">
               Términos
             </a>
@@ -881,5 +881,7 @@ function FullScreenLogoFX({
     </motion.div>
   );
 }
+
+
 
 
