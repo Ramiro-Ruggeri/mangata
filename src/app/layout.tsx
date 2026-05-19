@@ -35,7 +35,7 @@ export const viewport: Viewport = {
  * SEO global (App Router)
  * ========================= */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.tu-dominio.com"),
+  metadataBase: new URL("https://mangata-store.vercel.app"),
   title: {
     default: "MANGATA — Upcycling Streetwear",
     template: "%s · MANGATA",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    url: "https://www.tu-dominio.com/",
+    url: "https://mangata-store.vercel.app/",
     title: "MANGATA — Upcycling Streetwear",
     description:
       "Piezas únicas y tiradas cortas. Redefinimos la moda con creatividad, rebeldía y sostenibilidad.",
@@ -77,7 +77,7 @@ export const metadata: Metadata = {
     description:
       "Upcycling de alto diseño desde Córdoba, Argentina. Piezas únicas y tiradas cortas.",
     images: ["/og/og-default.jpg"],
-    creator: "@mangata_upcycling",
+    creator: "@mangata.upcy",
   },
   robots: {
     index: true,
@@ -91,9 +91,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
   category: "fashion",
 };
@@ -122,9 +122,9 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "MANGATA",
-              url: "https://www.tu-dominio.com",
-              logo: "https://www.tu-dominio.com/og/og-default.jpg",
-              sameAs: ["https://www.instagram.com/mangata.upcycling"],
+              url: "https://mangata-store.vercel.app",
+              logo: "https://mangata-store.vercel.app/icon.png",
+              sameAs: ["https://www.instagram.com/mangata.upcy"],
             }),
           }}
         />
@@ -140,3 +140,6 @@ export default function RootLayout({
     </html>
   );
 }
+
+
+
