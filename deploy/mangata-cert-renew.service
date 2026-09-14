@@ -1,0 +1,13 @@
+[Unit]
+Description=Renew the MANGATA TLS certificate only
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /opt/mangata/ops/renew-certificate.sh
+TimeoutStartSec=15min
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077

@@ -73,3 +73,25 @@ Guardar copia de la configuración vigente del proxy antes de agregar los fragme
 Cloudflare: mantener inicialmente DNS only hasta verificar el certificado de origen; activar proxy y Full (strict) después. No usar Flexible, Cache Everything, Rocket Loader ni caché compartida sobre /api/* o checkout. Preservar los registros de correo que existan. Delegar en NIC únicamente a los dos nameservers asignados a esta zona.
 
 No se considera terminado hasta comprobar DNS autoritativo, TLS raíz/www, redirección www, imágenes optimizadas, catálogo de 26 productos, suma a bolsa, enlaces de WhatsApp y ausencia de errores del navegador.
+
+## Estado verificado de la migración — 14/09/2026
+
+- Código de aplicación publicado: `e7764a18154f0eee4eff646286256297f9fe4d71`; GitHub y despliegue de Vercel confirmados. Respaldo público: https://mangata-store.vercel.app/.
+- VPS Hostinger: contenedor `mangata-web-1` saludable, imagen `mangata/web:e7764a18154f0eee4eff646286256297f9fe4d71`, sin puertos publicados. La ruta `/opt/mangata/current` apunta a esa release.
+- Red privada `mangata_edge` conectada a la app y al Nginx existente, persistida en Compose. Sólo se agregó el bloque HTTP de MANGATA; el bloque HTTPS aún no está habilitado.
+- Copias del proxy previas al cambio en `/opt/mangata/backups/compose-before-81a3749.yaml` y `/opt/mangata/backups/nginx-before-81a3749.conf`. Los otros cuatro sitios comprobados conservaron respuesta HTTP 200, sin reiniciar sus contenedores.
+- Cloudflare Free: registro A raíz a `187.77.63.73` y CNAME `www` a `mangata.com.ar`, ambos DNS only para el arranque. Nameservers asignados: `aspen.ns.cloudflare.com` y `harlan.ns.cloudflare.com`.
+- NIC: dominio registrado; sesión del titular disponible y los dos nameservers cargados en el formulario. **Ejecutar cambios queda pendiente de confirmación**. No se transfirió la titularidad.
+- El certificado de origen aún no está emitido y Cloudflare muestra modo Full, no Full (strict). No se considera el dominio oficial activo ni la migración terminada.
+
+Validaciones completadas: 34 pruebas automatizadas, lint y TypeScript sin errores; compilación Linux en el VPS; 26 precios y 26 altas de SKU en bolsa con el origen público configurado; 32 imágenes fuente y optimización Next Image; rechazo de origen externo y SKU retirado; datos estructurados de las cinco altas y sitemap de 27 URLs con canonical oficial. Vista desktop de 1440 px y móvil de 320 px sin desbordamiento horizontal; compra de prueba agregada y retirada sin alterar los artículos previos de la bolsa. El navegador del sitio público no registró errores ni advertencias en la revisión.
+
+### Cierre pendiente
+
+1. Confirmar y ejecutar en NIC la delegación exclusiva a los nameservers indicados; verificar propagación autoritativa.
+2. Emitir un certificado válido para `mangata.com.ar` y `www.mangata.com.ar` mediante el webroot ACME existente. No habilitar HTTPS con certificados ajenos ni desactivar su validación.
+3. Agregar el bloque HTTPS sobre una copia fresca del proxy, comprobar `nginx -t` y recargar. Verificar primero el origen con resolución forzada y luego el DNS público.
+4. Activar Cloudflare Full (strict) y proxy; verificar nuevamente raíz, www, bolsa e imágenes. Mantener /api y checkout sin caché compartida.
+5. Instalar `deploy/renew-certificate.sh` en `/opt/mangata/ops/` y las unidades `mangata-cert-renew.*` en systemd. Validar renovación con `--dry-run` antes de habilitar el timer. El script renueva exclusivamente el certificado de MANGATA y recarga Nginx sólo si cambió. No se encontró un cron de renovación de root; no asumir que el script existente de otros sitios se ejecuta automáticamente.
+
+Los archivos de renovación están copiados en `/opt/mangata/ops/`; pasaron `sh -n` y `systemd-analyze verify` en el VPS. Las unidades no están instaladas ni habilitadas todavía: falta el certificado y la prueba real de renovación. No afirmar renovación automática hasta completar esos pasos. Los cambios posteriores exclusivamente documentales u operativos no requieren reconstruir la misma aplicación.

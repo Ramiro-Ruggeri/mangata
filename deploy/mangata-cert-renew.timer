@@ -1,0 +1,11 @@
+[Unit]
+Description=Check MANGATA certificate renewal twice daily
+
+[Timer]
+OnCalendar=*-*-* 03,15:20:00
+RandomizedDelaySec=30min
+Persistent=true
+Unit=mangata-cert-renew.service
+
+[Install]
+WantedBy=timers.target
