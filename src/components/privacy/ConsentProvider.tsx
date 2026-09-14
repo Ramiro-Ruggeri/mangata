@@ -19,13 +19,15 @@ function PreferencesDialog({ analytics, onSave, onClose }: { analytics: boolean;
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    dialog.showModal();
+    if (!dialog.open) dialog.showModal();
     headingRef.current?.focus({ preventScroll: true });
     return () => { if (dialog.open) dialog.close(); };
   }, []);
   return (
     <dialog ref={dialogRef} className="privacy-dialog" aria-labelledby="privacy-title" aria-describedby="privacy-description"
-      onCancel={(event) => { event.preventDefault(); onClose(); }} onClose={onClose}
+      onCancel={(event) => { event.preventDefault(); onClose(); }}
+      // A queued close from Strict Mode cleanup must not dismiss a reopened dialog.
+      onClose={(event) => { if (!event.currentTarget.open) onClose(); }}
       onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}>
       <div className="privacy-dialog-inner">
         <header className="privacy-dialog-header">
