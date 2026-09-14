@@ -1,13 +1,43 @@
+const remotePatterns = [];
+
+if (process.env.EVERSHOP_BASE_URL) {
+  try {
+    const everShopUrl = new URL(process.env.EVERSHOP_BASE_URL);
+    remotePatterns.push({
+      protocol: everShopUrl.protocol.slice(0, -1),
+      hostname: everShopUrl.hostname,
+      port: everShopUrl.port,
+      pathname: "/**",
+    });
+  } catch {
+    // Runtime validation in the commerce adapter reports an invalid URL clearly.
+  }
+}
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  poweredByHeader: false,
+  reactCompiler: true,
   images: {
     formats: ["image/avif", "image/webp"],
-    minimumCacheTTL: 31536000, // cache de 1 año
+    qualities: [75, 85],
+    minimumCacheTTL: 86400,
     deviceSizes: [360, 640, 768, 1024, 1280, 1536, 1920],
     imageSizes: [16, 24, 32, 48, 64, 96, 128, 256],
+    remotePatterns,
   },
-  experimental: {
-    optimizePackageImports: ["framer-motion"],
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" },
+        ],
+      },
+    ];
   },
 };
 

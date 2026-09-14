@@ -1,8 +1,16 @@
 // src/app/layout.tsx
 import "./globals.css";
+import "@/components/ui/interface-actions.css";
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
-import BackToTop from "@/components/BackToTop"; // 🆕 ➊ import del botón
+import { CartProvider } from "@/components/commerce/CartProvider";
+import { ExperienceProvider } from "@/components/experience/ExperienceProvider";
+import { ScrollReturnControl } from "@/components/experience/ScrollReturnControl";
+import { ConsentProvider } from "@/components/privacy/ConsentProvider";
+import { PrivacyFooter } from "@/components/PrivacyFooter";
+import { getCommerceMode } from "@/lib/commerce/catalog";
+import { getCheckoutReady } from "@/lib/commerce/readiness";
+import { getSiteUrl } from "@/config/site-url";
 
 /* =========================
  * Fuentes (next/font) — swap para evitar FOIT
@@ -25,8 +33,8 @@ const body = Plus_Jakarta_Sans({
  * Viewport / PWA hints
  * ========================= */
 export const viewport: Viewport = {
-  themeColor: "#000000",
-  colorScheme: "light",
+  themeColor: "#090909",
+  colorScheme: "dark",
   width: "device-width",
   initialScale: 1,
 };
@@ -35,13 +43,13 @@ export const viewport: Viewport = {
  * SEO global (App Router)
  * ========================= */
 export const metadata: Metadata = {
-  metadataBase: new URL("https://mangata-store.vercel.app"),
+  metadataBase: new URL(getSiteUrl()),
   title: {
-    default: "MANGATA — Upcycling Streetwear",
+    default: "MANGATA — Streetwear recuperado en Córdoba",
     template: "%s · MANGATA",
   },
   description:
-    "Upcycling de alto diseño. Piezas únicas y tiradas cortas hechas en Argentina. Creatividad, rebeldía y sostenibilidad.",
+    "Upcycling streetwear hecho en Córdoba, Argentina. Piezas únicas recuperadas, intervenidas y terminadas a mano.",
   applicationName: "MANGATA",
   generator: "Next.js",
   keywords: [
@@ -56,10 +64,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   openGraph: {
     type: "website",
-    url: "https://mangata-store.vercel.app/",
-    title: "MANGATA — Upcycling Streetwear",
+    url: "/",
+    title: "MANGATA — Streetwear recuperado en Córdoba",
     description:
-      "Piezas únicas y tiradas cortas. Redefinimos la moda con creatividad, rebeldía y sostenibilidad.",
+      "Piezas recuperadas, intervención manual y una sola unidad. Upcycling streetwear desde Córdoba.",
     siteName: "MANGATA",
     locale: "es_AR",
     images: [
@@ -73,11 +81,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MANGATA — Upcycling Streetwear",
+    title: "MANGATA — Streetwear recuperado en Córdoba",
     description:
-      "Upcycling de alto diseño desde Córdoba, Argentina. Piezas únicas y tiradas cortas.",
+      "Prendas recuperadas e intervenidas a mano en Córdoba, Argentina. Cada pieza tiene una sola unidad.",
     images: ["/og/og-default.jpg"],
-    creator: "@mangata.upcy",
   },
   robots: {
     index: true,
@@ -93,7 +100,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/icon.png",
     shortcut: "/icon.png",
-    apple: "/icon.png",
+    apple: "/apple-icon.png",
   },
   category: "fashion",
 };
@@ -106,12 +113,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const commerceMode = getCommerceMode();
   return (
     <html
       lang="es"
       dir="ltr"
+      data-scroll-behavior="smooth"
       className={`${display.variable} ${body.variable}`}
-      style={{ textRendering: "optimizeLegibility" }}
     >
       <head>
         {/* JSON-LD Organization */}
@@ -122,24 +130,25 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "MANGATA",
-              url: "https://mangata-store.vercel.app",
-              logo: "https://mangata-store.vercel.app/icon.png",
+              url: getSiteUrl(),
+              logo: `${getSiteUrl()}/icon.png`,
               sameAs: ["https://www.instagram.com/mangata.upcy"],
-            }),
+            }).replace(/</g, "\\u003c"),
           }}
         />
       </head>
 
-      <body className="font-[family-name:var(--font-body)] bg-neutral-50 text-neutral-900 antialiased">
-        {/* Contenido de cada página */}
-        {children}
-
-        {/* 🆕 Botón global "Volver arriba" */}
-        <BackToTop />
+      <body>
+        <ExperienceProvider>
+          <ConsentProvider>
+            <CartProvider mode={commerceMode} checkoutReady={getCheckoutReady(commerceMode)}>
+              {children}
+              <PrivacyFooter />
+            </CartProvider>
+            <ScrollReturnControl />
+          </ConsentProvider>
+        </ExperienceProvider>
       </body>
     </html>
   );
 }
-
-
-

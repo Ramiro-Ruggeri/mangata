@@ -3,6 +3,7 @@ export type Category = "Prendas" | "Accesorios";
 
 export type Product = {
   id: number;
+  sku?: string;
   name: string;
   price: number; // ARS
   img?: string;
@@ -136,7 +137,6 @@ export const products: Product[] = [
     images: [
       "/products/9/blazerCuadri.png",
       "/products/9/blazerCuadri2.png",
-      "/products/9/blazerCuadri3.png",
     ],
     description: "Sastrero intervenido, patrón cuadrillé, fit moderno.",
     order: 90,

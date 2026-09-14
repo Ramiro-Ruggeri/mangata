@@ -1,118 +1,59 @@
-// src/app/api/mp/route.ts
 import { NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
+import { getCommerceMode, getLocalCatalog } from "@/lib/commerce/catalog";
+import { CHECKOUT_COOKIE, CHECKOUT_TTL_SECONDS, signCheckoutIntent } from "@/lib/commerce/checkout-session";
+import { assertCheckoutConfigured, reserveCheckoutIntent } from "@/lib/commerce/order-service";
+import { assertStoreRequest, CommerceError, publicCommerceError, resolveOneOfOneItems } from "@/lib/commerce/one-of-one";
+import { readStoreJson, secureServiceUrl } from "@/lib/commerce/http-security";
 
-type CartItemInput = {
-  id?: number | string;
-  name?: string;
-  price?: number | string;
-  qty?: number | string;
-};
-
-type MercadoPagoPreferenceResponse = {
-  init_point?: string;
-  sandbox_init_point?: string;
-};
-
-function isCartItemInput(value: unknown): value is CartItemInput {
-  return typeof value === "object" && value !== null;
-}
-
-function getErrorMessage(error: unknown): string {
-  if (error instanceof Error) return error.message;
-  return "Error al crear preferencia";
-}
-
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const body: unknown = await req.json();
-
-    const rawItems =
-      typeof body === "object" &&
-      body !== null &&
-      "items" in body &&
-      Array.isArray((body as { items?: unknown }).items)
-        ? (body as { items: unknown[] }).items
-        : [];
-
-    const items = rawItems.filter(isCartItemInput);
-
-    if (!items.length) {
-      return NextResponse.json({ error: "Sin items" }, { status: 400 });
-    }
-
-    const accessToken = process.env.MP_ACCESS_TOKEN;
-
-    if (!accessToken) {
-      return NextResponse.json(
-        { error: "Falta MP_ACCESS_TOKEN en .env.local" },
-        { status: 500 }
-      );
-    }
-
-    const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ||
-      "http://localhost:3000";
-
-    const currency = (process.env.MP_CURRENCY || "ARS").toUpperCase();
-
-    const mpItems = items.map((item) => ({
-      title: String(item.name || "Producto Mangata"),
-      quantity: Math.max(1, Number(item.qty) || 1),
-      currency_id: currency,
-      unit_price: Math.max(1, Number(item.price) || 1),
-    }));
-
-    const preference = {
-      items: mpItems,
-      back_urls: {
-        success: `${siteUrl}/checkout/success`,
-        failure: `${siteUrl}/checkout/failure`,
-        pending: `${siteUrl}/checkout/pending`,
-      },
-      auto_return: "approved",
-      statement_descriptor: "MANGATA",
+    assertStoreRequest(request);
+    if (getCommerceMode() !== "local") throw new CommerceError("checkout_unavailable", 409);
+    const body = await readStoreJson(request);
+    const products = resolveOneOfOneItems(body?.items, getLocalCatalog());
+    assertCheckoutConfigured();
+    const siteUrl = secureServiceUrl(process.env.NEXT_PUBLIC_SITE_URL);
+    const intent = {
+      reference: `MNGT-${randomUUID()}`,
+      amount: products.reduce((total, product) => total + product.price, 0),
+      currency: "ARS" as const,
+      skus: products.map((product) => product.sku),
+      expiresAt: Date.now() + CHECKOUT_TTL_SECONDS * 1000,
     };
-
-    const response = await fetch(
-      "https://api.mercadopago.com/checkout/preferences",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+    const paymentExpiresAt = Date.now() + 30 * 60 * 1000;
+    await reserveCheckoutIntent(intent, products, paymentExpiresAt);
+    const response = await fetch("https://api.mercadopago.com/checkout/preferences", {
+      method: "POST", cache: "no-store", redirect: "error",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}` },
+      body: JSON.stringify({
+        items: products.map((product) => ({ id: product.sku, title: product.name, quantity: 1, currency_id: "ARS", unit_price: product.price })),
+        back_urls: {
+          success: new URL("/checkout/success", siteUrl).toString(),
+          failure: new URL("/checkout/failure", siteUrl).toString(),
+          pending: new URL("/checkout/pending", siteUrl).toString(),
         },
-        body: JSON.stringify(preference),
-      }
-    );
-
-    if (!response.ok) {
-      const text = await response.text();
-      console.error("MercadoPago error:", text);
-
-      return NextResponse.json(
-        { error: "Mercado Pago rechazó la creación de la preferencia" },
-        { status: 500 }
-      );
+        notification_url: new URL("/api/mp/webhook", siteUrl).toString(),
+        auto_return: "approved", statement_descriptor: "MANGATA",
+        external_reference: intent.reference,
+        expires: true,
+        expiration_date_to: new Date(paymentExpiresAt).toISOString(),
+      }),
+      signal: AbortSignal.timeout(10_000),
+    });
+    if (!response.ok) throw new CommerceError("checkout_unavailable", 502);
+    const data = await response.json() as { init_point?: string };
+    const paymentUrl = data.init_point ? new URL(data.init_point) : null;
+    if (!paymentUrl || paymentUrl.protocol !== "https:" || paymentUrl.username || paymentUrl.password || paymentUrl.port ||
+      !/(^|\.)mercadopago\.(com\.ar|com|com\.br|cl|com\.mx|com\.co|com\.pe|com\.uy)$/.test(paymentUrl.hostname)) {
+      throw new CommerceError("checkout_unavailable", 502);
     }
-
-    const data = (await response.json()) as MercadoPagoPreferenceResponse;
-
-    const initPoint = data.init_point || data.sandbox_init_point;
-
-    if (!initPoint) {
-      return NextResponse.json(
-        { error: "Mercado Pago no devolvió una URL de pago" },
-        { status: 500 }
-      );
-    }
-
-    return NextResponse.json({ init_point: initPoint }, { status: 200 });
-  } catch (error: unknown) {
-    console.error("MP exception:", error);
-
-    return NextResponse.json(
-      { error: getErrorMessage(error) },
-      { status: 500 }
-    );
+    const result = NextResponse.json({ init_point: paymentUrl.toString() }, { headers: { "Cache-Control": "no-store" } });
+    result.cookies.set(CHECKOUT_COOKIE, signCheckoutIntent(intent, process.env.COMMERCE_SESSION_SECRET!), {
+      httpOnly: true, sameSite: "lax", secure: true, path: "/", maxAge: CHECKOUT_TTL_SECONDS,
+    });
+    return result;
+  } catch (error) {
+    return NextResponse.json(publicCommerceError(error), { status: error instanceof CommerceError ? error.status : 503, headers: { "Cache-Control": "private, no-store" } });
   }
 }

@@ -1,308 +1,188 @@
-// src/components/CartDrawer.tsx
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "framer-motion";
+import { Check, MessageCircle, ShieldCheck, ShoppingBag, Trash2, X } from "lucide-react";
+import { useEffect, useRef, type ReactNode } from "react";
+import { BrandSignature } from "@/components/brand/BrandSignature";
+import { useCart } from "@/components/commerce/CartProvider";
+import { trackCommerceEvent } from "@/lib/analytics";
+import { motionTokens } from "@/lib/experience/interaction";
 
-/** Config básica */
-const CART_KEY = "mngt_cart_v1";
-type CartItem = { id: number; name: string; price: number; qty: number };
-
-function money(n: number) {
-  return n.toLocaleString("es-AR", {
+const money = (value: number) =>
+  new Intl.NumberFormat("es-AR", {
     style: "currency",
     currency: "ARS",
     maximumFractionDigits: 0,
-  });
+  }).format(value);
+
+function CartLayer({ children }: { children: ReactNode }) {
+  const present = useIsPresent();
+  return <div className="cart-layer" inert={!present} aria-hidden={!present || undefined}>{children}</div>;
 }
 
-function getCart(): CartItem[] {
-  try {
-    const raw = localStorage.getItem(CART_KEY);
-    return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
-}
-function setCart(items: CartItem[]) {
-  localStorage.setItem(CART_KEY, JSON.stringify(items));
-  // notificar a otros tabs/componentes
-  window.dispatchEvent(new Event("storage"));
-}
+export default function CartDrawer() {
+  const {
+    items,
+    subtotal,
+    open,
+    mode,
+    syncState,
+    syncMessage,
+    closeCart,
+    restoreCartFocus,
+    removeItem,
+    clear,
+    checkout,
+    checkoutReady,
+  } = useCart();
+  const inquiryMessage = `Hola MANGATA, quiero consultar por estas piezas:\n${items.map((item) => `${item.name} (${item.sku})`).join("\n")}\n¿Siguen disponibles?`;
+  const inquiryUrl = `https://wa.me/5493885195631?text=${encodeURIComponent(inquiryMessage)}`;
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const reducedMotion = useReducedMotion();
+  const panelRef = useRef<HTMLElement>(null);
+  const metricsRef = useRef({ subtotal, itemCount: items.length });
 
-/** Props del Drawer */
-type CartDrawerProps = {
-  open: boolean;
-  onClose: () => void;
-  /** Teléfono para WhatsApp sin +, ej "5492920559780" */
-  whatsappPhone?: string;
-};
-
-export default function CartDrawer({
-  open,
-  onClose,
-  whatsappPhone = "5492920559780",
-}: CartDrawerProps) {
-  const [items, setItems] = useState<CartItem[]>([]);
-  const firstFocusRef = useRef<HTMLButtonElement | null>(null);
-  const panelRef = useRef<HTMLDivElement | null>(null);
-
-  // cargar carrito y escuchar cambios globales
   useEffect(() => {
-    const refresh = () => setItems(getCart());
-    refresh();
-    window.addEventListener("storage", refresh);
-    return () => window.removeEventListener("storage", refresh);
-  }, []);
+    metricsRef.current = { subtotal, itemCount: items.length };
+  }, [items.length, subtotal]);
 
-  // focus al abrir
   useEffect(() => {
     if (!open) return;
-    const t = setTimeout(() => firstFocusRef.current?.focus(), 40);
-    return () => clearTimeout(t);
-  }, [open]);
-
-  // cerrar con ESC
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+    trackCommerceEvent("view_cart", {
+      currency: "ARS",
+      value: metricsRef.current.subtotal,
+      item_count: metricsRef.current.itemCount,
+    });
+    closeRef.current?.focus();
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeCart();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = Array.from(
+        panelRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((element) => element.getAttribute("aria-hidden") !== "true" && element.getClientRects().length > 0);
+      if (!focusable.length) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!panelRef.current?.contains(document.activeElement)) {
+        event.preventDefault();
+        first.focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
-
-  // click fuera
-  const onOverlayMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!panelRef.current) return;
-    if (!panelRef.current.contains(e.target as Node)) onClose();
-  };
-
-  // acciones
-  const inc = (id: number) => {
-    const next = items.map((it) =>
-      it.id === id ? { ...it, qty: it.qty + 1 } : it
-    );
-    setItems(next);
-    setCart(next);
-  };
-  const dec = (id: number) => {
-    const next = items
-      .map((it) =>
-        it.id === id ? { ...it, qty: Math.max(1, it.qty - 1) } : it
-      )
-      .filter(Boolean) as CartItem[];
-    setItems(next);
-    setCart(next);
-  };
-  const removeItem = (id: number) => {
-    const next = items.filter((it) => it.id !== id);
-    setItems(next);
-    setCart(next);
-  };
-  const clearAll = () => {
-    setItems([]);
-    setCart([]);
-  };
-
-  const subtotal = useMemo(
-    () => items.reduce((acc, it) => acc + it.price * it.qty, 0),
-    [items]
-  );
-
-  // WhatsApp link
-  const waText = useMemo(() => {
-    const lines = [
-      "Hola! Quiero finalizar esta compra en MANGATA:",
-      ...items.map(
-        (it) => `• ${it.name} x${it.qty} — ${money(it.price * it.qty)}`
-      ),
-      `Subtotal: ${money(subtotal)}`,
-      "",
-      "¿Cómo seguimos? 🙌",
-    ];
-    return encodeURIComponent(lines.join("\n"));
-  }, [items, subtotal]);
-
-  const waHref = `https://wa.me/${whatsappPhone}?text=${waText}`;
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [closeCart, open]);
 
   return (
-    <AnimatePresence>
+    <AnimatePresence onExitComplete={restoreCartFocus}>
       {open && (
-        <>
-          {/* Overlay */}
-          <motion.div
-            key="cart_overlay"
-            className="fixed inset-0 z-[95] bg-black/50 backdrop-blur-[2px]"
+        <CartLayer>
+          <motion.button
+            aria-label="Cerrar carrito"
+            className="cart-backdrop"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onMouseDown={onOverlayMouseDown}
+            onClick={closeCart}
           />
-
-          {/* Panel */}
           <motion.aside
-            key="cart_panel"
             ref={panelRef}
-            className="fixed right-0 top-0 bottom-0 z-[100] w-[88vw] max-w-[420px] bg-neutral-950 text-neutral-100 border-l border-white/10 shadow-2xl grid grid-rows-[auto,1fr,auto]"
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ type: "tween", duration: 0.22 }}
-            role="dialog"
+            aria-label="Tu selección"
             aria-modal="true"
-            aria-label="Carrito"
+            className="cart-panel"
+            initial={{ x: reducedMotion ? 0 : "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: reducedMotion ? 0 : "100%" }}
+            transition={{ duration: reducedMotion ? 0 : motionTokens.overlay, ease: motionTokens.ease }}
+            role="dialog"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10">
-              <div className="text-sm tracking-wider">Tu carrito</div>
-              <div className="flex items-center gap-2">
-                {items.length > 0 && (
-                  <button
-                    className="text-xs text-white/60 hover:text-white/90 px-2 py-1 rounded hover:bg-white/5"
-                    onClick={clearAll}
-                  >
-                    Vaciar
-                  </button>
-                )}
-                <button
-                  ref={firstFocusRef}
-                  onClick={onClose}
-                  className="p-2 rounded hover:bg-white/5"
-                  aria-label="Cerrar carrito"
-                  title="Cerrar"
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path d="M18.3 5.71 12 12l6.3 6.29-1.41 1.42L10.59 13.4 4.29 19.7 2.88 18.29 9.17 12 2.88 5.71 4.29 4.29l6.3 6.3 6.29-6.3z" />
-                  </svg>
-                </button>
+            <header className="cart-header">
+              <div>
+                <BrandSignature symbolOnly />
+                <h2>Tu bolsa <sup>{items.length}</sup></h2>
               </div>
-            </div>
+              <button ref={closeRef} className="icon-button" onClick={closeCart} aria-label="Cerrar">
+                <X size={19} strokeWidth={1.5} />
+              </button>
+            </header>
 
-            {/* Lista */}
-            <div className="overflow-y-auto px-3 py-3">
+            <div className="cart-body">
               {items.length === 0 ? (
-                <div className="h-full grid place-items-center text-white/60 text-sm">
-                  Tu carrito está vacío.
+                <div className="cart-empty">
+                  <ShoppingBag size={34} strokeWidth={1.2} />
+                  <p>Todavía no elegiste una pieza.</p>
+                  <button className="text-link" onClick={closeCart}>Explorar colección</button>
                 </div>
               ) : (
-                <ul className="space-y-3">
-                  {items.map((it) => {
-                    const cover = `/products/${it.id}/cover.jpg`; // fallback de tu Home
-                    return (
-                      <li
-                        key={it.id}
-                        className="flex gap-3 rounded-xl border border-white/10 p-2"
-                      >
-                        <div className="relative w-[84px] shrink-0 aspect-[4/5] overflow-hidden rounded-lg bg-neutral-900">
-                          <Image
-                            src={cover}
-                            alt={it.name}
-                            fill
-                            className="object-cover"
-                            sizes="84px"
-                            unoptimized
-                          />
+                <ul className="cart-list">
+                  {items.map((item) => (
+                    <li className="cart-line" key={item.id}>
+                      <div className="cart-line-image">
+                        <Image src={item.image} alt="" fill sizes="96px" className="object-contain" />
+                      </div>
+                      <div className="cart-line-copy">
+                        <div className="cart-line-top">
+                          <div>
+                            <span>{item.sku}</span>
+                            <h3>{item.name}</h3>
+                          </div>
+                          <button disabled={syncState === "syncing"} onClick={() => removeItem(item.id)} aria-label={`Quitar ${item.name}`}>
+                            <Trash2 size={15} strokeWidth={1.4} />
+                          </button>
                         </div>
-
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <h4 className="text-sm text-white/90 truncate">
-                              {it.name}
-                            </h4>
-                            <button
-                              onClick={() => removeItem(it.id)}
-                              className="p-1 rounded hover:bg-white/5 text-white/60 hover:text-white/90"
-                              aria-label="Quitar"
-                              title="Quitar"
-                            >
-                              <svg
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="currentColor"
-                              >
-                                <path d="M6 19c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
-                              </svg>
-                            </button>
-                          </div>
-
-                          <div className="mt-1 text-xs text-white/60">
-                            {money(it.price)} c/u
-                          </div>
-
-                          <div className="mt-2 flex items-center justify-between">
-                            <div className="inline-flex items-center rounded-full border border-white/15 overflow-hidden">
-                              <button
-                                className="px-3 py-1.5 text-sm hover:bg-white/5"
-                                onClick={() => dec(it.id)}
-                                aria-label="Disminuir"
-                              >
-                                −
-                              </button>
-                              <span className="px-3 py-1.5 text-sm select-none">
-                                {it.qty}
-                              </span>
-                              <button
-                                className="px-3 py-1.5 text-sm hover:bg-white/5"
-                                onClick={() => inc(it.id)}
-                                aria-label="Aumentar"
-                              >
-                                +
-                              </button>
-                            </div>
-
-                            <div className="text-sm font-medium">
-                              {money(it.price * it.qty)}
-                            </div>
-                          </div>
+                        <div className="cart-line-bottom">
+                          <span className="one-of-one">Única unidad</span>
+                          <strong>{money(item.price * item.qty)}</strong>
                         </div>
-                      </li>
-                    );
-                  })}
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               )}
             </div>
 
-            {/* Totales + acciones */}
-            <div className="border-t border-white/10 p-4 space-y-3">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-white/70">Subtotal</span>
-                <span className="font-medium">{money(subtotal)}</span>
+            <footer className="cart-footer">
+              {syncState === "error" && <p className="cart-error" role="alert">{syncMessage}</p>}
+              <div className="cart-sync" role="status" aria-live="polite">
+                <span className={`status-dot ${syncState}`} />
+                {mode === "evershop" && checkoutReady
+                  ? syncState === "syncing" ? "Verificando disponibilidad…" : "Disponibilidad sujeta a confirmación al pagar"
+                  : "La bolsa no reserva stock"}
+                {syncState === "synced" && <Check size={13} />}
               </div>
-              <p className="text-xs text-white/50">
-                * Envíos y medios de pago se coordinan luego. Podés finalizar
-                por WhatsApp o avanzar a pagar.
-              </p>
-
-              <div className="grid gap-2">
-                <a
-                  href={waHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-md bg-green-500 hover:bg-green-600 text-white text-sm px-4 py-2.5 transition"
-                >
-                  Finalizar por WhatsApp
-                </a>
-                <button
-                  onClick={() => alert("Integrar con MP/Checkout aquí 🧩")}
-                  className="rounded-md border border-white/20 text-white/90 hover:bg-white/10 text-sm px-4 py-2.5"
-                >
-                  Ir a pagar
+              <div className="cart-total"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
+              <p className="cart-note">{checkoutReady ? "Revisá el total y las opciones de entrega antes de pagar." : "Por ahora coordinamos la compra por WhatsApp."}</p>
+              {checkoutReady ? (
+                <button className="magnetic-button cart-checkout" disabled={!items.length || syncState === "syncing"} onClick={checkout}>
+                  <span>{syncState === "syncing" ? "Revisando tu bolsa…" : "Ir a pagar de forma segura"}</span><span>↗</span>
                 </button>
-              </div>
-            </div>
+              ) : items.length > 0 && syncState !== "syncing" ? (
+                <a className="magnetic-button cart-checkout" href={inquiryUrl} target="_blank" rel="noopener noreferrer" aria-label="Consultar mi selección por WhatsApp (se abre en otra pestaña)" onClick={() => trackCommerceEvent("checkout_inquiry", { currency: "ARS", value: subtotal, item_count: items.length, source: "bag" })}>
+                  <span>Consultar mi selección</span><MessageCircle size={20} strokeWidth={1.5} />
+                </a>
+              ) : (
+                <button className="magnetic-button cart-checkout" disabled><span>{syncState === "syncing" ? "Revisando tu bolsa…" : "Consultar mi selección"}</span><MessageCircle size={20} strokeWidth={1.5} /></button>
+              )}
+              <div className="cart-assurance">{checkoutReady ? <ShieldCheck size={14} strokeWidth={1.4} /> : <MessageCircle size={14} strokeWidth={1.4} />}<span>{checkoutReady ? "Completás el pago en una página segura." : "Se abre WhatsApp con tus piezas elegidas."}</span></div>
+              {syncState === "error" && <a className="text-link" href="https://wa.me/5493885195631?text=Hola%20MANGATA%2C%20necesito%20ayuda%20para%20comprar." target="_blank" rel="noreferrer"><MessageCircle size={15} /> Consultar por WhatsApp</a>}
+              {items.length > 0 && <button className="cart-clear" disabled={syncState === "syncing"} onClick={clear}>Vaciar selección</button>}
+            </footer>
           </motion.aside>
-        </>
+        </CartLayer>
       )}
     </AnimatePresence>
   );
 }
-

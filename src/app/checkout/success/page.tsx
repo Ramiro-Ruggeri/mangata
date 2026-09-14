@@ -1,30 +1,50 @@
-// src/app/checkout/success/page.tsx
-import Link from "next/link";
+import CheckoutStatus from "@/components/CheckoutStatus";
+import { cookies } from "next/headers";
+import { CHECKOUT_COOKIE, paymentMatchesIntent, readCheckoutIntent } from "@/lib/commerce/checkout-session";
+import { fetchMercadoPagoPayment } from "@/lib/commerce/payment-webhook";
+import { isPaymentRecorded } from "@/lib/commerce/order-service";
 
 export const metadata = {
-  title: "Pago aprobado · Checkout",
+  title: "Estado del pago · Checkout",
 };
 
-export default function SuccessPage() {
-  return (
-    <main className="min-h-[70vh] bg-neutral-950 text-neutral-100 grid place-items-center px-6">
-      <div className="max-w-md text-center">
-        <span className="inline-block text-sm text-emerald-400/90">Éxito</span>
-        <h1 className="mt-1 text-2xl md:text-3xl font-[family-name:var(--font-display)]">
-          ¡Pago aprobado! 🎉
-        </h1>
-        <p className="mt-3 text-white/70">
-          Gracias por tu compra. Te vamos a escribir por WhatsApp/Email para
-          coordinar envío o retiro. Guardá este comprobante.
-        </p>
+export default async function SuccessPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const paymentId = Array.isArray(params.payment_id)
+    ? params.payment_id[0]
+    : params.payment_id;
+  const intent = readCheckoutIntent((await cookies()).get(CHECKOUT_COOKIE)?.value, process.env.COMMERCE_SESSION_SECRET ?? "");
+  const payment = intent ? await fetchMercadoPagoPayment(paymentId || "").catch(() => null) : null;
+  let confirmed = false;
+  if (intent && payment && paymentMatchesIntent(payment, intent)) {
+    try {
+      confirmed = await isPaymentRecorded(payment);
+    } catch { /* Retain the bag until the order is durably recorded. */ }
+  }
 
-        <Link
-          href="/"
-          className="inline-block mt-6 rounded-full border border-white/25 px-5 py-2 text-white/85 hover:bg-white/10"
-        >
-          Volver a la tienda
-        </Link>
-      </div>
-    </main>
+  if (!confirmed || !intent || !payment) {
+    return (
+      <CheckoutStatus
+        state="pending"
+        eyebrow="PAGO SIN CONFIRMAR"
+        title="Tu pago aún no está confirmado."
+        description="Si ya pagaste, no repitas la operación. Revisá el estado en Mercado Pago o escribinos con el comprobante para ayudarte."
+      />
+    );
+  }
+
+  return (
+    <CheckoutStatus
+      state="success"
+      eyebrow="PAGO APROBADO"
+      title="Recibimos tu compra."
+      description="El pago está aprobado y tu compra quedó registrada. Guardá esta referencia para consultar por tu pedido."
+      reference={intent.reference}
+      purchase={{ transactionId: String(payment.id), value: intent.amount, skus: intent.skus }}
+    />
   );
 }
