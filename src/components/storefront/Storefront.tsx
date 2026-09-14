@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { BrandSignature } from "@/components/brand/BrandSignature";
 import { useExperience } from "@/components/experience/ExperienceProvider";
+import { useRevealOnView } from "@/components/experience/useRevealOnView";
 import { useNativeDialog } from "@/components/ui/useNativeDialog";
 import Link from "next/link";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
@@ -45,7 +46,7 @@ function Header({ onSearch }: { onSearch: () => void }) {
       <nav className="mg-desktop-nav" aria-label="Navegación principal"><a href="#coleccion">La colección</a><a href="#manifiesto">Cómo lo hacemos</a><a href="#ayuda">Hablemos</a></nav>
       <div className="mg-header-actions">
         <button onClick={onSearch} className="mg-icon-button" aria-label="Buscar una pieza"><Search size={20} strokeWidth={1.5} /></button>
-        <button onClick={openCart} className="mg-cart-button" aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} /><span className="mg-bag-label">Bolsa</span><span className="mg-cart-count">{count}</span></button>
+        <button onClick={openCart} className="mg-cart-button" aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} /><span className="mg-bag-label">Bolsa</span><span key={count} className="mg-cart-count" data-filled={count > 0}>{count}</span></button>
         <button onClick={() => setMenuOpen(true)} className="mg-icon-button mg-menu-toggle" aria-label="Abrir menú"><Menu size={22} strokeWidth={1.5} /></button>
       </div>
     </header>
@@ -147,7 +148,7 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     });
   }, [products, category, onlyAvailable, sort]);
   return <section ref={sectionRef} id="coleccion" className="mg-collection mg-shell" aria-labelledby="collection-title">
-    <div className="mg-collection-heading"><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>otra historia.</em></h2></div><div className="mg-collection-context"><p>Denim, prendas y accesorios.<br /> Recuperados e intervenidos a mano.</p>{source === "local" && <aside className="mg-opening-note" aria-label="Precios de apertura"><span className="mg-opening-dot" aria-hidden="true" /><span><strong>Precios de apertura</strong><small>Ya están aplicados.</small></span></aside>}</div></div>
+    <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>otra historia.</em></h2></div><div className="mg-collection-context"><p>Denim, prendas y accesorios.<br /> Recuperados e intervenidos a mano.</p>{source === "local" && <aside className="mg-opening-note" aria-label="Precios de apertura"><span className="mg-opening-dot" aria-hidden="true" /><span><strong>Precios de apertura</strong><small>Ya están aplicados.</small></span></aside>}</div></div>
     {source === "local-fallback" && <p className="mg-catalog-notice" role="status">Estamos revisando la disponibilidad de las piezas. Podés verlas y consultarnos por WhatsApp.</p>}
     <div className="mg-catalog-controls"><div className="mg-category-tabs" role="group" aria-label="Filtrar colección">{["Todas", "Denim", "Prendas", "Accesorios"].map((name) => <button key={name} aria-pressed={category === name} className={category === name ? "is-active" : ""} onClick={() => { setCategory(name); setLimit(8); }}>{name}</button>)}</div><label className="mg-sort"><SlidersHorizontal size={15} /><select aria-label="Ordenar piezas" value={sort} onChange={(event) => { setSort(event.target.value); setLimit(8); }}><option value="selection">Nuestra selección</option><option value="new">Recién intervenidas</option><option value="price-low">Menor precio</option><option value="price-high">Mayor precio</option></select><ChevronDown size={13} /></label></div>
     <div className="mg-catalog-summary"><p role="status">{filtered.length} {filtered.length === 1 ? "pieza" : "piezas"}</p><label><input type="checkbox" checked={onlyAvailable} onChange={(event) => { setOnlyAvailable(event.target.checked); setLimit(8); }} /> Sólo disponibles</label></div>
@@ -160,7 +161,7 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
 function CraftStory() {
   return <section id="manifiesto" className="mg-story" aria-labelledby="story-title">
     <div className="mg-story-image"><Image src="/campaign/rework-still-life-v2.webp" alt="Composición conceptual de denim recuperado, bordes deshilachados y metal" fill quality={85} sizes="(max-width: 700px) 100vw, (max-width: 1400px) 52vw, 720px" /><span>Estudio de materiales · campaña conceptual</span></div>
-    <div className="mg-story-copy"><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">No arrancamos<br /><em>de cero.</em></h2><p>Arrancamos de un jean. De una costura que todavía sirve. De una tela que merece seguir.</p><p>Desarmamos prendas, cambiamos recortes y trabajamos cada intervención a mano. Por eso dos piezas nunca salen iguales.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div>
+    <div className="mg-story-copy" data-reveal><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">No arrancamos<br /><em>de cero.</em></h2><p>Arrancamos de un jean. De una costura que todavía sirve. De una tela que merece seguir.</p><p>Desarmamos prendas, cambiamos recortes y trabajamos cada intervención a mano. Por eso dos piezas nunca salen iguales.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div>
   </section>;
 }
 
@@ -171,13 +172,13 @@ function Help() {
 function Footer() {
   return <footer className="mg-footer" aria-label="MANGATA: colección y contacto">
     <div className="mg-footer-top mg-shell">
-      <div className="mg-footer-intro">
+      <div className="mg-footer-intro" data-reveal>
         <span className="mg-eyebrow">Seguimos por acá</span>
         <h2>¿Te quedó una<br /><em>en la cabeza?</em></h2>
         <p>Volvé a mirarla. Si dudás con el calce, lo vemos con vos antes de que elijas.</p>
         <a href="#coleccion" className="mg-button mg-button-lilac mg-footer-collection" onClick={() => trackCommerceEvent("footer_navigation", { source: "footer_collection" })}>Volver a la colección <ArrowUp size={18} aria-hidden="true" /></a>
       </div>
-      <div className="mg-footer-support">
+      <div className="mg-footer-support" data-reveal>
         <a href={WHATSAPP_MEASURES} target="_blank" rel="noopener noreferrer" className="mg-footer-assist" aria-label="Consultar medidas por WhatsApp (se abre en otra pestaña)" onClick={() => trackCommerceEvent("measurement_inquiry", { source: "footer" })}>
           <span className="mg-footer-assist-icon"><MessageCircle size={20} strokeWidth={1.5} aria-hidden="true" /></span>
           <span><strong>¿Cómo te va a quedar?</strong><small>Pedinos las medidas por WhatsApp.</small></span>
@@ -207,6 +208,8 @@ function Footer() {
 }
 
 export default function Storefront({ initialProducts, mode, source: initialSource }: { initialProducts: StoreProduct[]; mode: CommerceMode; source: CatalogSource }) {
+  const storefrontRef = useRef<HTMLDivElement>(null);
+  useRevealOnView(storefrontRef);
   const [products, setProducts] = useState(initialProducts);
   const [source, setSource] = useState(initialSource);
   const { activeOverlay, openOverlay, closeOverlay } = useExperience();
@@ -226,5 +229,5 @@ export default function Storefront({ initialProducts, mode, source: initialSourc
     const interval = window.setInterval(refresh, 60_000);
     return () => window.clearInterval(interval);
   }, [mode]);
-  return <MotionConfig reducedMotion="user"><div className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><Help /></main><Footer /></div></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><Help /></main><Footer /></div></MotionConfig>;
 }
