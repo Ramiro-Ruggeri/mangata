@@ -76,7 +76,7 @@ function SearchDialog({ products, open, onClose }: { products: StoreProduct[]; o
 }
 
 function Hero({ products }: { products: StoreProduct[] }) {
-  const featured = products.find((product) => product.name === "Baggy Foil" && product.inventory.isInStock) ?? products.find((product) => product.inventory.isInStock) ?? products[0];
+  const featured = products.find((product) => product.name === "Bermuda Tribal" && product.inventory.isInStock) ?? products.find((product) => product.inventory.isInStock) ?? products[0];
   return <section className="mg-hero" id="inicio" aria-labelledby="hero-title">
     <div className="mg-hero-copy">
       <span className="mg-eyebrow"><i /> Streetwear recuperado</span>
@@ -86,7 +86,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
       <span className="mg-hero-footnote">Hecho a mano en Córdoba, de a una prenda.</span>
     </div>
     {featured && <div className="mg-hero-visual">
-      <Link className="mg-hero-photo" href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, 55vw" /></Link>
+      <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, 55vw" /></Link>
       <Link className="mg-hero-product" href={`/producto/${featured.id}`} onClick={() => selectProduct(featured, "hero_label")}><span><small>La pieza de portada</small><strong>{featured.name}</strong></span><span>{money(featured.price)} <ArrowUpRight size={22} /></span></Link>
     </div>}
     <div className="mg-hero-bottom"><span>Una prenda anterior. Otra forma de usarla.</span><a href="#manifiesto">El trabajo detrás <ArrowUpRight size={14} /></a></div>
@@ -94,7 +94,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
 }
 
 function PurchaseNotes() {
-  return <div className="mg-purchase-notes" aria-label="Información para comprar"><span><Plus size={18} /> Cada pieza tiene una sola unidad</span><a href="#ayuda"><MessageCircle size={18} /> Te ayudamos con las medidas</a><span><CreditCard size={19} /> Precio por transferencia en cada ficha</span></div>;
+  return <div className="mg-purchase-notes" aria-label="Información para comprar"><span><Plus size={18} /> Cada pieza tiene una sola unidad</span><a href="#ayuda"><MessageCircle size={18} /> Te ayudamos con las medidas</a><span><CreditCard size={19} /> Precios en pesos argentinos</span></div>;
 }
 
 function ProductCard({ product }: { product: StoreProduct }) {
@@ -104,7 +104,7 @@ function ProductCard({ product }: { product: StoreProduct }) {
   const secondary = product.images[1];
   const add = async () => { setPending(true); try { await addItem(product); } finally { setPending(false); } };
   return <motion.article data-scroll-anchor={`product-${product.id}`} layout="position" initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .22 }} className="mg-product-card">
-    <div className="mg-product-media">
+    <div className="mg-product-media" data-photo-surface={product.image.startsWith("/catalog/") ? "light" : undefined}>
       <Link href={`/producto/${product.id}`} className="mg-product-photo" aria-label={`Ver ${product.name}`} onClick={() => selectProduct(product, "collection")}>
         <Image src={product.image} alt={product.name} fill loading="lazy" sizes="(max-width: 700px) 50vw, (max-width: 1024px) 33vw, 25vw" className="mg-image-primary" />
         {secondary && <Image src={secondary} fill alt="" sizes="(max-width: 700px) 50vw, (max-width: 1024px) 33vw, 25vw" className="mg-image-secondary" />}
@@ -140,7 +140,7 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     if (sort === "price-low") return result.sort((a, b) => a.price - b.price);
     if (sort === "price-high") return result.sort((a, b) => b.price - a.price);
     if (sort === "new") return result.sort((a, b) => Number(b.isNew) - Number(a.isNew));
-    const curated = ["Baggy Foil", "Campera de Jean", "Pollera Foil", "Blazer Cuadrillé"];
+    const curated = ["Bermuda Tribal", "Bandoo Moñito", "Blazer Cuadrillé", "Bermuda Oscuridad", "Camisa Crop Cuadrillé", "Boxy Black", "Buzo Alitas", "Camisa Jappon"];
     return result.sort((a, b) => {
       const aRank = curated.indexOf(a.name), bRank = curated.indexOf(b.name);
       return (aRank === -1 ? 999 : aRank) - (bRank === -1 ? 999 : bRank);

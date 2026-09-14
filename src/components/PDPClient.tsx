@@ -93,7 +93,7 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
         </div>
 
         <section className="product-gallery" aria-label={`Fotos de ${product.name}`}>
-          <div className="product-image-stage">
+          <div className="product-image-stage" data-photo-surface={activeImage.startsWith("/catalog/") ? "light" : undefined}>
             <button className="product-image-open" onClick={() => setZoomOpen(true)} aria-label={`Ampliar foto de ${product.name}`} aria-haspopup="dialog">
               <AnimatePresence initial={false} mode="wait"><motion.div key={activeImage} className="product-image-motion" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} exit={{ opacity: reducedMotion ? 1 : 0 }} transition={{ duration: reducedMotion ? 0 : 0.2 }}>
                 <Image src={activeImage} alt={`${product.name}${gallery.length > 1 ? `, vista ${current + 1}` : ""}`} fill loading="eager" fetchPriority="high" sizes="(max-width: 800px) 100vw, 56vw" />

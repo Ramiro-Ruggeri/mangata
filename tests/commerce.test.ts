@@ -6,6 +6,9 @@ import { readCheckoutIntent, signCheckoutIntent, paymentMatchesIntent, type Chec
 import { fetchMercadoPagoPayment, verifyMercadoPagoSignature } from "../src/lib/commerce/payment-webhook";
 import { assertOneOfOneCart, withCartLock } from "../src/lib/commerce/cart-server";
 import { getLocalCatalog } from "../src/lib/commerce/catalog";
+import { refreshLocalCart } from "../src/lib/commerce/cart-refresh";
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { POST as createPreference } from "../src/app/api/mp/route";
 import { POST as webhook } from "../src/app/api/mp/webhook/route";
 import { getCheckoutReady } from "../src/lib/commerce/readiness";
@@ -16,6 +19,40 @@ import { POST as addCartItem, DELETE as removeCartItem } from "../src/app/api/st
 const products = getLocalCatalog();
 const product = products.find((item) => item.inventory.isInStock)!;
 const secret = "a-secure-test-only-key-with-at-least-32-bytes";
+
+test("September catalog uses the eight confirmed final ARS prices and real photo files", () => {
+  const expected = new Map([
+    ["Bandoo Moñito", 10000], ["Bermuda Oscuridad", 17000], ["Bermuda Tribal", 17000],
+    ["Blazer Cuadrillé", 25000], ["Boxy Black", 10000], ["Buzo Alitas", 17000],
+    ["Camisa Crop Cuadrillé", 12000], ["Camisa Jappon", 12000],
+  ]);
+  for (const [name, price] of expected) {
+    const item = products.find((candidate) => candidate.name === name);
+    assert.ok(item, `Missing ${name}`);
+    assert.equal(item.price, price);
+    assert.equal(item.transferPrice, undefined, "No unconfirmed additional transfer discount");
+    assert.equal(item.compareAtPrice, undefined, "No fictional before price or launch percentage");
+    assert.ok(item.images.every((image) => image.startsWith("/catalog/2026-09/")));
+  }
+  assert.equal(new Set(products.map((item) => item.id)).size, products.length);
+  assert.equal(new Set(products.map((item) => item.sku)).size, products.length);
+  for (const item of products) {
+    for (const image of item.images) assert.ok(existsSync(path.join(process.cwd(), "public", image)), image);
+  }
+  assert.deepEqual(products.find((item) => item.id === "7")?.images, ["/catalog/2026-09/campera-corderoy-corregida.webp"]);
+});
+
+test("saved local bags refresh prices and photos, deduplicate, and remove unavailable identities", () => {
+  const current = products.find((item) => item.id === "11")!;
+  const saved = { id: current.id, sku: current.sku, name: current.name, price: 69900, image: "/products/11/bermudaTribal.webp", qty: 1 };
+  const result = refreshLocalCart([saved, saved, { ...saved, sku: "missing" }], products);
+  assert.equal(result.length, 1);
+  assert.equal(result[0].price, 17000);
+  assert.equal(result[0].image, current.image);
+  assert.equal(saved.price, 69900, "Never mutate the original snapshot");
+  assert.deepEqual(refreshLocalCart([saved], [{ ...current, inventory: { ...current.inventory, isInStock: false } }]), []);
+  assert.deepEqual(refreshLocalCart([{ ...saved, id: "other" }], products), []);
+});
 const intent: CheckoutIntent = {
   reference: "MNGT-aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", currency: "ARS", amount: 100,
   skus: [product.sku], expiresAt: Date.now() + 600_000,

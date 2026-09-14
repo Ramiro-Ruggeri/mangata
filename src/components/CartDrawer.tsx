@@ -156,6 +156,7 @@ export default function CartDrawer() {
 
             <footer className="cart-footer">
               {syncState === "error" && <p className="cart-error" role="alert">{syncMessage}</p>}
+              {syncState === "synced" && syncMessage && <p className="cart-note" role="status">{syncMessage}</p>}
               <div className="cart-sync" role="status" aria-live="polite">
                 <span className={`status-dot ${syncState}`} />
                 {mode === "evershop" && checkoutReady

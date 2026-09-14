@@ -60,7 +60,7 @@
   .mg-inline-link:hover svg { transform: translate(2px, -2px); }
 }
 
-/* The original garments remain untouched; the black stage matches their photos. */
+/* Preserve the full garment; photo surfaces follow each catalog's supplied background. */
 .mg-hero { position: relative; display: grid; grid-template-columns: .9fr 1.1fr; background: #000; color: var(--mg-paper); padding: 0 4.2%; }
 .mg-hero-copy { position: relative; z-index: 1; padding: clamp(36px, 4.2vw, 70px) 0 42px; }
 .mg-hero h1 { margin: 24px 0 26px; font-family: var(--font-display), sans-serif; font-size: clamp(64px, 7.2vw, 114px); font-weight: 600; line-height: .91; letter-spacing: -.065em; }
@@ -70,6 +70,7 @@
 .mg-hero-footnote { display: block; margin-top: 18px; color: #8f8d88; font-size: 10px; }
 .mg-hero-visual { position: relative; min-width: 0; min-height: 560px; }
 .mg-hero-photo { position: absolute; inset: 6px -2% 98px 0; display: block; }
+.mg-hero-photo[data-photo-surface="light"] { inset: 24px 0 98px 8%; overflow: hidden; background: #f3f2ee; }
 .mg-hero-photo img { object-fit: contain; object-position: center; transition: transform var(--motion-editorial) var(--motion-ease); }
 .mg-hero-photo:hover img { transform: scale(1.025); }
 .mg-hero-product { position: absolute; right: 0; bottom: 24px; left: 8%; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px 0 0; border-top: 1px solid #353535; }
@@ -101,6 +102,7 @@
 .mg-product-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 36px 20px; }
 .mg-product-card { display: flex; min-width: 0; flex-direction: column; }
 .mg-product-media { position: relative; aspect-ratio: 3 / 4; overflow: hidden; background: #000; }
+.mg-product-media[data-photo-surface="light"] { background: #f3f2ee; }
 .mg-product-photo { position: absolute; inset: 0; }
 .mg-product-photo img { object-fit: contain; transition: opacity var(--motion-overlay) ease, transform var(--motion-editorial) var(--motion-ease); }
 .mg-image-secondary { opacity: 0; }
@@ -246,6 +248,7 @@
   .mg-hero-footnote { display: none; }
   .mg-hero-visual { min-height: 380px; }
   .mg-hero-photo { inset: 18px -15px 124px -5px; }
+  .mg-hero-photo[data-photo-surface="light"] { inset: 18px -15px 124px 0; }
   .mg-hero-product { right: -2px; bottom: 32px; left: 14px; flex-direction: column; align-items: flex-start; gap: 9px; padding-top: 12px; }
   .mg-hero-product small { font-size: 8px; }
   .mg-hero-product strong { font-size: 13px; }

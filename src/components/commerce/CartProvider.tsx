@@ -1,7 +1,8 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import type { CommerceMode, StoreProduct } from "@/lib/commerce/types";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import type { CatalogResult, CommerceMode, StoreProduct } from "@/lib/commerce/types";
+import { refreshLocalCart } from "@/lib/commerce/cart-refresh";
 import CartDrawer from "@/components/CartDrawer";
 import { useExperience } from "@/components/experience/ExperienceProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
@@ -111,6 +112,40 @@ export function CartProvider({ children, mode, checkoutReady }: { children: Reac
     operations.current = next;
     return next;
   }, []);
+  useEffect(() => {
+    if (mode !== "local") return;
+    let active = true;
+    const controller = new AbortController();
+    const refresh = () => {
+      void enqueue(async () => {
+        if (!active || !cartSnapshot.length) return;
+        setSyncState("syncing");
+        try {
+          const response = await fetch("/api/store/catalog", {
+            cache: "no-store", signal: AbortSignal.any([controller.signal, AbortSignal.timeout(15_000)]),
+          });
+          if (!response.ok) throw new Error("catalog_unavailable");
+          const catalog = await response.json() as CatalogResult;
+          // An outage or provider fallback is not evidence that every saved piece was sold.
+          if (catalog.source !== "local" || !Array.isArray(catalog.products)) throw new Error("catalog_unavailable");
+          if (!active) return;
+          const refreshed = refreshLocalCart(cartSnapshot, catalog.products);
+          const changed = JSON.stringify(refreshed) !== JSON.stringify(cartSnapshot);
+          if (changed) writeCart(refreshed);
+          setSyncMessage(changed ? "Actualizamos tu bolsa con los precios y la disponibilidad de hoy." : undefined);
+          setSyncState("synced");
+        } catch {
+          if (!active) return;
+          setSyncMessage("No pudimos verificar los precios de tu bolsa. Confirmalos con MANGATA antes de comprar.");
+          setSyncState("error");
+        }
+      });
+    };
+    // Also refresh when the bag opens or the customer returns to this tab.
+    refresh();
+    window.addEventListener("focus", refresh);
+    return () => { active = false; controller.abort(); window.removeEventListener("focus", refresh); };
+  }, [enqueue, mode, open]);
   const runSync = useCallback(async (request: RequestInit & { url?: string }): Promise<SyncPayload> => {
     setSyncState("syncing"); setSyncMessage(undefined);
     let response: Response;
