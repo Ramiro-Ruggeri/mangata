@@ -356,5 +356,5 @@
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .mg-storefront *, .mg-storefront *::before, .mg-storefront *::after { animation: none !important; transition: none !important; }
-  .mg-hero-photo img, .mg-product-photo img, .mg-button svg, .mg-inline-link svg, .mg-storefront :is(.mg-button, .mg-add-button, .mg-icon-button, .mg-cart-button):active { transform: none !important; }
+  .mg-hero-photo img, .mg-product-photo img, .mg-button svg, .mg-inline-link svg, .mg-storefront .mg-button:hover, .mg-category-tabs button:active, .mg-storefront :is(.mg-button, .mg-add-button, .mg-icon-button, .mg-cart-button):active { transform: none !important; }
 }
