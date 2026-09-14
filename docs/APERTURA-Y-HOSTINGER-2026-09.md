@@ -76,8 +76,8 @@ No se considera terminado hasta comprobar DNS autoritativo, TLS raíz/www, redir
 
 ## Estado verificado de la migración — 14/09/2026
 
-- Código de aplicación vigente: `e5445e15d4cecb08fe2c284ce2151efdd518337a`, publicado en GitHub y construido en Linux. Respaldo público: https://mangata-store.vercel.app/.
-- VPS Hostinger: contenedor `mangata-web-1` saludable, imagen `mangata/web:e5445e15d4cecb08fe2c284ce2151efdd518337a`, sin puertos publicados. La ruta `/opt/mangata/current` apunta a esa release.
+- Código de aplicación vigente: `255a0ecbe8030b2a0756b7f081525860286e5ec3`, publicado en GitHub y construido en Linux. Incluye la anulación del desplazamiento hover cuando se solicita movimiento reducido. Respaldo público: https://mangata-store.vercel.app/.
+- VPS Hostinger: contenedor `mangata-web-1` saludable, imagen `mangata/web:255a0ecbe8030b2a0756b7f081525860286e5ec3`, sin puertos publicados. La ruta `/opt/mangata/current` apunta a esa release.
 - Red privada `mangata_edge` conectada a la app y al Nginx existente, persistida en Compose. Sólo se agregó el bloque HTTP de MANGATA; el bloque HTTPS aún no está habilitado.
 - Copias del proxy previas al cambio en `/opt/mangata/backups/compose-before-81a3749.yaml` y `/opt/mangata/backups/nginx-before-81a3749.conf`. Los otros cuatro sitios comprobados conservaron respuesta HTTP 200, sin reiniciar sus contenedores.
 - Cloudflare Free: registro A raíz a `187.77.63.73` y CNAME `www` a `mangata.com.ar`, ambos DNS only para el arranque. Nameservers asignados: `aspen.ns.cloudflare.com` y `harlan.ns.cloudflare.com`.
