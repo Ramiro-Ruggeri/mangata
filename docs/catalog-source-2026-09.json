@@ -34,9 +34,10 @@
     },
     {
       "id": "1MMWl9bjhcYSPgp2dAb7GcDqWdnK_0Ob0",
-      "title": "corbata 2.jpg",
+      "title": "corbata religiones.jpg",
       "filename": "corbata-2.jpg",
-      "bytes": 1293127
+      "bytes": 1293127,
+      "originalTitle": "corbata 2.jpg"
     },
     {
       "id": "1LALKQiO5PZ4rDfeNoHF5_ytNChzKowqt",
@@ -58,9 +59,10 @@
     },
     {
       "id": "1g_LE8MUu_Pi0MuQoVWB6lqMIdNVpfuCQ",
-      "title": "campera corderoy 2.png",
+      "title": "campera reverso.png",
       "filename": "campera-corderoy-2.png",
-      "bytes": 463048
+      "bytes": 463048,
+      "originalTitle": "campera corderoy 2.png"
     },
     {
       "id": "12fHMCu5PohYv3i2qbXYbiRIDScfA7DtX",
@@ -106,9 +108,10 @@
     },
     {
       "id": "1aZ-mxQrC5rt83dBeX-OGNYk_7t2uADql",
-      "title": "corbata 1.jpg",
+      "title": "corbata pistolera.jpg",
       "filename": "corbata-1.jpg",
-      "bytes": 1709249
+      "bytes": 1709249,
+      "originalTitle": "corbata 1.jpg"
     },
     {
       "id": "1ZKaeepY6DBPU-3JhLw5GV8R2n_QXn7Hg",
@@ -190,17 +193,19 @@
     },
     {
       "id": "1v7V60ldJswC3CxS_vU4rS7cmTDA9PWKq",
-      "title": "Campera corderoy 1.jpg",
+      "title": "Campera rituales.jpg",
       "filename": "campera-corderoy-1.jpg",
-      "bytes": 2019038
+      "bytes": 2019038,
+      "originalTitle": "Campera corderoy 1.jpg"
     }
   ],
   "correction": {
     "filename": "campera-corderoy-corregida.png",
     "source": "User attachment, 2026-09-14",
     "replaces": [
-      "campera-corderoy-1.jpg",
-      "campera-corderoy-2.png"
-    ]
-  }
+      "campera-corderoy-1.jpg"
+    ],
+    "note": "The current Drive names distinguish Campera Rituales from Campera Reverso. The supplied correction represents Rituales; Reverso is a separate unpriced product."
+  },
+  "verified": "2026-09-14"
 }

@@ -16,9 +16,9 @@ export type Product = {
   order?: number;
 };
 
+// Reconciled against the client's Drive inventory on 2026-09-14.
+// Removed IDs are never recycled; history is preserved in docs/catalog-retired-2026-09.json.
 export const products: Product[] = [
-  // Stable IDs are retained so saved bags and product links keep their identity.
-  // Prices confirmed on 2026-09-14 are final ARS amounts, with no extra discount.
   {
     id: 32,
     name: "Bandoo Moñito",
@@ -26,9 +26,11 @@ export const products: Product[] = [
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/bandoo-monito.webp",
-    images: ["/catalog/2026-09/bandoo-monito.webp"],
+    images: [
+      "/catalog/2026-09/bandoo-monito.webp"
+    ],
     description: "Bandoo negro con moñito y terminación de encaje.",
-    order: 5,
+    order: 5
   },
   {
     id: 33,
@@ -37,9 +39,11 @@ export const products: Product[] = [
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/bermuda-oscuridad.webp",
-    images: ["/catalog/2026-09/bermuda-oscuridad.webp"],
+    images: [
+      "/catalog/2026-09/bermuda-oscuridad.webp"
+    ],
     description: "Bermuda de denim gris, con ruedo desflecado y apliques negros.",
-    order: 6,
+    order: 6
   },
   {
     id: 34,
@@ -48,74 +52,70 @@ export const products: Product[] = [
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/camisa-jappon.webp",
-    images: ["/catalog/2026-09/camisa-jappon.webp"],
+    images: [
+      "/catalog/2026-09/camisa-jappon.webp"
+    ],
     description: "Camisa corta azul, con textura marcada y mangas largas.",
-    order: 7,
+    order: 7
   },
   {
     id: 1,
-    name: "Baggy Denim Custom",
+    name: "Vaquero Tribal",
     price: 50000,
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
     isNew: true,
-    img: "/products/1/cover.png",
-    images: ["/products/1/cover.png"],
-    description:
-      "Baggy custom de denim con intervención artesanal. Cada pieza es única.",
-    order: 10,
-  },
-  {
-    id: 2,
-    name: "Baggy Denim Custom",
-    price: 50000,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    isNew: true,
-    img: "/products/2/baggyRam.png",
-    images: ["/products/2/baggyRam.png"],
-    description: "Denim baggy intervenido por MANGATA. Upcycling con carácter.",
-    order: 20,
+    img: "/catalog/2026-09/vaquero-tribal.webp",
+    images: [
+      "/catalog/2026-09/vaquero-tribal.webp"
+    ],
+    description: "Jean azul con dibujo tribal bordado en una pierna.",
+    order: 10
   },
   {
     id: 3,
-    name: "Baggy Foil",
+    name: "Pantalón Foil",
     price: 55900,
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/3/jeanFoil.png",
-    images: ["/products/3/jeanFoil.png", "/products/3/jeanFoil2.png"],
-    description: "Baggy con detalles foil y tratamiento manual. Fit relajado.",
-    order: 30,
+    img: "/catalog/2026-09/pant-foil-delante.webp",
+    images: [
+      "/catalog/2026-09/pant-foil-delante.webp",
+      "/catalog/2026-09/pant-foil-atras.webp"
+    ],
+    description: "Pantalón negro con paneles de denim y detalles de foil.",
+    order: 30
   },
-
-  /* ====== 4–31 (todos .png) ====== */
   {
     id: 4,
-    name: "Canesú",
+    name: "Pantalón Canesú",
     price: 69900,
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/4/canesu.png",
-    images: ["/products/4/canesu.png", "/products/4/canesu2.png"],
-    description: "Jean con recorte canesú y juego de volúmenes.",
-    order: 40,
+    img: "/catalog/2026-09/pantalon-con-canesu.webp",
+    images: [
+      "/catalog/2026-09/pantalon-con-canesu.webp"
+    ],
+    description: "Pantalón negro de pierna ancha, con canesú y botones a la vista.",
+    order: 40
   },
   {
     id: 5,
-    name: "Pollera Foil",
+    name: "Mini Foil",
     price: 58900,
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/5/polleraFoil.png",
-    images: ["/products/5/polleraFoil.png", "/products/5/polleraFoil2.png"],
-    description: "Pollera intervenida con foil. Brillo sobrio y artesanal.",
-    order: 50,
+    img: "/catalog/2026-09/mini-foil-delante.webp",
+    images: [
+      "/catalog/2026-09/mini-foil-delante.webp",
+      "/catalog/2026-09/mini-foil-atras.webp"
+    ],
+    description: "Mini negra con volado y detalles de foil.",
+    order: 50
   },
   {
     id: 6,
@@ -124,39 +124,40 @@ export const products: Product[] = [
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/buzo-alitas-delante.webp",
-    images: ["/catalog/2026-09/buzo-alitas-delante.webp", "/catalog/2026-09/buzo-alitas-atras.webp"],
+    images: [
+      "/catalog/2026-09/buzo-alitas-delante.webp",
+      "/catalog/2026-09/buzo-alitas-atras.webp"
+    ],
     description: "Buzo corto de mangas largas, con tiras y recortes.",
-    order: 60,
+    order: 60
   },
   {
     id: 7,
-    name: "Campera Corderoy",
+    name: "Campera Rituales",
     price: 95900,
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/campera-corderoy-corregida.webp",
     images: [
-      "/catalog/2026-09/campera-corderoy-corregida.webp",
+      "/catalog/2026-09/campera-corderoy-corregida.webp"
     ],
     description: "Campera de corderoy color caramelo, con parches negros y dibujos tribales en la espalda.",
-    order: 70,
+    order: 70
   },
   {
     id: 8,
-    name: "Campera de Jean",
+    name: "Campera Deseos",
     price: 97900,
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/8/camperaDeJean.png",
+    img: "/catalog/2026-09/campera-deseos.webp",
     images: [
-      "/products/8/camperaDeJean.png",
-      "/products/8/camperaDeJean2.png",
-      "/products/8/camperaDeJean3.png",
+      "/catalog/2026-09/campera-deseos.webp"
     ],
-    description: "Clásica de denim con reconstrucción MANGATA.",
-    order: 80,
+    description: "Campera corta de jean con detalles aplicados en el frente.",
+    order: 80
   },
   {
     id: 9,
@@ -167,22 +168,10 @@ export const products: Product[] = [
     img: "/catalog/2026-09/blazer-cuadrille.webp",
     images: [
       "/catalog/2026-09/blazer-cuadrille.webp",
-      "/catalog/2026-09/blazer-atras.webp",
+      "/catalog/2026-09/blazer-atras.webp"
     ],
     description: "Blazer cuadrillé en tonos ladrillo, con detalles aplicados en el frente.",
-    order: 90,
-  },
-  {
-    id: 10,
-    name: "Sastrero Baggy Black",
-    price: 89900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    img: "/products/10/sastreroBaggyBlack.png",
-    images: ["/products/10/sastreroBaggyBlack.png"],
-    description: "Pantalón sastrero baggy negro, líneas limpias.",
-    order: 100,
+    order: 90
   },
   {
     id: 11,
@@ -191,9 +180,12 @@ export const products: Product[] = [
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/bermuda-tribal-azul-delante.webp",
-    images: ["/catalog/2026-09/bermuda-tribal-azul-delante.webp", "/catalog/2026-09/bermuda-tribal-azul-atras.webp"],
+    images: [
+      "/catalog/2026-09/bermuda-tribal-azul-delante.webp",
+      "/catalog/2026-09/bermuda-tribal-azul-atras.webp"
+    ],
     description: "Bermuda denim con apliques tribales.",
-    order: 110,
+    order: 110
   },
   {
     id: 12,
@@ -202,76 +194,27 @@ export const products: Product[] = [
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/12/monoBlack.png",
-    images: ["/products/12/monoBlack.png"],
+    img: "/catalog/2026-09/mono-black.webp",
+    images: [
+      "/catalog/2026-09/mono-black.webp"
+    ],
     description: "Mono negro minimal con ajuste cómodo.",
-    order: 120,
-  },
-
-  /* ====== ACCESORIOS reales (normalizados a ASCII) ====== */
-  {
-    id: 13,
-    name: "Corbata Corazón",
-    price: 31900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Accesorios",
-    img: "/products/13/corbataCorazon.png",
-    images: ["/products/13/corbataCorazon.png"],
-    description: "Corbata upcycled con aplique corazón.",
-    order: 130,
-  },
-  {
-    id: 18,
-    name: "Choker Metalizado",
-    price: 23900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Accesorios",
-    img: "/products/18/chockerMetalizado.png",
-    images: ["/products/18/chockerMetalizado.png"],
-    description: "Gargantilla metálica reciclada. Statement piece.",
-    order: 180,
+    order: 120
   },
   {
     id: 22,
-    name: "Bag Croco",
+    name: "Cartera Crocco",
     price: 69900,
     inStock: true,
     transferDiscount: 0.1,
     category: "Accesorios",
-    img: "/products/22/bagCroco.png",
-    images: ["/products/22/bagCroco.png"],
+    img: "/catalog/2026-09/cartera-crocco.webp",
+    images: [
+      "/catalog/2026-09/cartera-crocco.webp"
+    ],
     description: "Bolso textura croco upcycled. Compacto y robusto.",
-    order: 220,
+    order: 220
   },
-  {
-    id: 27,
-    name: "Cinto Utilitario",
-    price: 35900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Accesorios",
-    img: "/products/27/cintoUtilitario.png",
-    images: ["/products/27/cintoUtilitario.png"],
-    description: "Cinturón utilitario reforzado, regulable.",
-    order: 270,
-  },
-  {
-    id: 31,
-    name: "Pasamontañas Friza",
-    price: 29900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Accesorios",
-    // ⚠️ archivo en ASCII: pasamontanasFriza.png (sin ñ)
-    img: "/products/31/pasamontañasFriza.png",
-    images: ["/products/31/pasamontañasFriza.png"],
-    description: "Pasamontañas de friza. Abrigo y actitud.",
-    order: 310,
-  },
-
-  /* ====== resto de prendas ====== */
   {
     id: 14,
     name: "Top Cruz",
@@ -279,22 +222,12 @@ export const products: Product[] = [
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/14/topCruz.png",
-    images: ["/products/14/topCruz.png"],
+    img: "/catalog/2026-09/top-cruz.webp",
+    images: [
+      "/catalog/2026-09/top-cruz.webp"
+    ],
     description: "Top cruzado con recortes y ajuste firme.",
-    order: 140,
-  },
-  {
-    id: 15,
-    name: "Musculosa Red",
-    price: 39900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    img: "/products/15/musculosaRed.png",
-    images: ["/products/15/musculosaRed.png"],
-    description: "Musculosa con red y contraste de texturas.",
-    order: 150,
+    order: 140
   },
   {
     id: 16,
@@ -303,10 +236,12 @@ export const products: Product[] = [
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/16/vestidoMicrotul.png",
-    images: ["/products/16/vestidoMicrotul.png"],
+    img: "/catalog/2026-09/vestido-microtul.webp",
+    images: [
+      "/catalog/2026-09/vestido-microtul.webp"
+    ],
     description: "Vestido etéreo de microtul. Capas y movimiento.",
-    order: 160,
+    order: 160
   },
   {
     id: 17,
@@ -315,70 +250,39 @@ export const products: Product[] = [
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/camisa-crop-cuadrille.webp",
-    images: ["/catalog/2026-09/camisa-crop-cuadrille.webp"],
+    images: [
+      "/catalog/2026-09/camisa-crop-cuadrille.webp"
+    ],
     description: "Camisa recortada con patrón cuadrillé.",
-    order: 170,
-  },
-  {
-    id: 19,
-    name: "Mini Volado",
-    price: 52900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    img: "/products/19/miniVolado.png",
-    images: ["/products/19/miniVolado.png"],
-    description: "Falda mini con volado y corte upcycled.",
-    order: 190,
+    order: 170
   },
   {
     id: 20,
-    name: "Corpiño Óxido",
+    name: "Top Óxido",
     price: 44900,
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    // ASCII en archivo: corpiñoOxido.png (sin ñ/acentos)
-    img: "/products/20/corpiñoOxido.png",
-    images: ["/products/20/corpiñoOxido.png"],
-    description: "Top/corpiño con efectos de óxido controlado.",
-    order: 200,
+    img: "/catalog/2026-09/top-oxido.webp",
+    images: [
+      "/catalog/2026-09/top-oxido.webp"
+    ],
+    description: "Top de denim con tiras finas y detalles en tonos óxido.",
+    order: 200
   },
   {
     id: 21,
-    name: "Musculosa Cute",
+    name: "Top Cute",
     price: 38900,
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/21/musculosaCute.png",
-    images: ["/products/21/musculosaCute.png"],
-    description: "Musculosa ligera con detalles delicados.",
-    order: 210,
-  },
-  {
-    id: 23,
-    name: "Baggy Tribal",
-    price: 57900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    img: "/products/23/baggyTribal.png",
-    images: ["/products/23/baggyTribal.png"],
-    description: "Baggy con apliques gráficos tribales.",
-    order: 230,
-  },
-  {
-    id: 24,
-    name: "Hood Denim",
-    price: 82900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    img: "/products/24/hoodDenim.png",
-    images: ["/products/24/hoodDenim.png"],
-    description: "Hoodie intervenido con denim. Híbrido textil.",
-    order: 240,
+    img: "/catalog/2026-09/top-cute.webp",
+    images: [
+      "/catalog/2026-09/top-cute.webp"
+    ],
+    description: "Top claro con terminaciones de encaje negro y detalles aplicados.",
+    order: 210
   },
   {
     id: 25,
@@ -387,9 +291,11 @@ export const products: Product[] = [
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/boxy.webp",
-    images: ["/catalog/2026-09/boxy.webp"],
+    images: [
+      "/catalog/2026-09/boxy.webp"
+    ],
     description: "Remera negra de corte boxy y manga corta.",
-    order: 250,
+    order: 250
   },
   {
     id: 26,
@@ -398,45 +304,11 @@ export const products: Product[] = [
     inStock: true,
     transferDiscount: 0.1,
     category: "Prendas",
-    img: "/products/26/topPicos.png",
-    images: ["/products/26/topPicos.png"],
+    img: "/catalog/2026-09/top-picos.webp",
+    images: [
+      "/catalog/2026-09/top-picos.webp"
+    ],
     description: "Top con picos y recortes geométricos.",
-    order: 260,
-  },
-  {
-    id: 28,
-    name: "Falda Red Plata",
-    price: 56900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    img: "/products/28/faldaRedPlata.png",
-    images: ["/products/28/faldaRedPlata.png"],
-    description: "Mini falda con red plateada y capas.",
-    order: 280,
-  },
-  {
-    id: 29,
-    name: "Micro Mini",
-    price: 51900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    img: "/products/29/microMini.png",
-    images: ["/products/29/microMini.png"],
-    description: "Micro mini con fit ceñido.",
-    order: 290,
-  },
-  {
-    id: 30,
-    name: "Musculosa Trash",
-    price: 38900,
-    inStock: true,
-    transferDiscount: 0.1,
-    category: "Prendas",
-    img: "/products/30/musculosaTrash.png",
-    images: ["/products/30/musculosaTrash.png"],
-    description: "Musculosa con estética raw/trash.",
-    order: 300,
-  },
+    order: 260
+  }
 ];

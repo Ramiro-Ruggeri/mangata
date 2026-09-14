@@ -1,0 +1,189 @@
+{
+  "retiredAt": "2026-09-14",
+  "reason": "User requested removing previous catalog pieces not present in the supplied Drive folder. Sales are presumed by the user, not independently verified.",
+  "products": [
+    {
+      "id": 2,
+      "name": "Baggy Denim Custom",
+      "price": 50000,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "isNew": true,
+      "img": "/products/2/baggyRam.png",
+      "images": [
+        "/products/2/baggyRam.png"
+      ],
+      "description": "Denim baggy intervenido por MANGATA. Upcycling con carácter.",
+      "order": 20
+    },
+    {
+      "id": 10,
+      "name": "Sastrero Baggy Black",
+      "price": 89900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "img": "/products/10/sastreroBaggyBlack.png",
+      "images": [
+        "/products/10/sastreroBaggyBlack.png"
+      ],
+      "description": "Pantalón sastrero baggy negro, líneas limpias.",
+      "order": 100
+    },
+    {
+      "id": 13,
+      "name": "Corbata Corazón",
+      "price": 31900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Accesorios",
+      "img": "/products/13/corbataCorazon.png",
+      "images": [
+        "/products/13/corbataCorazon.png"
+      ],
+      "description": "Corbata upcycled con aplique corazón.",
+      "order": 130
+    },
+    {
+      "id": 18,
+      "name": "Choker Metalizado",
+      "price": 23900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Accesorios",
+      "img": "/products/18/chockerMetalizado.png",
+      "images": [
+        "/products/18/chockerMetalizado.png"
+      ],
+      "description": "Gargantilla metálica reciclada. Statement piece.",
+      "order": 180
+    },
+    {
+      "id": 27,
+      "name": "Cinto Utilitario",
+      "price": 35900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Accesorios",
+      "img": "/products/27/cintoUtilitario.png",
+      "images": [
+        "/products/27/cintoUtilitario.png"
+      ],
+      "description": "Cinturón utilitario reforzado, regulable.",
+      "order": 270
+    },
+    {
+      "id": 31,
+      "name": "Pasamontañas Friza",
+      "price": 29900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Accesorios",
+      "img": "/products/31/pasamontañasFriza.png",
+      "images": [
+        "/products/31/pasamontañasFriza.png"
+      ],
+      "description": "Pasamontañas de friza. Abrigo y actitud.",
+      "order": 310
+    },
+    {
+      "id": 15,
+      "name": "Musculosa Red",
+      "price": 39900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "img": "/products/15/musculosaRed.png",
+      "images": [
+        "/products/15/musculosaRed.png"
+      ],
+      "description": "Musculosa con red y contraste de texturas.",
+      "order": 150
+    },
+    {
+      "id": 19,
+      "name": "Mini Volado",
+      "price": 52900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "img": "/products/19/miniVolado.png",
+      "images": [
+        "/products/19/miniVolado.png"
+      ],
+      "description": "Falda mini con volado y corte upcycled.",
+      "order": 190
+    },
+    {
+      "id": 23,
+      "name": "Baggy Tribal",
+      "price": 57900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "img": "/products/23/baggyTribal.png",
+      "images": [
+        "/products/23/baggyTribal.png"
+      ],
+      "description": "Baggy con apliques gráficos tribales.",
+      "order": 230
+    },
+    {
+      "id": 24,
+      "name": "Hood Denim",
+      "price": 82900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "img": "/products/24/hoodDenim.png",
+      "images": [
+        "/products/24/hoodDenim.png"
+      ],
+      "description": "Hoodie intervenido con denim. Híbrido textil.",
+      "order": 240
+    },
+    {
+      "id": 28,
+      "name": "Falda Red Plata",
+      "price": 56900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "img": "/products/28/faldaRedPlata.png",
+      "images": [
+        "/products/28/faldaRedPlata.png"
+      ],
+      "description": "Mini falda con red plateada y capas.",
+      "order": 280
+    },
+    {
+      "id": 29,
+      "name": "Micro Mini",
+      "price": 51900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "img": "/products/29/microMini.png",
+      "images": [
+        "/products/29/microMini.png"
+      ],
+      "description": "Micro mini con fit ceñido.",
+      "order": 290
+    },
+    {
+      "id": 30,
+      "name": "Musculosa Trash",
+      "price": 38900,
+      "inStock": true,
+      "transferDiscount": 0.1,
+      "category": "Prendas",
+      "img": "/products/30/musculosaTrash.png",
+      "images": [
+        "/products/30/musculosaTrash.png"
+      ],
+      "description": "Musculosa con estética raw/trash.",
+      "order": 300
+    }
+  ]
+}

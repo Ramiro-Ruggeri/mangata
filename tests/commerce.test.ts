@@ -5,9 +5,10 @@ import { assertStoreRequest, CommerceError, publicCommerceError, resolveOneOfOne
 import { readCheckoutIntent, signCheckoutIntent, paymentMatchesIntent, type CheckoutIntent } from "../src/lib/commerce/checkout-session";
 import { fetchMercadoPagoPayment, verifyMercadoPagoSignature } from "../src/lib/commerce/payment-webhook";
 import { assertOneOfOneCart, withCartLock } from "../src/lib/commerce/cart-server";
-import { getLocalCatalog } from "../src/lib/commerce/catalog";
+import { getLocalCatalog, getProduct } from "../src/lib/commerce/catalog";
+import sitemap from "../src/app/sitemap";
 import { refreshLocalCart } from "../src/lib/commerce/cart-refresh";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { POST as createPreference } from "../src/app/api/mp/route";
 import { POST as webhook } from "../src/app/api/mp/webhook/route";
@@ -52,6 +53,44 @@ test("saved local bags refresh prices and photos, deduplicate, and remove unavai
   assert.equal(saved.price, 69900, "Never mutate the original snapshot");
   assert.deepEqual(refreshLocalCart([saved], [{ ...current, inventory: { ...current.inventory, isInStock: false } }]), []);
   assert.deepEqual(refreshLocalCart([{ ...saved, id: "other" }], products), []);
+});
+
+test("only photograph-matched Drive products remain in the public catalog", () => {
+  const reconciled = JSON.parse(readFileSync("docs/catalog-reconciliation-2026-09.json", "utf8")) as {
+    active: Array<{ id: number; files: string[] }>; retiredIds: number[];
+  };
+  assert.equal(products.length, 21);
+  assert.deepEqual(products.map((item) => Number(item.id)).sort((a, b) => a - b), reconciled.active.map((item) => item.id).sort((a, b) => a - b));
+  for (const item of products) {
+    const mapping = reconciled.active.find((entry) => String(entry.id) === item.id)!;
+    assert.deepEqual(item.images, mapping.files.map((file) => `/catalog/2026-09/${file.replace(/\.(png|jpe?g)$/i, ".webp")}`));
+  }
+  assert.equal(products.find((item) => item.id === "1")?.name, "Vaquero Tribal", "Photo identity wins over the old generic product name");
+  assert.equal(products.find((item) => item.id === "7")?.name, "Campera Rituales");
+});
+
+test("retired pieces cannot return through product URLs, sitemap, cart API or saved bags", async () => {
+  const retiredIds = [2, 10, 13, 15, 18, 19, 23, 24, 27, 28, 29, 30, 31];
+  const previousMode = process.env.MANGATA_COMMERCE_MODE;
+  process.env.MANGATA_COMMERCE_MODE = "local";
+  try {
+    const sitemapUrls = (await sitemap()).map((entry) => new URL(entry.url).pathname);
+    for (const id of retiredIds) {
+      const sku = `MNGT-${String(id).padStart(3, "0")}`;
+      assert.equal(await getProduct(String(id)), null);
+      assert.ok(!sitemapUrls.includes(`/producto/${id}`));
+      const response = await addCartItem(new Request("https://mangata.test/api/store/cart", {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ sku }),
+      }));
+      assert.equal(response.status, 400);
+      const saved = { id: String(id), sku, name: "Previous selection", price: 10000, image: "/old.webp", qty: 1 };
+      assert.deepEqual(refreshLocalCart([saved], products), []);
+    }
+    assert.equal(sitemapUrls.length, products.length + 1);
+  } finally {
+    if (previousMode === undefined) delete process.env.MANGATA_COMMERCE_MODE;
+    else process.env.MANGATA_COMMERCE_MODE = previousMode;
+  }
 });
 const intent: CheckoutIntent = {
   reference: "MNGT-aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa", currency: "ARS", amount: 100,

@@ -19,22 +19,26 @@ Las ocho se muestran primero en la selección de portada. Los IDs anteriores no 
 
 No se publicó un “20% OFF”, precio tachado ni descuento por transferencia para estas ocho prendas. No se confirmó un precio de referencia ni una promoción acumulable.
 
-La Campera Corderoy (ID 7) usa exclusivamente la imagen corregida adjunta: frente sin parches y espalda con tres paneles negros. Las dos versiones de Drive fueron excluidas de su galería. Su precio anterior no se modificó: requiere confirmación del cliente.
+La campera del ID 7 usa exclusivamente la imagen corregida adjunta: frente sin parches y espalda con tres paneles negros. La nueva lectura de Drive la identifica como **Campera Rituales**. El archivo antes llamado `campera corderoy 2.png` ahora se llama **Campera Reverso** y corresponde a una prenda distinta, pendiente de precio. Su separación queda registrada en el manifiesto. El precio anterior del ID 7 no se modificó: requiere confirmación del cliente.
 
-El catálogo anterior permanece disponible mientras se confirma si hay que retirarlo o actualizar sus precios. No se inventaron importes para nuevas prendas sin precio ni se declararon vendidas las anteriores. Esta entrega no equivale a una conciliación completa de stock de Emilia.
+El cliente autorizó retirar las prendas anteriores ausentes de Drive. Se retiraron **13 IDs: 2, 10, 13, 15, 18, 19, 23, 24, 27, 28, 29, 30 y 31**. Se conservan sus datos en `catalog-retired-2026-09.json` y sus archivos originales para recuperación, pero ya no forman parte del catálogo, búsqueda, sitemap, fichas comprables ni de una bolsa revalidada. No se registró una venta contable: el cliente presume que fueron vendidas.
+
+Quedan **21 productos publicados**, todos contrastados visualmente con Drive y usando las fotos actuales. El ID 1 se conserva como Vaquero Tribal; no debe confundirse con el Baggy Tribal del ID 23, que es otra prenda y fue retirado. Las correspondencias completas constan en `catalog-reconciliation-2026-09.json`.
+
+Cinco prendas nuevas de Drive siguen pendientes de precio y no se publican como comprables: Campera Reverso, Corbata Religiones, Corbata Pistolera, Mini Print y Short Brishitos. Los productos conservados sin un nuevo precio mantienen su importe anterior; no se inventaron importes ni descuentos.
 
 ## Fotografías y procedencia
 
 - Fuente: carpeta de Drive autorizada por el cliente, identificada en `catalog-source-2026-09.json`.
 - Se descargaron los 32 originales a `source-assets/catalog-2026-09`, excluido de Git y del despliegue.
 - La corrección se conserva como `campera-corderoy-corregida.png` en esa misma carpeta.
-- `node scripts/prepare-current-catalog.mjs` produce 31 WebP (7,75 MB en total), sin recortar, inventar detalle ni ampliar la resolución original. Las fuentes van de 576 × 1024 a 1792 × 2390 / 1536 × 2730; la corrección mide 1600 × 1160. No son todas 4K.
+- `node scripts/prepare-current-catalog.mjs` produce 32 WebP (7,80 MB en total), incluida la Campera Reverso pendiente de precio, sin recortar, inventar detalle ni ampliar la resolución original. Las fuentes van de 576 × 1024 a 1792 × 2390 / 1536 × 2730; la corrección mide 1600 × 1160. No son todas 4K.
 - Los archivos públicos versionados evitan que la caché muestre fotos anteriores. Next Image genera tamaños adecuados para cada dispositivo.
 - Las demás fotos están preparadas para completar el catálogo cuando se confirmen los precios y las correspondencias de producto.
 
 ## QA local
 
-- 29 pruebas automáticas aprobadas: precios, archivos de imagen, IDs/SKU únicos, carrito guardado, seguridad de pagos, consentimiento y experiencia de scroll.
+- 31 pruebas automáticas aprobadas: precios, archivos de imagen, IDs/SKU únicos, bajas de catálogo y sus URLs/sitemap/carrito, carrito guardado, seguridad de pagos, consentimiento y experiencia de scroll.
 - Compilación de producción, TypeScript y ESLint aprobados.
 - Home sin desborde horizontal a 320, 375, 390, 768, 1024, 1440 y 1920 px.
 - Revisión visual de la grilla y portada móvil; ficha corregida de corderoy a 390 px, foto completa y cargada.

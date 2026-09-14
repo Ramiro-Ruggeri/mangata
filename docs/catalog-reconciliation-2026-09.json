@@ -1,0 +1,296 @@
+{
+  "verified": "2026-09-14",
+  "folder": "https://drive.google.com/drive/folders/1dF-pmy3evnqWkdSHVYypAPokDfkgQkqS",
+  "active": [
+    {
+      "id": 1,
+      "name": "Vaquero Tribal",
+      "files": [
+        "vaquero-tribal.jpg"
+      ],
+      "driveFileIds": [
+        "1sZjDMDF1w3dSdHtl1-D54QFtL2QpWrXT"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Pantalón Foil",
+      "files": [
+        "pant-foil-delante.jpg",
+        "pant-foil-atras.jpg"
+      ],
+      "driveFileIds": [
+        "1ngplXtjHe_pw0TP-McWe6v0HSRvh-2T4",
+        "1IRObhe2QYh2HGKslwjx8Y5H7kre87wV8"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Pantalón Canesú",
+      "files": [
+        "pantalon-con-canesu.jpg"
+      ],
+      "driveFileIds": [
+        "1Lnvb3q21WRjwLWT0kA7Y8zbdKQbrrWhJ"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Mini Foil",
+      "files": [
+        "mini-foil-delante.jpeg",
+        "mini-foil-atras.jpg"
+      ],
+      "driveFileIds": [
+        "1atcucikBZpskrRfz-lQaRx6k2tbK1jPE",
+        "19EirAPGQF7eBLXQhOP-6GhMkfKi89Lih"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Buzo Alitas",
+      "files": [
+        "buzo-alitas-delante.png",
+        "buzo-alitas-atras.jpg"
+      ],
+      "driveFileIds": [
+        "18X4PI-cf_zjAWx84cGzMgxIlZGwH7pQM",
+        "1w27w9nQ7EczU6orsRZEmVCw0dZsruGV4"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Campera Rituales",
+      "files": [
+        "campera-corderoy-corregida.png"
+      ],
+      "driveFileIds": [
+        "1v7V60ldJswC3CxS_vU4rS7cmTDA9PWKq"
+      ],
+      "correction": "campera-corderoy-corregida.png"
+    },
+    {
+      "id": 8,
+      "name": "Campera Deseos",
+      "files": [
+        "campera-deseos.jpg"
+      ],
+      "driveFileIds": [
+        "15iGlDX4rEj-ftYE3_kNhtS6egh50v8_m"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Blazer Cuadrillé",
+      "files": [
+        "blazer-cuadrille.jpg",
+        "blazer-atras.jpg"
+      ],
+      "driveFileIds": [
+        "1idpSoOPwuyCDIRsZpcMsT8bYyGsLzH2i",
+        "1-wqORyfbiI2pimRcv9Dc0BMvgndeE87U"
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Bermuda Tribal",
+      "files": [
+        "bermuda-tribal-azul-delante.jpg",
+        "bermuda-tribal-azul-atras.jpg"
+      ],
+      "driveFileIds": [
+        "11FZuX1vbRT-_lIe2MaEP_Xe2akLgQpgm",
+        "17_sGEF6-1E5D8ZxmPVhyJ8hPqkT851_E"
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Mono Black",
+      "files": [
+        "mono-black.jpg"
+      ],
+      "driveFileIds": [
+        "1LALKQiO5PZ4rDfeNoHF5_ytNChzKowqt"
+      ]
+    },
+    {
+      "id": 14,
+      "name": "Top Cruz",
+      "files": [
+        "top-cruz.png"
+      ],
+      "driveFileIds": [
+        "1iLJ3AzAWPgX073YLYRUNP7jw_znbPZUt"
+      ]
+    },
+    {
+      "id": 16,
+      "name": "Vestido Microtul",
+      "files": [
+        "vestido-microtul.jpg"
+      ],
+      "driveFileIds": [
+        "1wUHRG5rr9qAakRmIrSPyog43E-AaECzb"
+      ]
+    },
+    {
+      "id": 17,
+      "name": "Camisa Crop Cuadrillé",
+      "files": [
+        "camisa-crop-cuadrille.jpg"
+      ],
+      "driveFileIds": [
+        "17sgHbNVnsKa1zRu3gPKP9E4aNV6j70C5"
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Top Óxido",
+      "files": [
+        "top-oxido.png"
+      ],
+      "driveFileIds": [
+        "1eNElum5JbrR8AIQHZqsQAUXyIeeyqDTh"
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Top Cute",
+      "files": [
+        "top-cute.png"
+      ],
+      "driveFileIds": [
+        "1hMaQx4nsKGzffsgjXWc9IuUIjVXBwvq5"
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Cartera Crocco",
+      "files": [
+        "cartera-crocco.jpg"
+      ],
+      "driveFileIds": [
+        "1ZKaeepY6DBPU-3JhLw5GV8R2n_QXn7Hg"
+      ]
+    },
+    {
+      "id": 25,
+      "name": "Boxy Black",
+      "files": [
+        "boxy.png"
+      ],
+      "driveFileIds": [
+        "12fHMCu5PohYv3i2qbXYbiRIDScfA7DtX"
+      ]
+    },
+    {
+      "id": 26,
+      "name": "Top Picos",
+      "files": [
+        "top-picos.jpg"
+      ],
+      "driveFileIds": [
+        "134PD_hb5YPZ766QwRuSnIRw0J4iVGIiP"
+      ]
+    },
+    {
+      "id": 32,
+      "name": "Bandoo Moñito",
+      "files": [
+        "bandoo-monito.jpg"
+      ],
+      "driveFileIds": [
+        "1891P1Tg5P7vzCMrv3uyt1D9PfSLiLcvl"
+      ]
+    },
+    {
+      "id": 33,
+      "name": "Bermuda Oscuridad",
+      "files": [
+        "bermuda-oscuridad.jpg"
+      ],
+      "driveFileIds": [
+        "1ca10dvB1skM3rzMA3_aTYE_lao5E-MGR"
+      ]
+    },
+    {
+      "id": 34,
+      "name": "Camisa Jappon",
+      "files": [
+        "camisa-jappon.jpg"
+      ],
+      "driveFileIds": [
+        "1Yz2nXVxXk3p2mHubyFCh-NQDEv5JcMVJ"
+      ]
+    }
+  ],
+  "retiredIds": [
+    2,
+    10,
+    13,
+    15,
+    18,
+    19,
+    23,
+    24,
+    27,
+    28,
+    29,
+    30,
+    31
+  ],
+  "pendingNewProducts": [
+    {
+      "name": "Campera Reverso",
+      "files": [
+        "campera-corderoy-2.png"
+      ],
+      "driveFileIds": [
+        "1g_LE8MUu_Pi0MuQoVWB6lqMIdNVpfuCQ"
+      ],
+      "reason": "Price not supplied; not published as purchasable."
+    },
+    {
+      "name": "Corbata Religiones",
+      "files": [
+        "corbata-2.jpg"
+      ],
+      "driveFileIds": [
+        "1MMWl9bjhcYSPgp2dAb7GcDqWdnK_0Ob0"
+      ],
+      "reason": "Price not supplied; not published as purchasable."
+    },
+    {
+      "name": "Corbata Pistolera",
+      "files": [
+        "corbata-1.jpg"
+      ],
+      "driveFileIds": [
+        "1aZ-mxQrC5rt83dBeX-OGNYk_7t2uADql"
+      ],
+      "reason": "Price not supplied; not published as purchasable."
+    },
+    {
+      "name": "Mini Print",
+      "files": [
+        "mini-print-delante.jpg",
+        "mini-print-atras.jpg"
+      ],
+      "driveFileIds": [
+        "10jS-sfpcP2GIUYzNLfGYCGF30SMvQ4uw",
+        "1Y6imKvpFYbMp5VhLzyxgth4HndK-d9sM"
+      ],
+      "reason": "Price not supplied; not published as purchasable."
+    },
+    {
+      "name": "Short Brishitos",
+      "files": [
+        "short-brishitos.png"
+      ],
+      "driveFileIds": [
+        "17UBTaBqtRyJX5iKde38GtuSJSfGekFpk"
+      ],
+      "reason": "Price not supplied; not published as purchasable."
+    }
+  ]
+}

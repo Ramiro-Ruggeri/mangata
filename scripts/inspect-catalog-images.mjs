@@ -3,7 +3,7 @@ import path from "node:path";
 import sharp from "sharp";
 
 const source = path.resolve("source-assets/catalog-2026-09");
-const files = (await fs.readdir(source)).filter((name) => /\.(jpe?g|png)$/i.test(name) && name !== "contact-sheet.jpg").sort();
+const files = (await fs.readdir(source)).filter((name) => /\.(jpe?g|png)$/i.test(name) && !name.endsWith("contact-sheet.jpg")).sort();
 const tiles = [];
 const metadata = [];
 for (const [index, name] of files.entries()) {
