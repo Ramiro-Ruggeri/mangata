@@ -1,0 +1,10 @@
+[Unit]
+Description=Finish MANGATA domain rollout when public DNS is ready
+
+[Timer]
+OnBootSec=2min
+OnUnitInactiveSec=5min
+Unit=mangata-publish.service
+
+[Install]
+WantedBy=timers.target

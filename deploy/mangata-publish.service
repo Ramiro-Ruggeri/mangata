@@ -1,0 +1,14 @@
+[Unit]
+Description=Complete the authorised MANGATA HTTPS rollout after NIC propagation
+Wants=network-online.target
+After=network-online.target docker.service
+Requires=docker.service
+ConditionPathExists=!/opt/mangata/ops/publication-complete
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /opt/mangata/ops/publish-when-dns-ready.sh
+TimeoutStartSec=15min
+NoNewPrivileges=true
+PrivateTmp=true
+UMask=0077

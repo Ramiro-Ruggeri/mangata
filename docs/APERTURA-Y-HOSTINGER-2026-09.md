@@ -76,22 +76,39 @@ No se considera terminado hasta comprobar DNS autoritativo, TLS raíz/www, redir
 
 ## Estado verificado de la migración — 14/09/2026
 
-- Código de aplicación publicado: `e7764a18154f0eee4eff646286256297f9fe4d71`; GitHub y despliegue de Vercel confirmados. Respaldo público: https://mangata-store.vercel.app/.
-- VPS Hostinger: contenedor `mangata-web-1` saludable, imagen `mangata/web:e7764a18154f0eee4eff646286256297f9fe4d71`, sin puertos publicados. La ruta `/opt/mangata/current` apunta a esa release.
+- Código de aplicación vigente: `e5445e15d4cecb08fe2c284ce2151efdd518337a`, publicado en GitHub y construido en Linux. Respaldo público: https://mangata-store.vercel.app/.
+- VPS Hostinger: contenedor `mangata-web-1` saludable, imagen `mangata/web:e5445e15d4cecb08fe2c284ce2151efdd518337a`, sin puertos publicados. La ruta `/opt/mangata/current` apunta a esa release.
 - Red privada `mangata_edge` conectada a la app y al Nginx existente, persistida en Compose. Sólo se agregó el bloque HTTP de MANGATA; el bloque HTTPS aún no está habilitado.
 - Copias del proxy previas al cambio en `/opt/mangata/backups/compose-before-81a3749.yaml` y `/opt/mangata/backups/nginx-before-81a3749.conf`. Los otros cuatro sitios comprobados conservaron respuesta HTTP 200, sin reiniciar sus contenedores.
 - Cloudflare Free: registro A raíz a `187.77.63.73` y CNAME `www` a `mangata.com.ar`, ambos DNS only para el arranque. Nameservers asignados: `aspen.ns.cloudflare.com` y `harlan.ns.cloudflare.com`.
-- NIC: dominio registrado; sesión del titular disponible y los dos nameservers cargados en el formulario. **Ejecutar cambios queda pendiente de confirmación**. No se transfirió la titularidad.
-- El certificado de origen aún no está emitido y Cloudflare muestra modo Full, no Full (strict). No se considera el dominio oficial activo ni la migración terminada.
+- NIC: delegación ejecutada a `aspen.ns.cloudflare.com` y `harlan.ns.cloudflare.com`. El panel confirmó **Delegado: SÍ**; no se transfirió la titularidad. Falta la publicación/propagación de esa delegación en los DNS públicos.
+- Cloudflare Full (strict) guardado y confirmado en el panel. Los registros siguen DNS only durante el arranque. El certificado de origen aún no está emitido: no se considera el dominio oficial activo ni la migración terminada mientras los resolvers públicos devuelvan NXDOMAIN.
 
 Validaciones completadas: 34 pruebas automatizadas, lint y TypeScript sin errores; compilación Linux en el VPS; 26 precios y 26 altas de SKU en bolsa con el origen público configurado; 32 imágenes fuente y optimización Next Image; rechazo de origen externo y SKU retirado; datos estructurados de las cinco altas y sitemap de 27 URLs con canonical oficial. Vista desktop de 1440 px y móvil de 320 px sin desbordamiento horizontal; compra de prueba agregada y retirada sin alterar los artículos previos de la bolsa. El navegador del sitio público no registró errores ni advertencias en la revisión.
 
 ### Cierre pendiente
 
-1. Confirmar y ejecutar en NIC la delegación exclusiva a los nameservers indicados; verificar propagación autoritativa.
+1. Verificar propagación autoritativa de la delegación ya ejecutada en NIC.
 2. Emitir un certificado válido para `mangata.com.ar` y `www.mangata.com.ar` mediante el webroot ACME existente. No habilitar HTTPS con certificados ajenos ni desactivar su validación.
 3. Agregar el bloque HTTPS sobre una copia fresca del proxy, comprobar `nginx -t` y recargar. Verificar primero el origen con resolución forzada y luego el DNS público.
 4. Activar Cloudflare Full (strict) y proxy; verificar nuevamente raíz, www, bolsa e imágenes. Mantener /api y checkout sin caché compartida.
 5. Instalar `deploy/renew-certificate.sh` en `/opt/mangata/ops/` y las unidades `mangata-cert-renew.*` en systemd. Validar renovación con `--dry-run` antes de habilitar el timer. El script renueva exclusivamente el certificado de MANGATA y recarga Nginx sólo si cambió. No se encontró un cron de renovación de root; no asumir que el script existente de otros sitios se ejecuta automáticamente.
 
 Los archivos de renovación están copiados en `/opt/mangata/ops/`; pasaron `sh -n` y `systemd-analyze verify` en el VPS. Las unidades no están instaladas ni habilitadas todavía: falta el certificado y la prueba real de renovación. No afirmar renovación automática hasta completar esos pasos. Los cambios posteriores exclusivamente documentales u operativos no requieren reconstruir la misma aplicación.
+
+### Continuación automática de la publicación
+
+`mangata-publish.timer` está instalado y habilitado en el VPS. Ejecuta `deploy/publish-when-dns-ready.sh` cada cinco minutos. La primera ejecución comprobada terminó en WAIT por DNS pendiente, sin pedir certificados ni tocar la configuración activa.
+
+Cuando raíz y www resuelvan al VPS en dos resolvers públicos, valida el webroot HTTP, reutiliza la cuenta ACME existente, solicita el certificado de ambos nombres y habilita el bloque HTTPS. La configuración candidata está en `/opt/mangata/ops/nginx-ready-tls.conf`; el script comprueba los hashes del archivo candidato y del Nginx vigente antes de copiar, conserva un backup y restaura el original si falla la validación. Si otro despliegue cambia el proxy, se detiene sin sobrescribirlo. Hay backoff de 30 minutos para fallos de certificado o de prueba de renovación.
+
+Después verifica HTTPS y www, prueba la renovación con `--dry-run`, instala el timer de renovación, escribe `/opt/mangata/ops/publication-complete` y deshabilita su propio timer de publicación. Cloudflare sigue como administrador DNS; activar su proxy/CDN es un paso separado después de comprobar también el certificado de borde. No activar proxy mientras el proceso de arranque espera la IP de origen.
+
+Estado: `systemctl status mangata-publish.timer`; últimas ejecuciones: `journalctl -u mangata-publish.service -n 30`. Para detener la continuación: `systemctl disable --now mangata-publish.timer`. No confundir timer habilitado con sitio ya accesible.
+
+### Pasada de microinteracciones
+
+- Entradas finitas de colección, manifiesto y footer al entrar en pantalla, con contenido visible sin JavaScript y cancelación inmediata al activar movimiento reducido o enfocar un control.
+- Apertura animada de búsqueda, menú, privacidad y zoom; feedback más perceptible de los CTA generales, contador de bolsa y acordeones. Sin loops decorativos ni cambio del hero o de los botones de producto.
+- Corregido un cierre inmediato del panel de privacidad causado por el evento `close` pendiente de una limpieza de efectos en Strict Mode. Reapertura y foco comprobados en navegador.
+- Pruebas manuales: búsqueda sin tildes, filtro de accesorios, agregar/quitar una corbata de ARS 7000, menú móvil, FAQ, privacidad, galería de dos fotos, zoom con flechas y Escape, barra móvil sin desbordamiento. El retorno bidireccional volvió de 0 a los mismos 2772 px. Las 34 pruebas, lint y TypeScript volvieron a pasar; smoke del nuevo contenedor: 26 productos, 32 fotos, imagen optimizada, 26 SKU en bolsa, rechazo cross-origin y bajas, 5 esquemas nuevos y 27 URLs de sitemap.
