@@ -36,6 +36,10 @@ El panel de Vercel identifica `ramiro-ruggeris-projects/mangata`, conectado a `R
 
 `getSiteUrl()` centraliza canonical, Open Graph, Organization, robots y sitemap; descarta el alias retirado incluso si una configuración antigua aún lo contiene. La variable de Vercel está tipada como secreto de sólo escritura: la interfaz no permitió convertirla a configuración pública; se canceló el cambio sin eliminar ni revelar variables. El guard de metadatos no configura pagos ni reemplaza la futura configuración comercial.
 
+La primera comprobación del despliegue detectó el alias adicional `mangata.vercel.app` en canonical/OG procedente de la configuración heredada. También se normaliza hacia `mangata-store.vercel.app`, con prueba de regresión. Los futuros dominios personalizados y localhost siguen admitidos.
+
+El despliegue de `4bced22aef0f480ca1f41eca52f896e8e5053b93` llegó a Ready/Production en Vercel. En la URL pública se verificaron el nuevo footer, sus enlaces, imágenes visibles cargadas, ausencia de overflow y alturas de cookies de 123 px (390 px de ancho) y 69 px (1366 px). El ajuste del alias adicional se publica como corrección posterior; la revisión final debe comprobar canonical/OG, robots, sitemap y ficha en esa nueva versión.
+
 Se recuperó el historial Git de la copia ZIP sin sobrescribir el trabajo local. Las fotos originales siguen en `source-assets` (excluido de Git/despliegue) y en el historial remoto; la publicación utiliza sus derivados optimizados.
 
 EverShop y los cobros siguen pendientes de configuración y pruebas. Se conserva el flujo de consulta por WhatsApp y el cierre seguro del checkout. Ver `COMMERCE-READINESS.md` y `RELEASE-CHECKLIST.md` antes de habilitar pagos. La publicación visual no acredita que el backend de stock esté integrado.

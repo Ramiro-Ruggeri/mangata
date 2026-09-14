@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { PRODUCTION_SITE_URL, resolveSiteUrl } from "../src/config/site-url";
 
 test("public metadata cannot point at the retired alias, malformed URLs or credentials", () => {
-  for (const value of [undefined, "", "broken", "https://mangata-two.vercel.app/", "https://mangata-two.vercel.app/old", "https://user:password@example.com", "javascript:alert(1)"]) {
+  for (const value of [undefined, "", "broken", "https://mangata-two.vercel.app/", "https://mangata-two.vercel.app/old", "https://mangata.vercel.app", "https://user:password@example.com", "javascript:alert(1)"]) {
     assert.equal(resolveSiteUrl(value), PRODUCTION_SITE_URL);
   }
 });
