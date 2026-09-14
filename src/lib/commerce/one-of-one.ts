@@ -1,4 +1,5 @@
 import type { StoreProduct } from "./types";
+import { getSiteUrl } from "@/config/site-url";
 
 export class CommerceError extends Error {
   constructor(public code: "invalid_cart" | "stock_unavailable" | "checkout_unavailable" | "cart_unavailable", public status = 409) {
@@ -43,7 +44,11 @@ export function publicCommerceError(error: unknown) {
 
 export function assertStoreRequest(request: Request) {
   const origin = request.headers.get("origin");
-  if (origin && origin !== new URL(request.url).origin) throw new CommerceError("invalid_cart", 403);
+  // Standalone Next sees the internal container URL behind TLS termination.
+  // Trust only our configured public origin, never caller-supplied forwarded headers.
+  if (origin && origin !== new URL(request.url).origin && origin !== getSiteUrl()) {
+    throw new CommerceError("invalid_cart", 403);
+  }
   const fetchSite = request.headers.get("sec-fetch-site");
   if (fetchSite === "cross-site" || fetchSite === "same-site") throw new CommerceError("invalid_cart", 403);
   const contentType = request.headers.get("content-type")?.split(";", 1)[0].trim().toLowerCase();

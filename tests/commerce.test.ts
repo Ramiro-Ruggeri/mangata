@@ -29,6 +29,33 @@ test("container liveness reveals no configuration or credentials and cannot be c
   assert.deepEqual(await response.json(), { status: "ok" });
 });
 
+test("TLS proxy accepts the configured storefront but not forged forwarded origins", async () => {
+  const previousUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  const previousMode = process.env.MANGATA_COMMERCE_MODE;
+  process.env.NEXT_PUBLIC_SITE_URL = "https://mangata.com.ar";
+  process.env.MANGATA_COMMERCE_MODE = "local";
+  const request = (origin: string, site = "same-origin") => new Request("http://0.0.0.0:3000/api/store/cart", {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Origin: origin, "Sec-Fetch-Site": site,
+      "X-Forwarded-Host": new URL(origin).host, "X-Forwarded-Proto": "https" },
+    body: JSON.stringify({ sku: "MNGT-037" }),
+  });
+  try {
+    const allowed = await addCartItem(request("https://mangata.com.ar"));
+    assert.equal(allowed.status, 200);
+    assert.equal((await allowed.json()).product.price, 7000);
+    for (const denied of ["https://attacker.test", "https://mangata.com.ar.attacker.test", "http://mangata.com.ar", "https://www.mangata.com.ar"]) {
+      assert.equal((await addCartItem(request(denied))).status, 403, denied);
+    }
+    assert.equal((await addCartItem(request("https://mangata.com.ar", "cross-site"))).status, 403);
+  } finally {
+    if (previousUrl === undefined) delete process.env.NEXT_PUBLIC_SITE_URL;
+    else process.env.NEXT_PUBLIC_SITE_URL = previousUrl;
+    if (previousMode === undefined) delete process.env.MANGATA_COMMERCE_MODE;
+    else process.env.MANGATA_COMMERCE_MODE = previousMode;
+  }
+});
+
 test("September catalog contains exactly the 26 confirmed final ARS prices and real photo files", () => {
   const expected = new Map([
     ["Bandoo Moñito", 10000], ["Bermuda Oscuridad", 25000], ["Bermuda Tribal", 25000],
