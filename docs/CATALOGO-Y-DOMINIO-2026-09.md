@@ -1,5 +1,7 @@
 # Catálogo y dominio — 14 de septiembre de 2026
 
+> Registro histórico de la primera conciliación. La lista completa posterior de 26 precios y la decisión Hostinger + Cloudflare reemplazan los pendientes, importes y DNS de este documento. Consultar APERTURA-Y-HOSTINGER-2026-09.md antes de publicar.
+
 ## Alcance de esta actualización
 
 Se incorporaron los ocho precios entregados por el cliente, en pesos argentinos y sin aplicar un descuento adicional:

@@ -16,6 +16,8 @@ if (process.env.EVERSHOP_BASE_URL) {
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Docker builds are portable; the existing Vercel build remains unchanged.
+  ...(process.env.MANGATA_STANDALONE === "1" ? { output: "standalone" } : {}),
   poweredByHeader: false,
   reactCompiler: true,
   images: {

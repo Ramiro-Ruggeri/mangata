@@ -1,0 +1,40 @@
+name: mangata
+
+services:
+  web:
+    image: mangata/web:${RELEASE_ID:?Set the exact release commit}
+    build:
+      context: ..
+      args:
+        RELEASE_ID: ${RELEASE_ID:?Set the exact release commit}
+        NEXT_PUBLIC_SITE_URL: https://mangata.com.ar
+    restart: unless-stopped
+    init: true
+    environment:
+      NEXT_PUBLIC_SITE_URL: https://mangata.com.ar
+      MANGATA_COMMERCE_MODE: local
+      NODE_OPTIONS: --max-old-space-size=768
+    expose:
+      - "3000"
+    networks:
+      edge:
+        aliases:
+          - mangata_web
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 1g
+    cpus: 1.0
+    stop_grace_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+
+networks:
+  edge:
+    name: mangata_edge
+    external: true

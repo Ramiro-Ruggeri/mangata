@@ -16,21 +16,37 @@ import { getCheckoutReady } from "../src/lib/commerce/readiness";
 import { readStoreJson, secureServiceUrl, STORE_BODY_LIMIT } from "../src/lib/commerce/http-security";
 import { requestEverShop } from "../src/lib/commerce/evershop";
 import { POST as addCartItem, DELETE as removeCartItem } from "../src/app/api/store/cart/route";
+import { GET as health } from "../src/app/api/health/route";
 
 const products = getLocalCatalog();
 const product = products.find((item) => item.inventory.isInStock)!;
 const secret = "a-secure-test-only-key-with-at-least-32-bytes";
 
-test("September catalog uses the eight confirmed final ARS prices and real photo files", () => {
+test("container liveness reveals no configuration or credentials and cannot be cached", async () => {
+  const response = health();
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.deepEqual(await response.json(), { status: "ok" });
+});
+
+test("September catalog contains exactly the 26 confirmed final ARS prices and real photo files", () => {
   const expected = new Map([
-    ["Bandoo Moñito", 10000], ["Bermuda Oscuridad", 17000], ["Bermuda Tribal", 17000],
+    ["Bandoo Moñito", 10000], ["Bermuda Oscuridad", 25000], ["Bermuda Tribal", 25000],
     ["Blazer Cuadrillé", 25000], ["Boxy Black", 10000], ["Buzo Alitas", 17000],
-    ["Camisa Crop Cuadrillé", 12000], ["Camisa Jappon", 12000],
+    ["Camisa Crop Cuadrillé", 15000], ["Camisa Jappon", 15000],
+    ["Campera Rituales", 30000], ["Campera Reverso", 30000], ["Campera Deseos", 30000],
+    ["Cartera Crocco", 15000], ["Corbata Pistolera", 7000], ["Corbata Religiones", 7000],
+    ["Mini Foil", 17000], ["Mini Print", 20000], ["Mono Black", 15000],
+    ["Pantalón Foil", 25000], ["Pantalón Canesú", 25000], ["Short Brishitos", 10000],
+    ["Top Cruz", 10000], ["Top Cute", 12000], ["Top Óxido", 10000],
+    ["Top Picos", 12000], ["Vaquero Tribal", 25000], ["Vestido Microtul", 15000],
   ]);
+  assert.equal(products.length, expected.size);
   for (const [name, price] of expected) {
     const item = products.find((candidate) => candidate.name === name);
     assert.ok(item, `Missing ${name}`);
     assert.equal(item.price, price);
+    assert.equal(item.inventory.isInStock, true);
     assert.equal(item.transferPrice, undefined, "No unconfirmed additional transfer discount");
     assert.equal(item.compareAtPrice, undefined, "No fictional before price or launch percentage");
     assert.ok(item.images.every((image) => image.startsWith("/catalog/2026-09/")));
@@ -48,7 +64,7 @@ test("saved local bags refresh prices and photos, deduplicate, and remove unavai
   const saved = { id: current.id, sku: current.sku, name: current.name, price: 69900, image: "/products/11/bermudaTribal.webp", qty: 1 };
   const result = refreshLocalCart([saved, saved, { ...saved, sku: "missing" }], products);
   assert.equal(result.length, 1);
-  assert.equal(result[0].price, 17000);
+  assert.equal(result[0].price, 25000);
   assert.equal(result[0].image, current.image);
   assert.equal(saved.price, 69900, "Never mutate the original snapshot");
   assert.deepEqual(refreshLocalCart([saved], [{ ...current, inventory: { ...current.inventory, isInStock: false } }]), []);
@@ -59,7 +75,7 @@ test("only photograph-matched Drive products remain in the public catalog", () =
   const reconciled = JSON.parse(readFileSync("docs/catalog-reconciliation-2026-09.json", "utf8")) as {
     active: Array<{ id: number; files: string[] }>; retiredIds: number[];
   };
-  assert.equal(products.length, 21);
+  assert.equal(products.length, 26);
   assert.deepEqual(products.map((item) => Number(item.id)).sort((a, b) => a - b), reconciled.active.map((item) => item.id).sort((a, b) => a - b));
   for (const item of products) {
     const mapping = reconciled.active.find((entry) => String(entry.id) === item.id)!;
@@ -67,6 +83,27 @@ test("only photograph-matched Drive products remain in the public catalog", () =
   }
   assert.equal(products.find((item) => item.id === "1")?.name, "Vaquero Tribal", "Photo identity wins over the old generic product name");
   assert.equal(products.find((item) => item.id === "7")?.name, "Campera Rituales");
+});
+
+test("every confirmed SKU can enter the local bag at its final server price", async () => {
+  const previousMode = process.env.MANGATA_COMMERCE_MODE;
+  process.env.MANGATA_COMMERCE_MODE = "local";
+  try {
+    for (const item of products) {
+      const response = await addCartItem(new Request("https://mangata.test/api/store/cart", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sku: item.sku, price: 1 }),
+      }));
+      assert.equal(response.status, 200, item.name);
+      assert.match(response.headers.get("cache-control") ?? "", /no-store/);
+      const result = await response.json();
+      assert.equal(result.product.price, item.price);
+      assert.equal(result.product.sku, item.sku);
+    }
+  } finally {
+    if (previousMode === undefined) delete process.env.MANGATA_COMMERCE_MODE;
+    else process.env.MANGATA_COMMERCE_MODE = previousMode;
+  }
 });
 
 test("retired pieces cannot return through product URLs, sitemap, cart API or saved bags", async () => {

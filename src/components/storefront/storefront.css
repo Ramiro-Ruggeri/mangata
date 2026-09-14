@@ -87,7 +87,12 @@
 .mg-collection { padding-block: 76px 85px; }
 .mg-collection-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; margin-bottom: 42px; }
 .mg-collection h2, .mg-story h2, .mg-help h2, .mg-footer h2 { margin: 17px 0 0; font-family: var(--font-display), sans-serif; font-size: clamp(38px, 4.5vw, 68px); font-weight: 500; line-height: 1; letter-spacing: -.055em; }
-.mg-collection-heading > p { max-width: 320px; padding-bottom: 3px; color: #66635e; font-size: 13px; line-height: 1.8; }
+.mg-collection-context { display: grid; justify-items: start; gap: 18px; max-width: 320px; }
+.mg-collection-context > p { padding-bottom: 3px; color: #66635e; font-size: 13px; line-height: 1.8; }
+.mg-opening-note { display: inline-flex; align-items: center; gap: 11px; max-width: 100%; padding: 12px 17px; border: 1px solid #cfc6df; border-radius: 4px; background: #e8e1ef; color: #41364f; box-shadow: 0 3px 10px #30213f06; }
+.mg-opening-dot { width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: #74628d; }
+.mg-opening-note strong { display: block; font-size: 12px; line-height: 1.5; font-weight: 600; }
+.mg-opening-note small { display: block; margin-top: 2px; font-size: 11px; line-height: 1.5; }
 .mg-catalog-notice { margin-bottom: 24px !important; padding: 18px; border: 1px solid #b4a97f; background: #e2dccb; font-size: 13px; line-height: 1.6; }
 .mg-catalog-controls { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--mg-line); }
 .mg-category-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -264,8 +269,10 @@
   .mg-collection-heading { align-items: flex-start; flex-direction: column; gap: 17px; margin-bottom: 27px; }
   .mg-collection .mg-eyebrow, .mg-help .mg-eyebrow, .mg-story .mg-eyebrow, .mg-footer .mg-eyebrow { font-size: 9px; }
   .mg-collection h2 { margin-top: 12px; font-size: 39px; }
-  .mg-collection-heading > p { max-width: 280px; margin-top: 0; font-size: 12px; line-height: 1.8; }
-  .mg-collection-heading > p br { display: none; }
+  .mg-collection-context { gap: 14px; }
+  .mg-collection-context > p { max-width: 280px; margin-top: 0; font-size: 12px; line-height: 1.8; }
+  .mg-collection-context > p br { display: none; }
+  .mg-opening-note { padding: 9px 13px; }
   .mg-catalog-controls { align-items: flex-start; flex-direction: column; gap: 8px; padding-bottom: 6px; }
   .mg-category-tabs { justify-content: space-between; width: 100%; gap: 1px; }
   .mg-category-tabs button { min-height: 44px; padding: 9px 11px; font-size: 12px; }

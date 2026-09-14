@@ -222,6 +222,58 @@
       "driveFileIds": [
         "1Yz2nXVxXk3p2mHubyFCh-NQDEv5JcMVJ"
       ]
+    },
+    {
+      "id": 35,
+      "name": "Campera Reverso",
+      "files": [
+        "campera-corderoy-2.png"
+      ],
+      "driveFileIds": [
+        "1g_LE8MUu_Pi0MuQoVWB6lqMIdNVpfuCQ"
+      ]
+    },
+    {
+      "id": 37,
+      "name": "Corbata Religiones",
+      "files": [
+        "corbata-2.jpg"
+      ],
+      "driveFileIds": [
+        "1MMWl9bjhcYSPgp2dAb7GcDqWdnK_0Ob0"
+      ]
+    },
+    {
+      "id": 36,
+      "name": "Corbata Pistolera",
+      "files": [
+        "corbata-1.jpg"
+      ],
+      "driveFileIds": [
+        "1aZ-mxQrC5rt83dBeX-OGNYk_7t2uADql"
+      ]
+    },
+    {
+      "id": 38,
+      "name": "Mini Print",
+      "files": [
+        "mini-print-delante.jpg",
+        "mini-print-atras.jpg"
+      ],
+      "driveFileIds": [
+        "10jS-sfpcP2GIUYzNLfGYCGF30SMvQ4uw",
+        "1Y6imKvpFYbMp5VhLzyxgth4HndK-d9sM"
+      ]
+    },
+    {
+      "id": 39,
+      "name": "Short Brishitos",
+      "files": [
+        "short-brishitos.png"
+      ],
+      "driveFileIds": [
+        "17UBTaBqtRyJX5iKde38GtuSJSfGekFpk"
+      ]
     }
   ],
   "retiredIds": [
@@ -239,58 +291,6 @@
     30,
     31
   ],
-  "pendingNewProducts": [
-    {
-      "name": "Campera Reverso",
-      "files": [
-        "campera-corderoy-2.png"
-      ],
-      "driveFileIds": [
-        "1g_LE8MUu_Pi0MuQoVWB6lqMIdNVpfuCQ"
-      ],
-      "reason": "Price not supplied; not published as purchasable."
-    },
-    {
-      "name": "Corbata Religiones",
-      "files": [
-        "corbata-2.jpg"
-      ],
-      "driveFileIds": [
-        "1MMWl9bjhcYSPgp2dAb7GcDqWdnK_0Ob0"
-      ],
-      "reason": "Price not supplied; not published as purchasable."
-    },
-    {
-      "name": "Corbata Pistolera",
-      "files": [
-        "corbata-1.jpg"
-      ],
-      "driveFileIds": [
-        "1aZ-mxQrC5rt83dBeX-OGNYk_7t2uADql"
-      ],
-      "reason": "Price not supplied; not published as purchasable."
-    },
-    {
-      "name": "Mini Print",
-      "files": [
-        "mini-print-delante.jpg",
-        "mini-print-atras.jpg"
-      ],
-      "driveFileIds": [
-        "10jS-sfpcP2GIUYzNLfGYCGF30SMvQ4uw",
-        "1Y6imKvpFYbMp5VhLzyxgth4HndK-d9sM"
-      ],
-      "reason": "Price not supplied; not published as purchasable."
-    },
-    {
-      "name": "Short Brishitos",
-      "files": [
-        "short-brishitos.png"
-      ],
-      "driveFileIds": [
-        "17UBTaBqtRyJX5iKde38GtuSJSfGekFpk"
-      ],
-      "reason": "Price not supplied; not published as purchasable."
-    }
-  ]
+  "pendingNewProducts": [],
+  "priceConfirmation": "All 26 products and final ARS prices confirmed by the client on 2026-09-14, superseding the earlier eight-price list."
 }

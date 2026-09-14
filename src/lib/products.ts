@@ -17,6 +17,7 @@ export type Product = {
 };
 
 // Reconciled against the client's Drive inventory on 2026-09-14.
+// All 26 opening prices are final ARS amounts confirmed by the client.
 // Removed IDs are never recycled; history is preserved in docs/catalog-retired-2026-09.json.
 export const products: Product[] = [
   {
@@ -35,7 +36,7 @@ export const products: Product[] = [
   {
     id: 33,
     name: "Bermuda Oscuridad",
-    price: 17000,
+    price: 25000,
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/bermuda-oscuridad.webp",
@@ -48,7 +49,7 @@ export const products: Product[] = [
   {
     id: 34,
     name: "Camisa Jappon",
-    price: 12000,
+    price: 15000,
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/camisa-jappon.webp",
@@ -61,11 +62,9 @@ export const products: Product[] = [
   {
     id: 1,
     name: "Vaquero Tribal",
-    price: 50000,
+    price: 25000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
-    isNew: true,
     img: "/catalog/2026-09/vaquero-tribal.webp",
     images: [
       "/catalog/2026-09/vaquero-tribal.webp"
@@ -76,9 +75,8 @@ export const products: Product[] = [
   {
     id: 3,
     name: "Pantalón Foil",
-    price: 55900,
+    price: 25000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/pant-foil-delante.webp",
     images: [
@@ -91,9 +89,8 @@ export const products: Product[] = [
   {
     id: 4,
     name: "Pantalón Canesú",
-    price: 69900,
+    price: 25000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/pantalon-con-canesu.webp",
     images: [
@@ -105,9 +102,8 @@ export const products: Product[] = [
   {
     id: 5,
     name: "Mini Foil",
-    price: 58900,
+    price: 17000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/mini-foil-delante.webp",
     images: [
@@ -134,9 +130,8 @@ export const products: Product[] = [
   {
     id: 7,
     name: "Campera Rituales",
-    price: 95900,
+    price: 30000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/campera-corderoy-corregida.webp",
     images: [
@@ -148,9 +143,8 @@ export const products: Product[] = [
   {
     id: 8,
     name: "Campera Deseos",
-    price: 97900,
+    price: 30000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/campera-deseos.webp",
     images: [
@@ -176,7 +170,7 @@ export const products: Product[] = [
   {
     id: 11,
     name: "Bermuda Tribal",
-    price: 17000,
+    price: 25000,
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/bermuda-tribal-azul-delante.webp",
@@ -190,9 +184,8 @@ export const products: Product[] = [
   {
     id: 12,
     name: "Mono Black",
-    price: 109900,
+    price: 15000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/mono-black.webp",
     images: [
@@ -204,9 +197,8 @@ export const products: Product[] = [
   {
     id: 22,
     name: "Cartera Crocco",
-    price: 69900,
+    price: 15000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Accesorios",
     img: "/catalog/2026-09/cartera-crocco.webp",
     images: [
@@ -218,9 +210,8 @@ export const products: Product[] = [
   {
     id: 14,
     name: "Top Cruz",
-    price: 45900,
+    price: 10000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/top-cruz.webp",
     images: [
@@ -232,9 +223,8 @@ export const products: Product[] = [
   {
     id: 16,
     name: "Vestido Microtul",
-    price: 95900,
+    price: 15000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/vestido-microtul.webp",
     images: [
@@ -246,7 +236,7 @@ export const products: Product[] = [
   {
     id: 17,
     name: "Camisa Crop Cuadrillé",
-    price: 12000,
+    price: 15000,
     inStock: true,
     category: "Prendas",
     img: "/catalog/2026-09/camisa-crop-cuadrille.webp",
@@ -259,9 +249,8 @@ export const products: Product[] = [
   {
     id: 20,
     name: "Top Óxido",
-    price: 44900,
+    price: 10000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/top-oxido.webp",
     images: [
@@ -273,9 +262,8 @@ export const products: Product[] = [
   {
     id: 21,
     name: "Top Cute",
-    price: 38900,
+    price: 12000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/top-cute.webp",
     images: [
@@ -300,9 +288,8 @@ export const products: Product[] = [
   {
     id: 26,
     name: "Top Picos",
-    price: 46900,
+    price: 12000,
     inStock: true,
-    transferDiscount: 0.1,
     category: "Prendas",
     img: "/catalog/2026-09/top-picos.webp",
     images: [
@@ -310,5 +297,60 @@ export const products: Product[] = [
     ],
     description: "Top con picos y recortes geométricos.",
     order: 260
+  },
+  {
+    id: 35,
+    name: "Campera Reverso",
+    price: 30000,
+    inStock: true,
+    category: "Prendas",
+    img: "/catalog/2026-09/campera-corderoy-2.webp",
+    images: ["/catalog/2026-09/campera-corderoy-2.webp"],
+    description: "Campera de corderoy caramelo, con parches negros en el frente y un panel tribal en la espalda.",
+    order: 75
+  },
+  {
+    id: 36,
+    name: "Corbata Pistolera",
+    price: 7000,
+    inStock: true,
+    category: "Accesorios",
+    img: "/catalog/2026-09/corbata-1.webp",
+    images: ["/catalog/2026-09/corbata-1.webp"],
+    description: "Corbata oscura intervenida con alfileres, dijes de pistolas y detalles metálicos.",
+    order: 225
+  },
+  {
+    id: 37,
+    name: "Corbata Religiones",
+    price: 7000,
+    inStock: true,
+    category: "Accesorios",
+    img: "/catalog/2026-09/corbata-2.webp",
+    images: ["/catalog/2026-09/corbata-2.webp"],
+    description: "Corbata oscura con cruces, alfileres y apliques metálicos.",
+    order: 226
+  },
+  {
+    id: 38,
+    name: "Mini Print",
+    price: 20000,
+    inStock: true,
+    category: "Prendas",
+    img: "/catalog/2026-09/mini-print-delante.webp",
+    images: ["/catalog/2026-09/mini-print-delante.webp", "/catalog/2026-09/mini-print-atras.webp"],
+    description: "Mini de jean con estrellas de animal print, tachas y encaje negro en el ruedo.",
+    order: 55
+  },
+  {
+    id: 39,
+    name: "Short Brishitos",
+    price: 10000,
+    inStock: true,
+    category: "Prendas",
+    img: "/catalog/2026-09/short-brishitos.webp",
+    images: ["/catalog/2026-09/short-brishitos.webp"],
+    description: "Short negro con pequeños brillos sobre toda la tela.",
+    order: 115
   }
 ];
