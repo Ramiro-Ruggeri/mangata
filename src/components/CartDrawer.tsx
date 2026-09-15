@@ -158,7 +158,7 @@ export default function CartDrawer() {
               )}
             </div>
 
-            <footer className="cart-footer">
+            {items.length > 0 && <footer className="cart-footer">
               {syncState === "error" && <p className="cart-error" role="alert">{syncMessage}</p>}
               {syncState === "synced" && syncMessage && <p className="cart-note" role="status">{syncMessage}</p>}
               <div className="cart-sync" role="status" aria-live="polite">
@@ -186,7 +186,7 @@ export default function CartDrawer() {
               <div className="cart-assurance">{checkoutReady ? <ShieldCheck size={14} strokeWidth={1.4} /> : <MessageCircle size={14} strokeWidth={1.4} />}<span>{checkoutReady ? "Completás el pago en una página segura." : "Se abre WhatsApp con tus piezas elegidas."}</span></div>
               {syncState === "error" && <a className="text-link" href={whatsappHref("Hola MANGATA, necesito ayuda para comprar.")} target="_blank" rel="noreferrer"><MessageCircle size={15} /> Consultar por WhatsApp</a>}
               {items.length > 0 && <button className="cart-clear" disabled={syncState === "syncing"} onClick={clear}>Vaciar selección</button>}
-            </footer>
+            </footer>}
           </motion.aside>
         </CartLayer>
       )}

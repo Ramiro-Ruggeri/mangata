@@ -10,13 +10,13 @@ const file = new URL('../.env.mercadopago-provision', import.meta.url);
 const keys = ['MP_ACCESS_TOKEN', 'MP_WEBHOOK_SECRET', 'MP_TEST_ACCESS_TOKEN'];
 const server = createServer(async (req, res) => {
   res.setHeader('Cache-Control', 'no-store');
-  res.setHeader('Content-Security-Policy', "default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'");
+  res.setHeader('Content-Security-Policy', `default-src 'none'; script-src 'nonce-${nonce}'; connect-src 'self'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'`);
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'no-referrer');
   if (req.headers.host !== `127.0.0.1:${port}` || req.url !== `/${nonce}`) { res.writeHead(404).end(); return; }
   if (req.method === 'GET') {
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.end(`<!doctype html><html lang="es"><meta charset="utf-8"><title>Configuración privada MANGATA</title><h1>Credenciales · transferencia local</h1><p>Se guardan sólo en este equipo, fuera de Git. Destino: servidor Hostinger de MANGATA.</p><form method="post" autocomplete="off"><label>Clave<select name="key">${keys.map(key => `<option>${key}</option>`).join('')}</select></label><label>Valor<input name="value" type="password" required autocomplete="off"></label><button>Guardar en archivo privado</button></form></html>`);
+    res.end(`<!doctype html><html lang="es"><meta charset="utf-8"><title>Configuración privada MANGATA</title><h1>Credenciales · transferencia local</h1><p>Se guardan sólo en este equipo, fuera de Git. Destino: servidor Hostinger de MANGATA.</p><form method="post" autocomplete="off"><label>Clave<select name="key">${keys.map(key => `<option>${key}</option>`).join('')}</select></label><label>Valor<input name="value" type="password" required autocomplete="off"></label><button>Guardar en archivo privado</button></form><p id="result" role="status"></p><script nonce="${nonce}">document.querySelector('form').addEventListener('submit',async(event)=>{event.preventDefault();const form=event.currentTarget;const response=await fetch(location.pathname,{method:'POST',body:new URLSearchParams(new FormData(form))});document.querySelector('#result').textContent=response.ok?'Clave guardada sin mostrar su valor.':'No se guardó: revisar el formato o el origen.';if(response.ok)form.elements.value.value='';});</script></html>`);
     return;
   }
   if (req.method !== 'POST' || req.headers.origin !== origin || !['same-origin', undefined].includes(req.headers['sec-fetch-site'])) { res.writeHead(403).end(); return; }

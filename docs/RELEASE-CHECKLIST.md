@@ -1,6 +1,6 @@
 # MANGATA · preparación de release
 
-Estado de comercio: **preparado para staging, con bloqueos de producción**. Esta auditoría no autoriza cobros ni acredita una integración operativa con EverShop. No se publicaron cambios ni se crearon pagos durante la revisión.
+**Registro histórico de la primera auditoría.** La publicación posterior está en `https://mangata.com.ar` sobre Hostinger y añade persistencia PostgreSQL. El estado y las pruebas vigentes se registran en `PRODUCTION-ENGINEERING-CHECKLIST.md`; los bloqueos de este documento describen la versión anterior y no sustituyen ese registro. EverShop continúa diferido.
 
 ## Evidencia de esta pasada
 

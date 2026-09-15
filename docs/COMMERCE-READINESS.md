@@ -2,11 +2,11 @@
 
 ## Estado real
 
-La tienda permite explorar y guardar una selección local. El catálogo incluido en el repositorio no es un registro transaccional de existencias. Por eso el pago local permanece cerrado hasta que exista un servicio persistente de pedidos y reserva de stock, además de las credenciales de Mercado Pago. Agregar solamente `MP_ACCESS_TOKEN` no habilita cobros.
+La tienda se publica en `https://mangata.com.ar` desde Hostinger. El catálogo del repositorio conserva datos y precios; el driver PostgreSQL incorporado registra disponibilidad, reservas, pagos y pedidos en una base privada persistente. Agregar solamente `MP_ACCESS_TOKEN` no habilita cobros: se requieren también firma Webhooks, identificación de la cuenta, términos de entrega confirmados y activación explícita después de QA. Consultar `PRODUCTION-ENGINEERING-CHECKLIST.md` para evidencia y pendientes vigentes.
 
 Mientras esa configuración falta, el carrito ofrece una salida comercial operativa: “Consultar mi selección” abre WhatsApp con los nombres y SKU elegidos para que el comprador revise y envíe el mensaje. No realiza envíos automáticos ni presenta un botón de pago que sabemos que fallará. El layout calcula `checkoutReady` exclusivamente en servidor; al navegador llega sólo el booleano. Este indicador describe configuración disponible, no una prueba de salud remota: el backend mantiene todas las comprobaciones al intentar pagar.
 
-EverShop conserva el papel de fuente de verdad. Su instancia, versión, tokens, políticas comerciales y extensión de handoff todavía requieren configuración y pruebas reales. El adaptador implementado no equivale a una conexión productiva validada.
+EverShop está diferido por pedido del cliente. No está conectado a esta publicación; la base privada es la fuente transaccional actual. Su futura migración deberá conservar pedidos y stock real, no reinicializar piezas vendidas.
 
 ## Garantías implementadas
 
@@ -20,7 +20,7 @@ EverShop conserva el papel de fuente de verdad. Su instancia, versión, tokens, 
 
 ## Checkout local con Mercado Pago
 
-Variables privadas necesarias:
+Variables del adaptador HTTP alternativo (la implementación PostgreSQL del VPS está documentada en `.env.example` y el checklist de producción):
 
 ```dotenv
 MP_ACCESS_TOKEN=
@@ -41,11 +41,11 @@ La secuencia implementada es:
 - Recibir el evento firmado; consultar el pago por ID en Mercado Pago y solicitar conciliación persistente.
 - En la página de resultado, verificar nuevamente el pago, exigir coincidencia exacta con la cookie y consultar si quedó registrado. Sólo entonces mostrar éxito, emitir `purchase` y quitar de la bolsa los SKU pagados. Otras piezas elegidas después permanecen.
 
-La navegación a `/checkout/success?payment_id=...` no confirma una compra por sí sola. Una referencia que únicamente empieza con `MNGT-` tampoco alcanza. Las páginas de resultado hacen lecturas; la escritura de conciliación ocurre en el webhook.
+La navegación a `/checkout/success?payment_id=...` no confirma una compra por sí sola. Una referencia que únicamente empieza con `MNGT-` tampoco alcanza. Con PostgreSQL, la página de resultado también puede conciliar un pago canónico coincidente con la sesión, como recuperación de un webhook demorado; exige persistencia antes de mostrar éxito.
 
-## Contrato del servicio durable pendiente
+## Contrato alternativo del servicio HTTP (no usado en Hostinger)
 
-Este repositorio incluye el cliente tipado `src/lib/commerce/order-service.ts`. No incluye ni inventa una base de datos en memoria. La URL configurada debe apuntar a una extensión propia de EverShop o a un servicio privado real con PostgreSQL.
+El driver PostgreSQL desplegado ya implementa persistencia y conciliación dentro de esta aplicación. El siguiente contrato documenta únicamente el adaptador HTTP alternativo de `src/lib/commerce/order-service.ts`, para una futura extensión privada de EverShop u otro servicio durable. No se utiliza en esta publicación ni es un bloqueo de la base actual.
 
 Todas las llamadas usan `Authorization: Bearer MANGATA_ORDER_SERVICE_TOKEN`, HTTPS y timeout. Se rechazan redirecciones. El servicio debe autenticar estas llamadas y revalidar los datos contra su inventario y precios, incluso aunque provengan del storefront.
 
@@ -96,7 +96,7 @@ Respuesta admitida:
 
 `result` también puede ser `duplicate`, únicamente si el evento ya quedó registrado. Un estado pendiente debe conservar la reserva hasta una resolución segura. Un pago aprobado tardío o una preferencia fallida no se resuelven liberando stock a ciegas: el servicio necesita una tarea de conciliación que consulte el estado real, registre los casos excepcionales y evite vender dos veces.
 
-El vencimiento es una fecha para iniciar la conciliación, no una autorización para volver a publicar stock automáticamente. Una tarea persistente debe recorrer intenciones vencidas aunque nunca llegue un callback. Si la creación de preferencia falló o sufrió timeout después de reservar, debe confirmar por referencia que no existe un pago activo/pendiente antes de liberar. Debe conservar las reservas de pagos pendientes, procesar aprobaciones tardías y tener una salida operativa para cancelación o devolución cuando no pueda garantizar disponibilidad. El proveedor puede aprobar un pago después del vencimiento de la preferencia; la expiración del enlace no prueba que el cobro sea imposible. Estas condiciones necesitan implementación y pruebas en el servicio real; el storefront no ejecuta un cron local ni tiene persistencia para resolverlas.
+El vencimiento es una fecha para iniciar la conciliación, no una autorización para volver a publicar stock automáticamente. Una tarea persistente debe recorrer intenciones vencidas aunque nunca llegue un callback. Si la creación de preferencia falló o sufrió timeout después de reservar, debe confirmar por referencia que no existe un pago activo/pendiente antes de liberar. Debe conservar las reservas de pagos pendientes, procesar aprobaciones tardías y tener una salida operativa para cancelación o devolución cuando no pueda garantizar disponibilidad. El proveedor puede aprobar un pago después del vencimiento de la preferencia; la expiración del enlace no prueba que el cobro sea imposible. En Hostinger estas situaciones se registran en PostgreSQL y se revisan mediante el timer de conciliación; la liberación de reservas requiere intervención del operador. Una futura implementación del adaptador HTTP debe conservar estas garantías.
 
 ### Consultar confirmación
 
