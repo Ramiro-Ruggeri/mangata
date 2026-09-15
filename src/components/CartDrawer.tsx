@@ -169,9 +169,9 @@ export default function CartDrawer() {
                 {syncState === "synced" && <Check size={13} />}
               </div>
               <div className="cart-total"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-              <p className="cart-note">{checkoutReady && mode === "local" ? "Este pago incluye sólo las prendas. El envío se acuerda y paga aparte con Emilia; no está incluido ni es gratuito." : checkoutReady ? "Revisá el total y las opciones de entrega antes de pagar." : "Por ahora coordinamos la compra por WhatsApp."}</p>
-              {checkoutReady && mode === "local" && <label className="cart-delivery-confirm"><input type="checkbox" checked={deliveryAcknowledged} onChange={event => setDeliverySelection(event.target.checked ? selectionKey : "")} /><span>Ya coordiné el retiro o el costo del envío con Emilia.</span></label>}
-              {checkoutReady && mode === "local" && <a className="text-link" href={whatsappHref("Hola Emilia, quiero coordinar la entrega y su costo antes de pagar mi selección.")} target="_blank" rel="noopener noreferrer">Consultar entrega antes de pagar</a>}
+              <p className="cart-note">{checkoutReady && mode === "local" ? "Este pago incluye sólo las prendas. El envío o retiro se coordina y paga aparte; no está incluido en el total." : checkoutReady ? "Revisá el total y las opciones de entrega antes de pagar." : "Por ahora coordinamos la compra por WhatsApp."}</p>
+              {checkoutReady && mode === "local" && <label className="cart-delivery-confirm"><input type="checkbox" checked={deliveryAcknowledged} onChange={event => setDeliverySelection(event.target.checked ? selectionKey : "")} /><span>Ya coordiné el envío o retiro.</span></label>}
+              {checkoutReady && mode === "local" && <a className="text-link" href={whatsappHref("Hola MANGATA, quiero coordinar el envío o retiro antes de pagar mi selección.")} target="_blank" rel="noopener noreferrer">Coordinar entrega</a>}
               {checkoutReady ? (
                 <button className="magnetic-button cart-checkout" disabled={!items.length || syncState === "syncing" || (mode === "local" && !deliveryAcknowledged)} onClick={() => checkout(deliveryAcknowledged)}>
                   <span>{syncState === "syncing" ? "Revisando tu bolsa…" : mode === "local" ? "Pagar con Mercado Pago" : "Ir a pagar de forma segura"}</span><span>↗</span>

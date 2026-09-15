@@ -119,6 +119,31 @@ export class PostgresOrders {
     return row.payment_url as string;
   }
 
+  async releaseUnstarted(reference: string) {
+    return this.transaction(async (client) => {
+      const { rows: [intent] } = await client.query("SELECT status,preference_id,approved_payment_id FROM checkout_intents WHERE reference=$1 FOR UPDATE", [reference]);
+      if (!intent || intent.status !== "reserved" || intent.preference_id || intent.approved_payment_id) return false;
+      if ((await client.query("SELECT 1 FROM payments WHERE reference=$1 LIMIT 1", [reference])).rowCount) return false;
+      await client.query("UPDATE inventory SET state='available',held_reference=NULL WHERE held_reference=$1 AND state='reserved'", [reference]);
+      await client.query("UPDATE checkout_intents SET status='cancelled',review_reason='preference_not_created',checked_at=now() WHERE reference=$1", [reference]);
+      return true;
+    });
+  }
+
+  async releaseExpiredUnpaid(reference: string) {
+    return this.transaction(async (client) => {
+      const { rows: [intent] } = await client.query("SELECT status,expires_at,approved_payment_id FROM checkout_intents WHERE reference=$1 FOR UPDATE", [reference]);
+      if (!intent || intent.approved_payment_id || new Date(intent.expires_at).getTime() > Date.now() - 5 * 60_000 ||
+        !["reserved", "preference_created", "manual_review"].includes(intent.status)) return false;
+      const blocking = await client.query(`SELECT 1 FROM payments WHERE reference=$1
+        AND status IN ('approved','pending','in_process','authorized','in_mediation') LIMIT 1`, [reference]);
+      if (blocking.rowCount) return false;
+      await client.query("UPDATE inventory SET state='available',held_reference=NULL WHERE held_reference=$1 AND state='reserved'", [reference]);
+      await client.query("UPDATE checkout_intents SET status='cancelled',review_reason='expired_without_payment',checked_at=now() WHERE reference=$1", [reference]);
+      return true;
+    });
+  }
+
   async settled(reference: string) {
     return (await this.db.query("SELECT 1 FROM checkout_intents WHERE reference=$1 AND approved_payment_id IS NOT NULL", [reference])).rowCount === 1;
   }
@@ -186,15 +211,13 @@ export class PostgresOrders {
 
   async candidates() {
     return (await this.db.query(`SELECT reference,expires_at FROM checkout_intents
-      WHERE checked_at<now()-interval '4 minutes' AND created_at>now()-interval '180 days'
+      WHERE status IN ('reserved','preference_created','pending','manual_review')
+      AND checked_at<now()-interval '4 minutes' AND created_at>now()-interval '180 days'
       ORDER BY checked_at LIMIT 25`)).rows as Array<{ reference: string; expires_at: Date }>;
   }
 
   async checked(reference: string) {
-    await this.db.query(`UPDATE checkout_intents SET checked_at=now(),
-      status=CASE WHEN expires_at<now() AND status IN ('reserved','preference_created') THEN 'manual_review' ELSE status END,
-      review_reason=CASE WHEN expires_at<now() AND status IN ('reserved','preference_created') THEN 'expired_requires_provider_review' ELSE review_reason END
-      WHERE reference=$1`, [reference]);
+    await this.db.query("UPDATE checkout_intents SET checked_at=now() WHERE reference=$1", [reference]);
   }
 
   async status() {
@@ -202,7 +225,7 @@ export class PostgresOrders {
       (SELECT count(*)::int FROM inventory WHERE active) AS products,
       (SELECT count(*)::int FROM orders) AS orders,
       (SELECT count(*)::int FROM checkout_intents WHERE status='manual_review') AS reviews,
-      (SELECT count(*)::int FROM checkout_intents WHERE status NOT IN ('approved') AND checked_at<now()-interval '15 minutes') AS overdue`);
+      (SELECT count(*)::int FROM checkout_intents WHERE status NOT IN ('approved','cancelled') AND checked_at<now()-interval '15 minutes') AS overdue`);
     return row;
   }
 }

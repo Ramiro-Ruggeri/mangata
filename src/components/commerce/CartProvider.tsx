@@ -10,12 +10,13 @@ import type { CommerceError } from "@/lib/commerce/one-of-one";
 
 const CART_KEY = "mangata_cart_v2";
 const LEGACY_CART_KEY = "mngt_cart_v1";
+const CHECKOUT_RESUME_KEY = "mangata_checkout_resume_v1";
 export type CartLine = {
   id: string; sku: string; name: string; price: number; image: string; qty: number; remoteItemId?: string;
 };
 type SyncState = "error" | "idle" | "syncing" | "synced";
 type ErrorCode = CommerceError["code"] | "network_error";
-type SyncPayload = { error?: string; code?: ErrorCode; itemId?: string; url?: string; init_point?: string; product?: StoreProduct };
+type SyncPayload = { error?: string; code?: ErrorCode; itemId?: string; url?: string; init_point?: string; resume_token?: string; product?: StoreProduct };
 type CartContextValue = {
   items: CartLine[]; count: number; subtotal: number; open: boolean; mode: CommerceMode;
   syncState: SyncState; syncMessage?: string;
@@ -66,6 +67,25 @@ function writeCart(items: CartLine[]) {
     } catch { /* Keep the bag usable when browser storage is blocked. */ }
   }
   emitCart();
+}
+function checkoutKey(items: CartLine[]) {
+  return items.map(item => `${item.sku}:${item.price}`).sort().join("|");
+}
+function readCheckoutResume(items: CartLine[]) {
+  if (typeof window === "undefined") return undefined;
+  try {
+    const values = JSON.parse(window.localStorage.getItem(CHECKOUT_RESUME_KEY) ?? "{}") as Record<string, string>;
+    const token = values[checkoutKey(items)];
+    return typeof token === "string" && token.length <= 4096 ? token : undefined;
+  } catch { return undefined; }
+}
+function writeCheckoutResume(items: CartLine[], token: string) {
+  if (typeof window === "undefined" || !token || token.length > 4096) return;
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(CHECKOUT_RESUME_KEY) ?? "{}") as Record<string, string>;
+    const entries = Object.entries(stored).filter(([, value]) => typeof value === "string").slice(-7);
+    window.localStorage.setItem(CHECKOUT_RESUME_KEY, JSON.stringify(Object.fromEntries([...entries, [checkoutKey(items), token]])));
+  } catch { /* The signed first-party cookie remains the primary resume path. */ }
 }
 function subscribeCart(listener: () => void) {
   cartListeners.add(listener);
@@ -169,7 +189,7 @@ export function CartProvider({ children, mode, checkoutReady }: { children: Reac
       : code === "invalid_cart"
         ? "Revisá tu bolsa antes de seguir."
         : event === "checkout_error"
-          ? "No pudimos abrir el pago. Tu bolsa sigue guardada; intentá de nuevo o escribinos."
+          ? "No pudimos abrir el pago. Tu bolsa sigue guardada; volvé a intentarlo."
           : "No pudimos actualizar tu bolsa. Intentá de nuevo en un momento.";
     setSyncState("error"); setSyncMessage(message);
     trackCommerceEvent(event, { error_code: code, source: "bag" });
@@ -232,13 +252,15 @@ export function CartProvider({ children, mode, checkoutReady }: { children: Reac
 
   const checkout = useCallback((deliveryAcknowledged = false) => enqueue(async () => {
     if (!checkoutReady || !cartSnapshot.length) return;
+    const selection = [...cartSnapshot];
     try {
       const payload = await runSync(mode === "evershop"
-        ? { method: "POST", url: "/api/store/checkout", body: JSON.stringify({ skus: cartSnapshot.map((item) => item.sku) }) }
-        : { method: "POST", url: "/api/mp", body: JSON.stringify({ deliveryAcknowledged, items: cartSnapshot.map((item) => ({ id: item.id, sku: item.sku, qty: 1 })) }) });
+        ? { method: "POST", url: "/api/store/checkout", body: JSON.stringify({ skus: selection.map((item) => item.sku) }) }
+        : { method: "POST", url: "/api/mp", body: JSON.stringify({ deliveryAcknowledged, resumeToken: readCheckoutResume(selection), items: selection.map((item) => ({ id: item.id, sku: item.sku, qty: 1 })) }) });
       const destination = mode === "evershop" ? payload.url : payload.init_point;
       if (!destination || new URL(destination).protocol !== "https:") throw new CartRequestError("checkout_unavailable");
-      trackCommerceEvent("begin_checkout", { currency: "ARS", value: cartSnapshot.reduce((sum, item) => sum + item.price, 0), item_count: cartSnapshot.length });
+      if (payload.resume_token) writeCheckoutResume(selection, payload.resume_token);
+      trackCommerceEvent("begin_checkout", { currency: "ARS", value: selection.reduce((sum, item) => sum + item.price, 0), item_count: selection.length });
       window.location.assign(destination);
     } catch (error) { showError(error, "checkout_error"); }
   }), [checkoutReady, enqueue, mode, runSync, showError]);

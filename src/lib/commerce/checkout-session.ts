@@ -37,6 +37,11 @@ export function readCheckoutIntent(value: string | undefined, secret: string, no
   } catch { return null; }
 }
 
+export function checkoutIntentMatches(intent: CheckoutIntent, skus: string[], amount: number) {
+  return Math.round(intent.amount * 100) === Math.round(amount * 100) &&
+    JSON.stringify([...intent.skus].sort()) === JSON.stringify([...skus].sort());
+}
+
 export type ProviderPayment = {
   id?: string | number;
   status?: string;

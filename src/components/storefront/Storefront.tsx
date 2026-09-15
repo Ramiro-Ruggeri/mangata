@@ -101,21 +101,23 @@ function PurchaseNotes() {
   return <section className="mg-purchase-notes" aria-label="Información para comprar">
     <a href="#ayuda"><PackageCheck size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Entrega a coordinar</strong><small>Consultá envío o retiro en Córdoba.</small></span></a>
     {mercadoPagoReady ? <button type="button" onClick={openCart}><ShieldCheck size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Pago con Mercado Pago</strong><small>Completás el pago en su checkout seguro.</small></span></button> : <div><CreditCard size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Precios en pesos argentinos</strong><small>El envío se coordina antes de comprar.</small></span></div>}
-    <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" aria-label={`Hablar con ${SITE.contactName} por WhatsApp (se abre en otra pestaña)`}><MessageCircle size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Hablá con {SITE.contactName}</strong><small>WhatsApp · {SITE.whatsappDisplay}</small></span></a>
+    <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" aria-label="Contactar a MANGATA por WhatsApp (se abre en otra pestaña)"><MessageCircle size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Atención por WhatsApp</strong><small>{SITE.whatsappDisplay}</small></span></a>
   </section>;
 }
 
 function ProductCard({ product }: { product: StoreProduct }) {
   const { addItem, items, syncState } = useCart();
   const [pending, setPending] = useState(false);
+  const [secondaryRequested, setSecondaryRequested] = useState(false);
+  const [secondaryLoaded, setSecondaryLoaded] = useState(false);
   const inBag = items.some((item) => item.sku === product.sku);
   const secondary = product.images[1];
   const add = async () => { setPending(true); try { await addItem(product); } finally { setPending(false); } };
   return <motion.article data-scroll-anchor={`product-${product.id}`} layout="position" initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .22 }} className="mg-product-card">
     <div className="mg-product-media" data-photo-surface={product.image.startsWith("/catalog/") ? "light" : undefined}>
-      <Link href={`/producto/${product.id}`} className="mg-product-photo" aria-label={`Ver ${product.name}`} onClick={() => selectProduct(product, "collection")}>
+      <Link href={`/producto/${product.id}`} className="mg-product-photo" aria-label={`Ver ${product.name}`} onPointerEnter={(event) => { if (event.pointerType === "mouse" && secondary) setSecondaryRequested(true); }} onClick={() => selectProduct(product, "collection")}>
         <Image src={product.image} alt={product.name} fill loading="lazy" sizes="(max-width: 700px) 50vw, (max-width: 1024px) 33vw, 25vw" className="mg-image-primary" />
-        {secondary && <Image src={secondary} fill alt="" sizes="(max-width: 700px) 50vw, (max-width: 1024px) 33vw, 25vw" className="mg-image-secondary" />}
+        {secondary && secondaryRequested && <Image src={secondary} fill alt="" loading="lazy" sizes="(max-width: 700px) 50vw, (max-width: 1024px) 33vw, 25vw" className={`mg-image-secondary ${secondaryLoaded ? "is-ready" : ""}`} onLoad={() => setSecondaryLoaded(true)} />}
       </Link>
       {product.isNew && product.inventory.isInStock && <span className="mg-new-label">Recién intervenida</span>}
       {!product.inventory.isInStock && <span className="mg-unavailable-label">{product.source === "local-fallback" || product.inventory.availability === "unconfirmed" ? "Consultar disponibilidad" : ["reserved", "review"].includes(product.inventory.availability ?? "") ? "En proceso de compra" : "Agotada"}</span>}
@@ -207,7 +209,7 @@ function Footer() {
       <span>© {new Date().getFullYear()} MANGATA · Córdoba, Argentina</span>
       <nav aria-label="Contacto y redes">
         <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram <ArrowUpRight size={13} aria-hidden="true" /></a>
-        <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">{SITE.contactName} · {SITE.whatsappDisplay} <ArrowUpRight size={13} aria-hidden="true" /></a>
+        <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">WhatsApp · {SITE.whatsappDisplay} <ArrowUpRight size={13} aria-hidden="true" /></a>
         <a href="mailto:mangataclothing777@gmail.com">Email <ArrowUpRight size={13} aria-hidden="true" /></a>
       </nav>
     </div>

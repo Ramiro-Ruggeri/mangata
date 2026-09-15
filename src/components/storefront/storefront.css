@@ -122,8 +122,8 @@
 .mg-image-secondary { opacity: 0; }
 @media (hover: hover) and (pointer: fine) {
   .mg-product-media:hover .mg-image-primary { transform: scale(1.035); }
-  .mg-product-media:has(.mg-image-secondary):hover .mg-image-primary { opacity: 0; }
-  .mg-product-media:hover .mg-image-secondary { opacity: 1; transform: scale(1.035); }
+  .mg-product-media:has(.mg-image-secondary.is-ready):hover .mg-image-primary { opacity: 0; }
+  .mg-product-media:hover .mg-image-secondary.is-ready { opacity: 1; transform: scale(1.035); }
 }
 .mg-new-label, .mg-unavailable-label { position: absolute; top: 12px; left: 12px; z-index: 1; padding: 6px 8px; background: #eeeae2; color: #101010; font-size: 9px; line-height: 1.4; pointer-events: none; }
 .mg-unavailable-label { background: #333; color: #eeeae2; }

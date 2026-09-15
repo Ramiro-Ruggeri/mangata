@@ -36,7 +36,7 @@ export function publicCommerceError(error: unknown) {
   const messages = {
     invalid_cart: "Revisá las piezas de tu bolsa antes de seguir.",
     stock_unavailable: "Una pieza ya no está disponible. Revisá tu bolsa o escribinos para ayudarte.",
-    checkout_unavailable: "No pudimos abrir el pago. Tu bolsa sigue guardada; intentá de nuevo o escribinos.",
+    checkout_unavailable: "No pudimos abrir el pago. Tu bolsa sigue guardada; volvé a intentarlo.",
     cart_unavailable: "No pudimos actualizar tu bolsa. Intentá de nuevo en un momento.",
   };
   return { code, error: messages[code] };

@@ -14,7 +14,7 @@ test("real PostgreSQL: atomic one-of-one stock and idempotent payment lifecycle"
   const pool = new Pool({ connectionString, max: 8 });
   const db = new PostgresOrders(pool);
   const skuPrefix = randomUUID();
-  const products: StoreProduct[] = Array.from({ length: 9 }, (_, i) => ({ id: String(i), sku: `${skuPrefix}-${i}`,
+  const products: StoreProduct[] = Array.from({ length: 13 }, (_, i) => ({ id: String(i), sku: `${skuPrefix}-${i}`,
     name: `Test ${i}`, price: 10000 + i * 1000, slug: `test-${i}`, category: "Prendas", description: "Test only",
     image: "/test.webp", images: ["/test.webp"], isNew: false, inventory: { isInStock: true, manageStock: true }, source: "local" }));
   const intent = (items: StoreProduct[]): CheckoutIntent => ({ reference: `MNGT-${randomUUID()}`, amount: items.reduce((sum, p) => sum + p.price, 0),
@@ -31,6 +31,12 @@ test("real PostgreSQL: atomic one-of-one stock and idempotent payment lifecycle"
       assert.equal(results.filter(r => r.status === "rejected").length, 1);
       assert.equal((await pool.query("SELECT count(*)::int AS n FROM checkout_intents WHERE reference=ANY($1)", [[a.reference, b.reference]])).rows[0].n, 1);
       assert.equal((await db.availability([products[0]]))[0].inventory.isInStock, false);
+    });
+    await t.test("distinct shoppers can reserve different pieces concurrently", async () => {
+      const selected = products.slice(9, 13);
+      const intents = selected.map(product => intent([product]));
+      const results = await Promise.allSettled(intents.map((checkout, index) => db.reserve(checkout, [selected[index]], checkout.expiresAt)));
+      assert.equal(results.filter(result => result.status === "fulfilled").length, selected.length);
     });
     await t.test("failed multi-item reserve rolls back all stock and intent", async () => {
       const a = intent([products[0], products[1]]);
@@ -70,6 +76,22 @@ test("real PostgreSQL: atomic one-of-one stock and idempotent payment lifecycle"
       assert.equal((await db.availability([products[3]]))[0].inventory.isInStock, false);
       const p = payment(a, `${Date.now()}2`); await db.reconcile(p);
       assert.equal(await db.recorded(p), true);
+    });
+    await t.test("an unstarted or expired checkout releases stock only without a payment", async () => {
+      const unstarted = intent([products[6]]); await db.reserve(unstarted, [products[6]], unstarted.expiresAt);
+      assert.equal(await db.releaseUnstarted(unstarted.reference), true);
+      assert.equal((await db.availability([products[6]]))[0].inventory.isInStock, true);
+
+      const expired = intent([products[6]]); await db.reserve(expired, [products[6]], expired.expiresAt);
+      await pool.query("UPDATE checkout_intents SET expires_at=now()-interval '6 minutes' WHERE reference=$1", [expired.reference]);
+      assert.equal(await db.releaseExpiredUnpaid(expired.reference), true);
+      assert.equal((await db.availability([products[6]]))[0].inventory.isInStock, true);
+
+      const pending = intent([products[7]]); await db.reserve(pending, [products[7]], pending.expiresAt);
+      await pool.query("UPDATE checkout_intents SET expires_at=now()-interval '6 minutes' WHERE reference=$1", [pending.reference]);
+      await db.reconcile(payment(pending, `${Date.now()}7`, "pending"));
+      assert.equal(await db.releaseExpiredUnpaid(pending.reference), false);
+      assert.equal((await db.availability([products[7]]))[0].inventory.isInStock, false);
     });
     await t.test("second payment creates a review, never a second fulfillment", async () => {
       const a = intent([products[4]]); await db.reserve(a, [products[4]], a.expiresAt);

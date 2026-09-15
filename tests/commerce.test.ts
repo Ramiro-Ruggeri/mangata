@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { assertStoreRequest, CommerceError, publicCommerceError, resolveOneOfOneItems } from "../src/lib/commerce/one-of-one";
-import { readCheckoutIntent, signCheckoutIntent, paymentMatchesIntent, type CheckoutIntent } from "../src/lib/commerce/checkout-session";
+import { checkoutIntentMatches, readCheckoutIntent, signCheckoutIntent, paymentMatchesIntent, type CheckoutIntent } from "../src/lib/commerce/checkout-session";
 import { fetchMercadoPagoPayment, verifyMercadoPagoSignature } from "../src/lib/commerce/payment-webhook";
 import { assertOneOfOneCart, withCartLock } from "../src/lib/commerce/cart-server";
 import { getLocalCatalog, getProduct } from "../src/lib/commerce/catalog";
@@ -189,6 +189,12 @@ test("a signed session cannot be forged, expired or used for another payment", (
   assert.equal(paymentMatchesIntent({ ...payment, transaction_amount: 1 }, intent), false);
   assert.equal(paymentMatchesIntent({ ...payment, currency_id: "USD" }, intent), false);
   assert.equal(paymentMatchesIntent({ ...payment, status: "pending" }, intent), false);
+});
+
+test("checkout resume only accepts the exact basket regardless of SKU order", () => {
+  assert.equal(checkoutIntentMatches(intent, [...intent.skus].reverse(), intent.amount), true);
+  assert.equal(checkoutIntentMatches(intent, [...intent.skus, "MNGT-999"], intent.amount), false);
+  assert.equal(checkoutIntentMatches(intent, intent.skus, intent.amount + 1), false);
 });
 
 test("webhook validates the exact resource ID, request ID, signature and freshness", () => {

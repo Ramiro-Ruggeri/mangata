@@ -10,6 +10,7 @@ export async function reconcileOutstandingPayments() {
   let checked = 0;
   for (const intent of await db.candidates()) {
     let offset = 0;
+    let paymentsFound = 0;
     for (;;) {
       const query = new URLSearchParams({ external_reference: intent.reference, limit: "50", offset: String(offset) });
       const response = await fetch(`https://api.mercadopago.com/v1/payments/search?${query}`, {
@@ -19,6 +20,7 @@ export async function reconcileOutstandingPayments() {
       const page = await response.json() as { results?: Array<{ id?: number | string }>; paging?: { total?: number } };
       if (!Array.isArray(page.results) || !Number.isSafeInteger(page.paging?.total) || page.paging!.total! > 200) throw new Error("provider_response_invalid");
       for (const result of page.results) {
+        paymentsFound++;
         const payment = await fetchMercadoPagoPayment(String(result.id));
         if (!payment || payment.external_reference !== intent.reference) throw new Error("payment_validation_failed");
         await db.reconcile(payment);
@@ -27,7 +29,12 @@ export async function reconcileOutstandingPayments() {
       if (offset >= page.paging!.total!) break;
       if (!page.results.length) throw new Error("provider_pagination_failed");
     }
-    // Never free a unique garment just because its checkout timer expired.
+    // The provider preference is already closed after its expiration. Once the
+    // provider confirms there are no payments, release the abandoned hold after
+    // a short grace period. A late event is still recorded for manual review.
+    if (paymentsFound === 0 && intent.expires_at.getTime() <= Date.now() - 5 * 60_000) {
+      await db.releaseExpiredUnpaid(intent.reference);
+    }
     await db.checked(intent.reference);
     checked++;
   }

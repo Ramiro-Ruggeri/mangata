@@ -19,6 +19,8 @@ services:
       NODE_OPTIONS: --max-old-space-size=768
     expose:
       - "3000"
+    volumes:
+      - image_cache:/app/.next/cache/images
     networks:
       private: {}
       edge:
@@ -45,3 +47,7 @@ networks:
   edge:
     name: mangata_edge
     external: true
+
+volumes:
+  image_cache:
+    name: mangata_next_image_cache

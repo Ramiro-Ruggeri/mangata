@@ -4,7 +4,7 @@ import { SITE, whatsappHref } from "../src/config/site";
 import { readFileSync } from "node:fs";
 import { nextOverlay, clampScrollY, resolveReturnY, isPastScrollThreshold, shouldDiscardReturn, type ScrollReturnPoint } from "../src/lib/experience/interaction";
 
-test("all purchase support links share Emilia's verified WhatsApp and preserve the message", () => {
+test("all purchase support links share MANGATA's verified WhatsApp and preserve the message", () => {
   assert.equal(SITE.whatsapp, "5492920559780");
   const message = "Hola, ¿medidas de Campera Rituales (MNGT-7)?\n$30.000 & envío";
   const url = new URL(whatsappHref(message));

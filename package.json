@@ -12,6 +12,7 @@
     "test": "node --import tsx --test tests/commerce.test.ts tests/consent.test.ts tests/experience.test.ts tests/site-url.test.ts",
     "images:brand": "node scripts/prepare-brand-campaign.mjs",
     "images:optimize": "node scripts/optimize-product-images.mjs",
+    "images:prewarm": "node scripts/prewarm-production-images.mjs",
     "evershop:import": "tsx scripts/import-evershop.ts"
   },
   "dependencies": {
