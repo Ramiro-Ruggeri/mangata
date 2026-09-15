@@ -112,6 +112,8 @@ Estado: `systemctl status mangata-publish.timer`; últimas ejecuciones: `journal
 
 > DNS: a las 21:12 ART la zona autoritativa de NIC ya delegaba en Cloudflare y el A público resolvía al VPS. El primer intento ACME de las 21:09 todavía recibió NXDOMAIN desde el resolvedor del emisor; el trabajo conserva su backoff de 30 minutos. No confundir resolución parcial con HTTPS ya validado.
 
+> Release de contacto desplegada: `a4cdfcaa0423616b8d1feb1b714b231cb318c366`, contenedor saludable en Hostinger y deployment Vercel exitoso. 35 tests, lint y tipos aprobados, build Linux correcto; QA móvil 320/390 y desktop 1440 sin desborde. Alta/baja de Bandoo Moñito de prueba restauró bolsa vacía; enlace contextual a Emilia correcto. Smoke: 26 productos, 32 imágenes, optimización, 26 SKU, rechazo cross-origin/bajas y 27 URLs. Los cuatro sitios ajenos conservaron HTTP 200. La foto compuesta de Rituales sigue sin cambio: el intento con edición generativa no preservó detalles y se excluyó; se solicitó autorización para recorte determinista del original. No hay cobros habilitados.
+
 - Entradas finitas de colección, manifiesto y footer al entrar en pantalla, con contenido visible sin JavaScript y cancelación inmediata al activar movimiento reducido o enfocar un control.
 - Apertura animada de búsqueda, menú, privacidad y zoom; feedback más perceptible de los CTA generales, contador de bolsa y acordeones. Sin loops decorativos ni cambio del hero o de los botones de producto.
 - Corregido un cierre inmediato del panel de privacidad causado por el evento `close` pendiente de una limpieza de efectos en Strict Mode. Reapertura y foco comprobados en navegador.
