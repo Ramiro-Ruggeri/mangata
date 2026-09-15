@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "framer-motion";
-import { Check, MessageCircle, ShieldCheck, ShoppingBag, Trash2, X } from "lucide-react";
+import { Check, CircleCheck, LockKeyhole, MessageCircle, ShoppingBag, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BrandSignature } from "@/components/brand/BrandSignature";
 import { useCart } from "@/components/commerce/CartProvider";
@@ -174,7 +174,7 @@ export default function CartDrawer() {
               {checkoutReady && mode === "local" && <a className="text-link" href={whatsappHref("Hola MANGATA, quiero coordinar el envío o retiro antes de pagar mi selección.")} target="_blank" rel="noopener noreferrer">Coordinar entrega</a>}
               {checkoutReady ? (
                 <button className="magnetic-button cart-checkout" disabled={!items.length || syncState === "syncing" || (mode === "local" && !deliveryAcknowledged)} onClick={() => checkout(deliveryAcknowledged)}>
-                  <span>{syncState === "syncing" ? "Revisando tu bolsa…" : mode === "local" ? "Pagar con Mercado Pago" : "Ir a pagar de forma segura"}</span><span>↗</span>
+                  <span className="cart-checkout-label"><LockKeyhole size={16} strokeWidth={1.8} aria-hidden="true" />{syncState === "syncing" ? "Revisando tu bolsa…" : mode === "local" ? "Pagar con Mercado Pago" : "Ir a pagar de forma segura"}</span><span aria-hidden="true">↗</span>
                 </button>
               ) : items.length > 0 && syncState !== "syncing" ? (
                 <a className="magnetic-button cart-checkout" href={inquiryUrl} target="_blank" rel="noopener noreferrer" aria-label="Consultar mi selección por WhatsApp (se abre en otra pestaña)" onClick={() => trackCommerceEvent("checkout_inquiry", { currency: "ARS", value: subtotal, item_count: items.length, source: "bag" })}>
@@ -183,7 +183,7 @@ export default function CartDrawer() {
               ) : (
                 <button className="magnetic-button cart-checkout" disabled><span>{syncState === "syncing" ? "Revisando tu bolsa…" : "Consultar mi selección"}</span><MessageCircle size={20} strokeWidth={1.5} /></button>
               )}
-              <div className="cart-assurance">{checkoutReady ? <ShieldCheck size={14} strokeWidth={1.4} /> : <MessageCircle size={14} strokeWidth={1.4} />}<span>{checkoutReady ? "Completás el pago en una página segura." : "Se abre WhatsApp con tus piezas elegidas."}</span></div>
+              <div className="cart-assurance">{checkoutReady ? <CircleCheck className="cart-assurance-check" size={15} strokeWidth={2.2} aria-hidden="true" /> : <MessageCircle size={14} strokeWidth={1.4} aria-hidden="true" />}<span>{checkoutReady ? "Pago protegido por Mercado Pago." : "Se abre WhatsApp con tus piezas elegidas."}</span></div>
               {syncState === "error" && <a className="text-link" href={whatsappHref("Hola MANGATA, necesito ayuda para comprar.")} target="_blank" rel="noreferrer"><MessageCircle size={15} /> Consultar por WhatsApp</a>}
               {items.length > 0 && <button className="cart-clear" disabled={syncState === "syncing"} onClick={clear}>Vaciar selección</button>}
             </footer>}

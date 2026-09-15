@@ -18,6 +18,21 @@ test("all purchase support links share MANGATA's verified WhatsApp and preserve 
   }
 });
 
+test("the storefront uses specific hero copy and visible payment trust signals", () => {
+  const storefront = readFileSync("src/components/storefront/Storefront.tsx", "utf8");
+  const cart = readFileSync("src/components/CartDrawer.tsx", "utf8");
+  assert.match(storefront, /El diseño/);
+  assert.doesNotMatch(storefront, /El denim/);
+  assert.match(storefront, /La que elegís es la que recibís/);
+  assert.match(storefront, /Pago protegido/);
+  assert.match(storefront, /Checkout seguro de Mercado Pago/);
+  assert.match(storefront, /LockKeyhole/);
+  assert.match(storefront, /CircleCheck/);
+  assert.match(cart, /Pago protegido por Mercado Pago/);
+  assert.match(cart, /LockKeyhole/);
+  assert.match(cart, /CircleCheck/);
+});
+
 test("only one overlay is active; cleanup of a replaced modal cannot close its replacement", () => {
   let active: string | null = nextOverlay(null, { type: "open", name: "search" });
   assert.equal(active, "search");

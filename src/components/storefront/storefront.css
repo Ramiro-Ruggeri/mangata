@@ -69,7 +69,8 @@
 .mg-hero h1 em { display: inline-block; color: #c0b4ec; line-height: .88; letter-spacing: -.055em; }
 .mg-hero-copy > p { color: #c4c1ba; font-size: 14px; line-height: 1.8; }
 .mg-hero-copy > .mg-button { min-width: 210px; margin-top: 28px; }
-.mg-hero-footnote { display: block; margin-top: 18px; color: #8f8d88; font-size: 10px; }
+.mg-hero-footnote { display: flex; align-items: center; gap: 7px; margin-top: 18px; color: #a4a19b; font-size: 10px; }
+.mg-hero-footnote svg { flex: 0 0 auto; color: #36a65c; }
 .mg-hero-visual { position: relative; min-width: 0; min-height: 560px; }
 .mg-hero-photo { position: absolute; inset: 6px -2% 98px 0; display: block; }
 .mg-hero-photo[data-photo-surface="light"] { inset: 24px 0 98px 8%; overflow: hidden; background: #f3f2ee; }
@@ -92,6 +93,8 @@
 .mg-purchase-notes :is(a, button) { transition: background var(--motion-feedback); }
 @media (hover: hover) { .mg-purchase-notes :is(a, button):hover { background: #c5b9ee18; } }
 .mg-purchase-notes svg { flex-shrink: 0; }
+.mg-trust-icon { position: relative; display: grid; flex: 0 0 auto; place-items: center; }
+.mg-trust-icon svg:last-child { position: absolute; right: -7px; bottom: -6px; color: #16833f; fill: var(--mg-paper); }
 
 .mg-collection { padding-block: 76px 85px; }
 .mg-collection-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; margin-bottom: 42px; }

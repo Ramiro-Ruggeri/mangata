@@ -7,7 +7,7 @@ import { useRevealOnView } from "@/components/experience/useRevealOnView";
 import { useNativeDialog } from "@/components/ui/useNativeDialog";
 import Link from "next/link";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight, Check, ChevronDown, CreditCard, Menu, MessageCircle, PackageCheck, Plus, Search, ShieldCheck, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight, Check, ChevronDown, CircleCheck, CreditCard, LockKeyhole, Menu, MessageCircle, PackageCheck, Plus, Search, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
@@ -82,10 +82,10 @@ function Hero({ products }: { products: StoreProduct[] }) {
   return <section className="mg-hero" id="inicio" aria-labelledby="hero-title">
     <div className="mg-hero-copy">
       <span className="mg-eyebrow"><i /> Streetwear recuperado</span>
-      <h1 id="hero-title">El denim<br />no termina<br /><em>acá.</em></h1>
-      <p>Lo desarmamos. Lo intervenimos.<br />{" "}Lo volvés a llevar a la calle.</p>
+      <h1 id="hero-title">El diseño<br />no termina<br /><em>acá.</em></h1>
+      <p>Piezas recuperadas, intervenidas una a una.<br />{" "}La que elegís es la que recibís.</p>
       <a href="#coleccion" className="mg-button mg-button-light">Ver las piezas <ArrowDown size={18} /></a>
-      <span className="mg-hero-footnote">Hecho a mano en Córdoba, de a una prenda.</span>
+      <span className="mg-hero-footnote"><CircleCheck size={13} strokeWidth={2} aria-hidden="true" /> Fotos reales. Hecho a mano en Córdoba.</span>
     </div>
     {featured && <div className="mg-hero-visual">
       <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, 55vw" /></Link>
@@ -100,7 +100,7 @@ function PurchaseNotes() {
   const mercadoPagoReady = checkoutReady && mode === "local";
   return <section className="mg-purchase-notes" aria-label="Información para comprar">
     <a href="#ayuda"><PackageCheck size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Entrega a coordinar</strong><small>Consultá envío o retiro en Córdoba.</small></span></a>
-    {mercadoPagoReady ? <button type="button" onClick={openCart}><ShieldCheck size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Pago con Mercado Pago</strong><small>Completás el pago en su checkout seguro.</small></span></button> : <div><CreditCard size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Precios en pesos argentinos</strong><small>El envío se coordina antes de comprar.</small></span></div>}
+    {mercadoPagoReady ? <button type="button" onClick={openCart}><span className="mg-trust-icon" aria-hidden="true"><LockKeyhole size={23} strokeWidth={1.4} /><CircleCheck size={13} strokeWidth={2.3} /></span><span><strong>Pago protegido</strong><small>Checkout seguro de Mercado Pago.</small></span></button> : <div><CreditCard size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Precios en pesos argentinos</strong><small>El envío se coordina antes de comprar.</small></span></div>}
     <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" aria-label="Contactar a MANGATA por WhatsApp (se abre en otra pestaña)"><MessageCircle size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Atención por WhatsApp</strong><small>{SITE.whatsappDisplay}</small></span></a>
   </section>;
 }
