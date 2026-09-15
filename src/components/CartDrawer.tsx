@@ -8,6 +8,7 @@ import { BrandSignature } from "@/components/brand/BrandSignature";
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import { motionTokens } from "@/lib/experience/interaction";
+import { whatsappHref } from "@/config/site";
 
 const money = (value: number) =>
   new Intl.NumberFormat("es-AR", {
@@ -37,7 +38,7 @@ export default function CartDrawer() {
     checkoutReady,
   } = useCart();
   const inquiryMessage = `Hola MANGATA, quiero consultar por estas piezas:\n${items.map((item) => `${item.name} (${item.sku})`).join("\n")}\n¿Siguen disponibles?`;
-  const inquiryUrl = `https://wa.me/5493885195631?text=${encodeURIComponent(inquiryMessage)}`;
+  const inquiryUrl = whatsappHref(inquiryMessage);
   const closeRef = useRef<HTMLButtonElement>(null);
   const reducedMotion = useReducedMotion();
   const panelRef = useRef<HTMLElement>(null);
@@ -178,7 +179,7 @@ export default function CartDrawer() {
                 <button className="magnetic-button cart-checkout" disabled><span>{syncState === "syncing" ? "Revisando tu bolsa…" : "Consultar mi selección"}</span><MessageCircle size={20} strokeWidth={1.5} /></button>
               )}
               <div className="cart-assurance">{checkoutReady ? <ShieldCheck size={14} strokeWidth={1.4} /> : <MessageCircle size={14} strokeWidth={1.4} />}<span>{checkoutReady ? "Completás el pago en una página segura." : "Se abre WhatsApp con tus piezas elegidas."}</span></div>
-              {syncState === "error" && <a className="text-link" href="https://wa.me/5493885195631?text=Hola%20MANGATA%2C%20necesito%20ayuda%20para%20comprar." target="_blank" rel="noreferrer"><MessageCircle size={15} /> Consultar por WhatsApp</a>}
+              {syncState === "error" && <a className="text-link" href={whatsappHref("Hola MANGATA, necesito ayuda para comprar.")} target="_blank" rel="noreferrer"><MessageCircle size={15} /> Consultar por WhatsApp</a>}
               {items.length > 0 && <button className="cart-clear" disabled={syncState === "syncing"} onClick={clear}>Vaciar selección</button>}
             </footer>
           </motion.aside>

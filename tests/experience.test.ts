@@ -1,6 +1,22 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { SITE, whatsappHref } from "../src/config/site";
+import { readFileSync } from "node:fs";
 import { nextOverlay, clampScrollY, resolveReturnY, isPastScrollThreshold, shouldDiscardReturn, type ScrollReturnPoint } from "../src/lib/experience/interaction";
+
+test("all purchase support links share Emilia's verified WhatsApp and preserve the message", () => {
+  assert.equal(SITE.whatsapp, "5492920559780");
+  const message = "Hola, ¿medidas de Campera Rituales (MNGT-7)?\n$30.000 & envío";
+  const url = new URL(whatsappHref(message));
+  assert.equal(url.origin, "https://wa.me");
+  assert.equal(url.pathname, "/5492920559780");
+  assert.equal(url.searchParams.get("text"), message);
+  for (const file of ["src/components/CartDrawer.tsx", "src/components/PDPClient.tsx", "src/components/CheckoutStatus.tsx", "src/components/storefront/Storefront.tsx", "src/app/error.tsx"]) {
+    const source = readFileSync(file, "utf8");
+    assert.ok(source.includes("whatsappHref"), `${file} must use the shared contact`);
+    assert.ok(!source.includes("5493885195631"), `${file} contains a retired contact`);
+  }
+});
 
 test("only one overlay is active; cleanup of a replaced modal cannot close its replacement", () => {
   let active: string | null = nextOverlay(null, { type: "open", name: "search" });

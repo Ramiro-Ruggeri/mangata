@@ -7,17 +7,18 @@ import { useRevealOnView } from "@/components/experience/useRevealOnView";
 import { useNativeDialog } from "@/components/ui/useNativeDialog";
 import Link from "next/link";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight, Check, ChevronDown, CreditCard, Menu, MessageCircle, Plus, Search, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight, Check, ChevronDown, CreditCard, Menu, MessageCircle, PackageCheck, Plus, Search, ShieldCheck, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { CatalogResult, CatalogSource, CommerceMode, StoreProduct } from "@/lib/commerce/types";
+import { SITE, whatsappHref } from "@/config/site";
 import "./storefront.css";
 
-const INSTAGRAM = "https://instagram.com/mangata.upcy";
-const WHATSAPP = "https://wa.me/5493885195631?text=Hola%20MANGATA%2C%20quiero%20consultar%20por%20una%20pieza.";
-const WHATSAPP_DROP = "https://wa.me/5493885195631?text=Hola%20MANGATA%2C%20%C2%BFcu%C3%A1ndo%20sale%20el%20pr%C3%B3ximo%20drop%3F";
-const WHATSAPP_MEASURES = "https://wa.me/5493885195631?text=Hola%20MANGATA%2C%20vi%20una%20pieza%20en%20la%20web%20y%20quiero%20consultar%20sus%20medidas.";
+const INSTAGRAM = SITE.instagram;
+const WHATSAPP = whatsappHref("Hola MANGATA, quiero consultar por una pieza.");
+const WHATSAPP_DROP = whatsappHref("Hola MANGATA, ¿cuándo sale el próximo drop?");
+const WHATSAPP_MEASURES = whatsappHref("Hola MANGATA, vi una pieza en la web y quiero consultar sus medidas.");
 const money = (value: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value);
 const clean = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es");
 
@@ -82,7 +83,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
     <div className="mg-hero-copy">
       <span className="mg-eyebrow"><i /> Streetwear recuperado</span>
       <h1 id="hero-title">El denim<br />no termina<br /><em>acá.</em></h1>
-      <p>Lo desarmamos. Lo intervenimos.<br />Lo volvés a llevar a la calle.</p>
+      <p>Lo desarmamos. Lo intervenimos.<br />{" "}Lo volvés a llevar a la calle.</p>
       <a href="#coleccion" className="mg-button mg-button-light">Ver las piezas <ArrowDown size={18} /></a>
       <span className="mg-hero-footnote">Hecho a mano en Córdoba, de a una prenda.</span>
     </div>
@@ -95,7 +96,13 @@ function Hero({ products }: { products: StoreProduct[] }) {
 }
 
 function PurchaseNotes() {
-  return <div className="mg-purchase-notes" aria-label="Información para comprar"><span><Plus size={18} /> Cada pieza tiene una sola unidad</span><a href="#ayuda"><MessageCircle size={18} /> Te ayudamos con las medidas</a><span><CreditCard size={19} /> Precios en pesos argentinos</span></div>;
+  const { checkoutReady, mode, openCart } = useCart();
+  const mercadoPagoReady = checkoutReady && mode === "local";
+  return <section className="mg-purchase-notes" aria-label="Información para comprar">
+    <a href="#ayuda"><PackageCheck size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Entrega a coordinar</strong><small>Consultá envío o retiro en Córdoba.</small></span></a>
+    {mercadoPagoReady ? <button type="button" onClick={openCart}><ShieldCheck size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Pago con Mercado Pago</strong><small>Completás el pago en su checkout seguro.</small></span></button> : <div><CreditCard size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Precios en pesos argentinos</strong><small>El envío se coordina antes de comprar.</small></span></div>}
+    <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" aria-label={`Hablar con ${SITE.contactName} por WhatsApp (se abre en otra pestaña)`}><MessageCircle size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Hablá con {SITE.contactName}</strong><small>WhatsApp · {SITE.whatsappDisplay}</small></span></a>
+  </section>;
 }
 
 function ProductCard({ product }: { product: StoreProduct }) {
@@ -200,7 +207,7 @@ function Footer() {
       <span>© {new Date().getFullYear()} MANGATA · Córdoba, Argentina</span>
       <nav aria-label="Contacto y redes">
         <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram <ArrowUpRight size={13} aria-hidden="true" /></a>
-        <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">WhatsApp <ArrowUpRight size={13} aria-hidden="true" /></a>
+        <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">{SITE.contactName} · {SITE.whatsappDisplay} <ArrowUpRight size={13} aria-hidden="true" /></a>
         <a href="mailto:mangataclothing777@gmail.com">Email <ArrowUpRight size={13} aria-hidden="true" /></a>
       </nav>
     </div>

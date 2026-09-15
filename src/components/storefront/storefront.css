@@ -82,8 +82,15 @@
 .mg-hero-product > span:last-child { display: flex; align-items: center; gap: 22px; font-size: 15px; }
 .mg-hero-bottom { display: flex; grid-column: 1 / -1; justify-content: space-between; align-items: center; gap: 16px; padding: 18px 0; border-top: 1px solid #282828; color: #96938e; font-size: 10px; }
 .mg-hero-bottom a { display: flex; align-items: center; gap: 12px; }
-.mg-purchase-notes { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 25px 4.2%; border-bottom: 1px solid var(--mg-line); font-size: 12px; }
-.mg-purchase-notes > * { display: flex; align-items: center; gap: 12px; }
+.mg-purchase-notes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; padding: 0 4.2%; border-bottom: 1px solid var(--mg-line); font-size: 12px; }
+.mg-purchase-notes > * { display: flex; align-items: center; gap: 16px; min-width: 0; min-height: 108px; padding: 24px 22px; text-align: left; }
+.mg-purchase-notes > :first-child { padding-left: 0; }
+.mg-purchase-notes > * + * { border-left: 1px solid var(--mg-line); }
+.mg-purchase-notes strong, .mg-purchase-notes small { display: block; }
+.mg-purchase-notes strong { font-size: 14px; font-weight: 600; line-height: 1.4; }
+.mg-purchase-notes small { margin-top: 5px; color: #625d55; font-size: 11px; line-height: 1.5; }
+.mg-purchase-notes :is(a, button) { transition: background var(--motion-feedback); }
+@media (hover: hover) { .mg-purchase-notes :is(a, button):hover { background: #c5b9ee18; } }
 .mg-purchase-notes svg { flex-shrink: 0; }
 
 .mg-collection { padding-block: 76px 85px; }
@@ -243,7 +250,7 @@
   .mg-bag-label { display: none; }
   .mg-hero h1 { font-size: clamp(60px, 7.8vw, 82px); }
   .mg-hero-visual { min-height: 540px; }
-  .mg-purchase-notes { gap: 14px; font-size: 11px; }
+  .mg-purchase-notes { gap: 0; font-size: 11px; }
   .mg-purchase-notes > * { gap: 8px; }
   .mg-product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 30px 16px; }
   .mg-story-image { min-height: 560px; }
@@ -283,9 +290,12 @@
   .mg-hero-bottom { padding-block: 14px; font-size: 8px; line-height: 1.7; }
   .mg-hero-bottom a { gap: 6px; white-space: nowrap; }
   .mg-hero-bottom > span { max-width: 175px; }
-  .mg-purchase-notes { display: grid; grid-template-columns: 1fr; justify-content: center; gap: 11px; padding: 21px 20px; font-size: 11px; }
-  .mg-purchase-notes > * { gap: 11px; }
-  .mg-purchase-notes svg { width: 15px; height: 15px; }
+  .mg-purchase-notes { grid-template-columns: 1fr; padding: 8px 20px; }
+  .mg-purchase-notes > *, .mg-purchase-notes > :first-child { gap: 14px; min-height: 76px; padding: 16px 0; }
+  .mg-purchase-notes > * + * { border-left: 0; border-top: 1px solid var(--mg-line); }
+  .mg-purchase-notes strong { font-size: 13px; }
+  .mg-purchase-notes small { font-size: 11px; margin-top: 3px; }
+  .mg-purchase-notes svg { width: 21px; height: 21px; }
   .mg-collection { padding-block: 44px 50px; }
   .mg-collection-heading { align-items: flex-start; flex-direction: column; gap: 17px; margin-bottom: 27px; }
   .mg-collection .mg-eyebrow, .mg-help .mg-eyebrow, .mg-story .mg-eyebrow, .mg-footer .mg-eyebrow { font-size: 9px; }

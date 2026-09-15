@@ -11,6 +11,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { StoreProduct } from "@/lib/commerce/types";
+import { whatsappHref } from "@/config/site";
 import "./product/product.css";
 
 const money = (value: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value);
@@ -32,8 +33,8 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
   const inBag = items.some((item) => item.sku === product.sku);
   const stockUnconfirmed = product.source === "local-fallback";
   const available = product.inventory.isInStock && !stockUnconfirmed;
-  const measurementHref = `https://wa.me/5493885195631?text=${encodeURIComponent(`Hola MANGATA, ¿me pasan las medidas de ${product.name} (${product.sku})?`)}`;
-  const helpHref = `https://wa.me/5493885195631?text=${encodeURIComponent(`Hola MANGATA, quiero consultar por ${product.name} (${product.sku}).`)}`;
+  const measurementHref = whatsappHref(`Hola MANGATA, ¿me pasan las medidas de ${product.name} (${product.sku})?`);
+  const helpHref = whatsappHref(`Hola MANGATA, quiero consultar por ${product.name} (${product.sku}).`);
 
   useEffect(() => {
     trackCommerceEvent("view_item", { currency: "ARS", value: product.price, item_id: product.sku, item_name: product.name, item_category: product.category });

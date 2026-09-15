@@ -8,9 +8,9 @@ import { ArrowLeft, Check, Clock3, MessageCircle, RotateCcw, X } from "lucide-re
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackVerifiedPurchase } from "@/lib/analytics";
 import { motionTokens } from "@/lib/experience/interaction";
+import { whatsappHref } from "@/config/site";
 
-const WHATSAPP_HELP =
-  "https://wa.me/5493885195631?text=Hola%20MANGATA%2C%20tuve%20un%20inconveniente%20con%20mi%20pago.";
+const WHATSAPP_HELP = whatsappHref("Hola MANGATA, tuve un inconveniente con mi pago.");
 
 type CheckoutState = "failure" | "pending" | "success";
 

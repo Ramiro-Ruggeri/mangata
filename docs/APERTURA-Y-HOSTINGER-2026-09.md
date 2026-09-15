@@ -108,6 +108,10 @@ Estado: `systemctl status mangata-publish.timer`; últimas ejecuciones: `journal
 
 ### Pasada de microinteracciones
 
+> Actualización posterior, 14/09/2026: el contacto confirmado por el cliente es Emilia, **+54 9 2920 55-9780**. Se centralizó en `src/config/site.ts` para todas las salidas comerciales y se añadió una franja compacta de confianza. El checkout continúa cerrado: la inspección de presencia de variables en el contenedor confirmó que no hay credenciales de Mercado Pago ni servicio durable configurados. La nueva solicitud de pago requiere conectar la cuenta de Emilia e implementar/probar persistencia; EverShop sigue diferido. Ver [checklist reutilizable](ECOMMERCE-DELIVERY-CHECKS.md).
+
+> DNS: a las 21:12 ART la zona autoritativa de NIC ya delegaba en Cloudflare y el A público resolvía al VPS. El primer intento ACME de las 21:09 todavía recibió NXDOMAIN desde el resolvedor del emisor; el trabajo conserva su backoff de 30 minutos. No confundir resolución parcial con HTTPS ya validado.
+
 - Entradas finitas de colección, manifiesto y footer al entrar en pantalla, con contenido visible sin JavaScript y cancelación inmediata al activar movimiento reducido o enfocar un control.
 - Apertura animada de búsqueda, menú, privacidad y zoom; feedback más perceptible de los CTA generales, contador de bolsa y acordeones. Sin loops decorativos ni cambio del hero o de los botones de producto.
 - Corregido un cierre inmediato del panel de privacidad causado por el evento `close` pendiente de una limpieza de efectos en Strict Mode. Reapertura y foco comprobados en navegador.
