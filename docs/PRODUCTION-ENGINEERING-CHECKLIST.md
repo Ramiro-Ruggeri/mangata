@@ -16,13 +16,29 @@ Este registro distingue evidencia técnica de aprobaciones comerciales pendiente
 
 ## Puertas de habilitación de cobros
 
-- [ ] Confirmación de Emilia: se abonan las prendas y el envío/retiro se coordina antes del pago; transporte no incluido. No activar `MANGATA_SHIPPING_MODE=arranged_separately` sin esa confirmación.
-- [ ] Access Token de la aplicación de Emilia y secreto Webhooks cargados sólo en el VPS; comprobar `/users/me`, titular y ambiente.
-- [ ] Webhooks `payment` configurados para `https://mangata.com.ar/api/mp/webhook`; firma HMAC y persistencia antes de responder OK.
-- [ ] Pruebas de proveedor aprobada, rechazada y pendiente; verificar destino y carrito en la interfaz. No ejecutar un cobro real sin autorización específica del importe.
-- [ ] Activar conciliación periódica después de configurar el proveedor, sin perder avisos al deshabilitar nuevas compras.
-- [ ] Habilitar `MANGATA_CHECKOUT_ENABLED=1` únicamente después de validar los puntos anteriores.
+- [x] El usuario confirmó: prendas en la web; envío/retiro coordinado aparte. El checkout exige confirmar que se acordó el retiro o costo del envío y aclara que el envío no está incluido ni es gratuito.
+- [x] Access Token de la aplicación de Emilia y secreto Webhooks en el archivo privado del VPS; `/users/me` confirmó la titular esperada y sitio MLA. No hay credenciales en Git ni en la imagen de la aplicación.
+- [x] Webhooks `payment` (Pagos legacy) guardados para `https://mangata.com.ar/api/mp/webhook`. HMAC inválido devuelve 401; firmado sin pago real verificable devuelve 503, nunca un falso éxito.
+- [x] API sandbox: aprobada, rechazada y en proceso, leídas nuevamente desde Mercado Pago y conciliadas en `mangata_test_20260914`; repetición idempotente y sólo la aprobada registra pedido pagado. Cero cobros reales.
+- [x] Preferencias de producción: creación autorizada, titular, ARS, retorno HTTPS y búsqueda de pagos verificados. Las dos preferencias sintéticas de diagnóstico se vencieron inmediatamente y no reservaron prendas.
+- [x] Conciliación cada cinco minutos, backup diario y renovación TLS con timers activos. Estado de lanzamiento: 26 productos, 0 pedidos reales, 0 revisiones, 0 atrasos.
+- [x] `MANGATA_CHECKOUT_ENABLED=1` habilitado tras estas verificaciones; bolsa publicada muestra Mercado Pago y bloquea el botón hasta confirmar entrega.
+- [ ] Compra real completa realizada por un comprador distinto de Emilia. No se ejecutó ni se afirma haber probado un cargo real, autenticación bancaria o acreditación bancaria.
 - [ ] Validar identidad fiscal, domicilio comercial, política de entrega/cambios y conservación de datos con la titular antes de declarar cerrado el cumplimiento comercial/legal.
+
+## Publicación comprobada
+
+La implementación base `c64a5c895374faafc023bc4c38d99e4af07eed35` se desplegó saludable en Hostinger; el commit de cierre que contiene este checklist incluye la revisión final de la bolsa vacía. La versión activa se identifica en `/opt/mangata/current` y en la etiqueta de revisión de la imagen Docker. Dominio anterior Vercel redirige con 308 al dominio oficial. Smoke de producción: 26 productos, 33 fotografías, precios y bolsa por SKU, 27 URLs en sitemap, canonical oficial, imagen optimizada y rechazo de origen ajeno/SKU retirado.
+
+Los scripts `deploy/verify-provider-connection.mjs` y `scripts/verify-mercadopago-sandbox.ts` conservan el procedimiento de QA. Las pruebas sandbox no sustituyen un recorrido completo del checkout alojado de Mercado Pago con comprador de prueba: no se inició sesión como comprador ni se completó ese recorrido de navegador. El ensayo API y la revisión de la bolsa publicada se verificaron por separado.
+
+Incidencias de QA preservadas: el simulador del panel Webhooks devolvió timeout; no se cambió el endpoint para aparentar un 200. La prueba HTTPS directa de firma válida/inválida respondió y la conciliación periódica quedó activa como respaldo. `GET /checkout/preferences/{id}` devolvió 403 con la credencial productiva, mientras crear/actualizar preferencias y buscar pagos funcionaron; la aplicación no depende de ese GET. El sandbox mostró errores intermitentes «Card Token not found»; se completó la validación recuperando y conciliando los tres pagos de prueba ya creados desde la API canónica, sin fabricar estados.
+
+Seguridad de QA: una credencial **de pruebas**, no la productiva ni la firma Webhooks, apareció en un resultado de diagnóstico local. Debe renovarse desde Mercado Pago; no se copió a Git ni al cliente web. La rotación queda a cargo del titular por requerir interacción con credenciales.
+
+Nginx: ruta interna devuelve 404 desde Internet; ráfaga controlada de solicitudes inválidas al checkout devuelve 429 sin reservar stock. HSTS inicial de un día sólo en los dos hosts de MANGATA; no preload ni política impuesta a otros subdominios. Los demás cuatro sitios del VPS conservaron HTTP 200. Cuenta de Mercado Pago verificada por `/users/me` como la titular esperada (MLA); no se realizó un cobro real.
+
+Revisión visual en el dominio: 320, 390 y 1440 px sin desbordamiento horizontal; cambio frente/dorso, zoom, Escape con restauración de foco, una sola capa modal, agregado/eliminación de una unidad, teléfono correcto, consentimiento y navegación bidireccional comprobados. Sin errores/advertencias de consola en el recorrido. No equivale a probar todos los modelos de teléfono o tecnologías asistivas.
 
 ## Regla operativa para piezas únicas
 
