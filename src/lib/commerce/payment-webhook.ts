@@ -26,5 +26,8 @@ export async function fetchMercadoPagoPayment(paymentId: string): Promise<Provid
   });
   if (!response.ok) return null;
   const payment = await response.json() as ProviderPayment;
+  if (process.env.MANGATA_ORDER_STORAGE === "postgres" &&
+    (String(payment.collector_id) !== process.env.MP_MERCHANT_ID ||
+      payment.live_mode !== (process.env.MANGATA_PAYMENT_ENV === "production"))) return null;
   return String(payment.id) === paymentId ? payment : null;
 }

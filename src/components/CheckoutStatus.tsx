@@ -79,11 +79,9 @@ export default function CheckoutStatus({
           {state === "pending" && (
             <button onClick={() => window.location.reload()}><RotateCcw size={16} strokeWidth={1.4} /> Consultar estado</button>
           )}
-          {state !== "success" && (
-            <a href={WHATSAPP_HELP} target="_blank" rel="noreferrer">
-              <MessageCircle size={16} strokeWidth={1.4} /> Pedir ayuda
-            </a>
-          )}
+          <a href={state === "success" && reference ? whatsappHref(`Hola Emilia, mi compra ${reference} fue confirmada. Quiero seguir la entrega.`) : WHATSAPP_HELP} target="_blank" rel="noopener noreferrer">
+            <MessageCircle size={16} strokeWidth={1.4} /> {state === "success" ? "Consultar mi entrega" : "Pedir ayuda"}
+          </a>
         </div>
       </motion.section>
 

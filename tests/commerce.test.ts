@@ -83,7 +83,10 @@ test("September catalog contains exactly the 26 confirmed final ARS prices and r
   for (const item of products) {
     for (const image of item.images) assert.ok(existsSync(path.join(process.cwd(), "public", image)), image);
   }
-  assert.deepEqual(products.find((item) => item.id === "7")?.images, ["/catalog/2026-09/campera-corderoy-corregida.webp"]);
+  const rituales = products.filter((item) => item.id === "7");
+  assert.equal(rituales.length, 1, "Front and back belong to one product, not two SKUs");
+  assert.deepEqual(rituales[0].images, ["/catalog/2026-09/campera-rituales-frente.webp", "/catalog/2026-09/campera-rituales-dorso.webp"]);
+  assert.equal(rituales[0].image, rituales[0].images[0]);
 });
 
 test("saved local bags refresh prices and photos, deduplicate, and remove unavailable identities", () => {

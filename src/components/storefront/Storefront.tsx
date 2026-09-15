@@ -118,7 +118,7 @@ function ProductCard({ product }: { product: StoreProduct }) {
         {secondary && <Image src={secondary} fill alt="" sizes="(max-width: 700px) 50vw, (max-width: 1024px) 33vw, 25vw" className="mg-image-secondary" />}
       </Link>
       {product.isNew && product.inventory.isInStock && <span className="mg-new-label">Recién intervenida</span>}
-      {!product.inventory.isInStock && <span className="mg-unavailable-label">{product.source === "local-fallback" ? "Consultar disponibilidad" : "Agotada"}</span>}
+      {!product.inventory.isInStock && <span className="mg-unavailable-label">{product.source === "local-fallback" || product.inventory.availability === "unconfirmed" ? "Consultar disponibilidad" : ["reserved", "review"].includes(product.inventory.availability ?? "") ? "En proceso de compra" : "Agotada"}</span>}
       <Link href={`/producto/${product.id}`} className="mg-view-piece" aria-label={`Ver detalles de ${product.name}`} onClick={() => selectProduct(product, "collection_detail")}><ArrowUpRight size={18} /></Link>
     </div>
     <div className="mg-product-info"><span className="mg-product-category">{product.category}</span><Link href={`/producto/${product.id}`} onClick={() => selectProduct(product, "collection_name")}><h3>{product.name}</h3></Link><div className="mg-product-prices"><strong>{money(product.price)}</strong>{product.compareAtPrice && <del>{money(product.compareAtPrice)}</del>}</div>{product.transferPrice && <p className="mg-transfer-price">{money(product.transferPrice)} por transferencia</p>}</div>
@@ -223,7 +223,6 @@ export default function Storefront({ initialProducts, mode, source: initialSourc
   const searchOpen = activeOverlay === "search";
   const setSearchOpen = (value: boolean) => value ? openOverlay("search") : closeOverlay("search");
   useEffect(() => {
-    if (mode !== "evershop") return;
     const refresh = async () => {
       try {
         const response = await fetch("/api/store/catalog", { cache: "no-store", signal: AbortSignal.timeout(10_000) });

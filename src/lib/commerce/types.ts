@@ -5,6 +5,7 @@ export type CatalogSource = "evershop" | "local" | "local-fallback";
 export type ProductInventory = {
   isInStock: boolean;
   manageStock: boolean;
+  availability?: "available" | "reserved" | "sold" | "review" | "unconfirmed";
 };
 
 export type StoreProduct = {

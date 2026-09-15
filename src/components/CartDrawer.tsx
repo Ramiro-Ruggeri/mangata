@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "framer-motion";
 import { Check, MessageCircle, ShieldCheck, ShoppingBag, Trash2, X } from "lucide-react";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { BrandSignature } from "@/components/brand/BrandSignature";
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
@@ -23,6 +23,7 @@ function CartLayer({ children }: { children: ReactNode }) {
 }
 
 export default function CartDrawer() {
+  const [deliverySelection, setDeliverySelection] = useState("");
   const {
     items,
     subtotal,
@@ -37,6 +38,8 @@ export default function CartDrawer() {
     checkout,
     checkoutReady,
   } = useCart();
+  const selectionKey = JSON.stringify(items.map(item => [item.sku, item.price]).sort());
+  const deliveryAcknowledged = deliverySelection === selectionKey && items.length > 0;
   const inquiryMessage = `Hola MANGATA, quiero consultar por estas piezas:\n${items.map((item) => `${item.name} (${item.sku})`).join("\n")}\n¿Siguen disponibles?`;
   const inquiryUrl = whatsappHref(inquiryMessage);
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -166,10 +169,12 @@ export default function CartDrawer() {
                 {syncState === "synced" && <Check size={13} />}
               </div>
               <div className="cart-total"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
-              <p className="cart-note">{checkoutReady ? "Revisá el total y las opciones de entrega antes de pagar." : "Por ahora coordinamos la compra por WhatsApp."}</p>
+              <p className="cart-note">{checkoutReady && mode === "local" ? "Este pago incluye sólo las prendas. El envío se acuerda y paga aparte con Emilia; no está incluido ni es gratuito." : checkoutReady ? "Revisá el total y las opciones de entrega antes de pagar." : "Por ahora coordinamos la compra por WhatsApp."}</p>
+              {checkoutReady && mode === "local" && <label className="cart-delivery-confirm"><input type="checkbox" checked={deliveryAcknowledged} onChange={event => setDeliverySelection(event.target.checked ? selectionKey : "")} /><span>Ya coordiné el retiro o el costo del envío con Emilia.</span></label>}
+              {checkoutReady && mode === "local" && <a className="text-link" href={whatsappHref("Hola Emilia, quiero coordinar la entrega y su costo antes de pagar mi selección.")} target="_blank" rel="noopener noreferrer">Consultar entrega antes de pagar</a>}
               {checkoutReady ? (
-                <button className="magnetic-button cart-checkout" disabled={!items.length || syncState === "syncing"} onClick={checkout}>
-                  <span>{syncState === "syncing" ? "Revisando tu bolsa…" : "Ir a pagar de forma segura"}</span><span>↗</span>
+                <button className="magnetic-button cart-checkout" disabled={!items.length || syncState === "syncing" || (mode === "local" && !deliveryAcknowledged)} onClick={() => checkout(deliveryAcknowledged)}>
+                  <span>{syncState === "syncing" ? "Revisando tu bolsa…" : mode === "local" ? "Pagar con Mercado Pago" : "Ir a pagar de forma segura"}</span><span>↗</span>
                 </button>
               ) : items.length > 0 && syncState !== "syncing" ? (
                 <a className="magnetic-button cart-checkout" href={inquiryUrl} target="_blank" rel="noopener noreferrer" aria-label="Consultar mi selección por WhatsApp (se abre en otra pestaña)" onClick={() => trackCommerceEvent("checkout_inquiry", { currency: "ARS", value: subtotal, item_count: items.length, source: "bag" })}>

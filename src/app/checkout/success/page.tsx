@@ -2,7 +2,8 @@ import CheckoutStatus from "@/components/CheckoutStatus";
 import { cookies } from "next/headers";
 import { CHECKOUT_COOKIE, paymentMatchesIntent, readCheckoutIntent } from "@/lib/commerce/checkout-session";
 import { fetchMercadoPagoPayment } from "@/lib/commerce/payment-webhook";
-import { isPaymentRecorded } from "@/lib/commerce/order-service";
+import { isPaymentRecorded, reconcilePayment } from "@/lib/commerce/order-service";
+import { usesPostgresOrders } from "@/lib/commerce/postgres-orders";
 
 export const metadata = {
   title: "Estado del pago · Checkout",
@@ -22,6 +23,8 @@ export default async function SuccessPage({
   let confirmed = false;
   if (intent && payment && paymentMatchesIntent(payment, intent)) {
     try {
+      // The canonical provider response is also a recovery path for a delayed webhook.
+      if (usesPostgresOrders()) await reconcilePayment(payment);
       confirmed = await isPaymentRecorded(payment);
     } catch { /* Retain the bag until the order is durably recorded. */ }
   }

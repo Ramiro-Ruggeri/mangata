@@ -24,7 +24,7 @@ type CartContextValue = {
   removeItem: (id: string) => Promise<void>;
   clear: () => Promise<void>;
   clearPurchased: (skus: string[]) => void;
-  checkout: () => Promise<void>;
+  checkout: (deliveryAcknowledged?: boolean) => Promise<void>;
   openCart: () => void; closeCart: () => void; restoreCartFocus: () => void;
 };
 const EMPTY_CART: CartLine[] = [];
@@ -230,12 +230,12 @@ export function CartProvider({ children, mode, checkoutReady }: { children: Reac
     writeCart(cartSnapshot.filter((item) => !skus.includes(item.sku)));
   }, []);
 
-  const checkout = useCallback(() => enqueue(async () => {
+  const checkout = useCallback((deliveryAcknowledged = false) => enqueue(async () => {
     if (!checkoutReady || !cartSnapshot.length) return;
     try {
       const payload = await runSync(mode === "evershop"
         ? { method: "POST", url: "/api/store/checkout", body: JSON.stringify({ skus: cartSnapshot.map((item) => item.sku) }) }
-        : { method: "POST", url: "/api/mp", body: JSON.stringify({ items: cartSnapshot.map((item) => ({ id: item.id, sku: item.sku, qty: 1 })) }) });
+        : { method: "POST", url: "/api/mp", body: JSON.stringify({ deliveryAcknowledged, items: cartSnapshot.map((item) => ({ id: item.id, sku: item.sku, qty: 1 })) }) });
       const destination = mode === "evershop" ? payload.url : payload.init_point;
       if (!destination || new URL(destination).protocol !== "https:") throw new CartRequestError("checkout_unavailable");
       trackCommerceEvent("begin_checkout", { currency: "ARS", value: cartSnapshot.reduce((sum, item) => sum + item.price, 0), item_count: cartSnapshot.length });

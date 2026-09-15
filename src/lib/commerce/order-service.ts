@@ -2,6 +2,7 @@ import type { CheckoutIntent, ProviderPayment } from "./checkout-session";
 import { CommerceError } from "./one-of-one";
 import type { StoreProduct } from "./types";
 import { secureServiceUrl } from "./http-security";
+import { assertDatabaseConfigured, ordersDatabase, usesPostgresOrders } from "./postgres-orders";
 
 function serviceConfig() {
   const base = process.env.MANGATA_ORDER_SERVICE_URL?.trim();
@@ -24,7 +25,13 @@ async function orderServiceRequest(path: string, body: unknown, idempotencyKey: 
 }
 
 export function assertCheckoutConfigured() {
-  serviceConfig();
+  if (usesPostgresOrders()) {
+    assertDatabaseConfigured();
+    if (process.env.MANGATA_CHECKOUT_ENABLED !== "1" || process.env.MANGATA_SHIPPING_MODE !== "arranged_separately" ||
+      !/^\d+$/.test(process.env.MP_MERCHANT_ID ?? "") || !["production", "test"].includes(process.env.MANGATA_PAYMENT_ENV ?? "")) {
+      throw new CommerceError("checkout_unavailable", 503);
+    }
+  } else serviceConfig();
   if (!process.env.MP_ACCESS_TOKEN?.trim() || !process.env.MP_WEBHOOK_SECRET?.trim() || (process.env.COMMERCE_SESSION_SECRET?.length ?? 0) < 32) {
     throw new CommerceError("checkout_unavailable", 503);
   }
@@ -33,6 +40,7 @@ export function assertCheckoutConfigured() {
 // The service must atomically persist the intent and reserve one unit per SKU.
 // A successful HTTP response alone is not accepted as proof of persistence.
 export async function reserveCheckoutIntent(intent: CheckoutIntent, products: StoreProduct[], expiresAt: number) {
+  if (usesPostgresOrders()) return ordersDatabase().reserve(intent, products, expiresAt);
   const result = await orderServiceRequest("/intents", {
     reference: intent.reference, currency: intent.currency, amount: intent.amount,
     expiresAt: new Date(expiresAt).toISOString(),
@@ -44,6 +52,7 @@ export async function reserveCheckoutIntent(intent: CheckoutIntent, products: St
 }
 
 export async function reconcilePayment(payment: ProviderPayment) {
+  if (usesPostgresOrders()) { await ordersDatabase().reconcile(payment); return; }
   const paymentId = String(payment.id ?? "");
   const reference = payment.external_reference;
   if (!/^\d{1,32}$/.test(paymentId) || !reference?.startsWith("MNGT-") || !payment.status) {
@@ -61,6 +70,7 @@ export async function reconcilePayment(payment: ProviderPayment) {
 }
 
 export async function isPaymentRecorded(payment: ProviderPayment): Promise<boolean> {
+  if (usesPostgresOrders()) return ordersDatabase().recorded(payment);
   const { base, token } = serviceConfig();
   const paymentId = String(payment.id ?? "");
   if (!/^\d{1,32}$/.test(paymentId)) return false;

@@ -62,12 +62,14 @@
       "id": 7,
       "name": "Campera Rituales",
       "files": [
-        "campera-corderoy-corregida.png"
+        "campera-rituales-frente.webp",
+        "campera-rituales-dorso.webp"
       ],
       "driveFileIds": [
         "1v7V60ldJswC3CxS_vU4rS7cmTDA9PWKq"
       ],
-      "correction": "campera-corderoy-corregida.png"
+      "correction": "campera-corderoy-corregida.png",
+      "derivation": "Original 1600x1160 split into two equal 800x1160 halves: left/front and right/back. Lossless WebP, no retouching, one product/SKU."
     },
     {
       "id": 8,

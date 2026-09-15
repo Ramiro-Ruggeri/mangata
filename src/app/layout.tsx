@@ -108,6 +108,9 @@ export const metadata: Metadata = {
 /* =========================
  * RootLayout — aplica las fuentes y estilos base
  * ========================= */
+// Runtime-only commerce configuration and stock must never be frozen into build HTML.
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({
   children,
 }: {

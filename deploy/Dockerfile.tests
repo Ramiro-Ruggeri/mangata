@@ -1,0 +1,9 @@
+FROM node:24-alpine
+WORKDIR /tests
+COPY package.json package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY tsconfig.json ./
+COPY src ./src
+COPY tests ./tests
+COPY deploy/commerce-schema.sql ./deploy/commerce-schema.sql
+CMD ["npm", "run", "test:database"]

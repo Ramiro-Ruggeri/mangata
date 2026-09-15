@@ -1,0 +1,7 @@
+[Unit]
+Description=MANGATA durable payment reconciliation
+After=docker.service network-online.target
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /opt/mangata/current/deploy/commerce-reconcile.sh
+TimeoutStartSec=240

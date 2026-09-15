@@ -1,0 +1,8 @@
+[Unit]
+Description=Backup the isolated MANGATA orders database
+After=docker.service
+[Service]
+Type=oneshot
+UMask=0077
+ExecStart=/bin/sh /opt/mangata/current/deploy/commerce-backup.sh
+TimeoutStartSec=180

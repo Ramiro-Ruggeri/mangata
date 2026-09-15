@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { addEverShopCartItem, createEverShopCart, removeEverShopCartItem, withCartLock } from "@/lib/commerce/cart-server";
-import { getCommerceMode, getLocalCatalog } from "@/lib/commerce/catalog";
+import { getCommerceMode, getAvailableLocalCatalog } from "@/lib/commerce/catalog";
 import { fetchEverShopCatalog } from "@/lib/commerce/evershop";
 import { assertStoreRequest, CommerceError, publicCommerceError, resolveOneOfOneItems } from "@/lib/commerce/one-of-one";
 import { readStoreJson } from "@/lib/commerce/http-security";
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     const sku = typeof body?.sku === "string" ? body.sku.trim() : "";
     if (!sku || sku.length > 128) throw new CommerceError("invalid_cart", 400);
     const remote = getCommerceMode() === "evershop";
-    const products = remote ? await fetchEverShopCatalog(true) : getLocalCatalog();
+    const products = remote ? await fetchEverShopCatalog(true) : await getAvailableLocalCatalog();
     const [product] = resolveOneOfOneItems([{ sku }], products);
     if (!remote) return NextResponse.json({ synced: true, product }, { headers: { "Cache-Control": "private, no-store" } });
     const existingCartId = (await cookies()).get(CART_COOKIE)?.value;

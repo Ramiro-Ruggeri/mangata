@@ -20,6 +20,11 @@ const nextConfig = {
   ...(process.env.MANGATA_STANDALONE === "1" ? { output: "standalone" } : {}),
   poweredByHeader: false,
   reactCompiler: true,
+  redirects() {
+    // Retired preview alias: one storefront and one live inventory, on Hostinger.
+    return [{ source: "/:path*", has: [{ type: "host", value: "mangata-store.vercel.app" }],
+      destination: "https://mangata.com.ar/:path*", permanent: true }];
+  },
   images: {
     formats: ["image/avif", "image/webp"],
     qualities: [75, 85],

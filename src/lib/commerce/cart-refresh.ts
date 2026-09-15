@@ -4,7 +4,8 @@ type SavedLine = { id: string; sku: string; name: string; price: number; image: 
 
 /** Refresh a saved local bag from current server data, never from historical prices. */
 export function refreshLocalCart<T extends SavedLine>(items: T[], products: StoreProduct[]): T[] {
-  const available = new Map(products.filter((product) => product.source === "local" && product.inventory.isInStock).map((product) => [product.sku, product]));
+  const available = new Map(products.filter((product) => product.source === "local" &&
+    (product.inventory.isInStock || ["reserved", "review", "unconfirmed"].includes(product.inventory.availability ?? ""))).map((product) => [product.sku, product]));
   const seen = new Set<string>();
   return items.flatMap((item) => {
     const current = available.get(item.sku);

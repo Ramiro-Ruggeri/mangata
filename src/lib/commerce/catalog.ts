@@ -1,6 +1,7 @@
 import { products as legacyProducts } from "@/lib/products";
 import { fetchEverShopCatalog, fetchEverShopProduct } from "./evershop";
 import type { CatalogResult, CommerceMode, StoreProduct } from "./types";
+import { ordersDatabase, usesPostgresOrders } from "./postgres-orders";
 
 export function getCommerceMode(): CommerceMode {
   return process.env.MANGATA_COMMERCE_MODE === "evershop"
@@ -59,7 +60,7 @@ export async function getCatalog(): Promise<CatalogResult> {
   const syncedAt = new Date().toISOString();
 
   if (mode === "local") {
-    return { products: getLocalCatalog(), source: "local", mode, syncedAt };
+    return { products: await getAvailableLocalCatalog(), source: "local", mode, syncedAt };
   }
 
   try {
@@ -105,5 +106,15 @@ export async function getProduct(id: string): Promise<StoreProduct | null> {
       return null;
     }
   }
-  return getLocalCatalog().find((product) => product.id === id) ?? null;
+  return (await getAvailableLocalCatalog()).find((product) => product.id === id) ?? null;
+}
+
+export async function getAvailableLocalCatalog(): Promise<StoreProduct[]> {
+  const products = getLocalCatalog();
+  if (!usesPostgresOrders()) return products;
+  try { return await ordersDatabase().availability(products); }
+  catch {
+    console.error("[commerce] inventory_unavailable");
+    return products.map(product => ({ ...product, inventory: { ...product.inventory, isInStock: false, availability: "unconfirmed" } }));
+  }
 }

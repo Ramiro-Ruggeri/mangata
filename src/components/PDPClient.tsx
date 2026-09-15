@@ -12,6 +12,7 @@ import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { StoreProduct } from "@/lib/commerce/types";
 import { whatsappHref } from "@/config/site";
+import { productImageView } from "@/lib/product-images";
 import "./product/product.css";
 
 const money = (value: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value);
@@ -31,7 +32,8 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
   const gallery = useMemo(() => Array.from(new Set([product.image, ...product.images].filter(Boolean))), [product.image, product.images]);
   const activeImage = gallery[current] || product.image;
   const inBag = items.some((item) => item.sku === product.sku);
-  const stockUnconfirmed = product.source === "local-fallback";
+  const stockUnconfirmed = product.source === "local-fallback" || product.inventory.availability === "unconfirmed";
+  const reserved = ["reserved", "review"].includes(product.inventory.availability ?? "");
   const available = product.inventory.isInStock && !stockUnconfirmed;
   const measurementHref = whatsappHref(`Hola MANGATA, ¿me pasan las medidas de ${product.name} (${product.sku})?`);
   const helpHref = whatsappHref(`Hola MANGATA, quiero consultar por ${product.name} (${product.sku}).`);
@@ -70,7 +72,7 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
     }
   };
   const changeImage = (direction: number) => setCurrent((index) => (index + direction + gallery.length) % gallery.length);
-  const buttonText = adding ? "Sumando…" : inBag ? "Ver mi bolsa" : available ? "Sumar a la bolsa" : stockUnconfirmed ? "Stock sin confirmar" : "Pieza agotada";
+  const buttonText = adding ? "Sumando…" : inBag ? "Ver mi bolsa" : available ? "Sumar a la bolsa" : stockUnconfirmed ? "Stock sin confirmar" : reserved ? "Pieza en proceso de compra" : "Pieza agotada";
 
   return (
     <main className="product-page">
@@ -97,17 +99,17 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
           <div className="product-image-stage" data-photo-surface={activeImage.startsWith("/catalog/") ? "light" : undefined}>
             <button className="product-image-open" onClick={() => setZoomOpen(true)} aria-label={`Ampliar foto de ${product.name}`} aria-haspopup="dialog">
               <AnimatePresence initial={false} mode="wait"><motion.div key={activeImage} className="product-image-motion" initial={{ opacity: reducedMotion ? 1 : 0 }} animate={{ opacity: 1 }} exit={{ opacity: reducedMotion ? 1 : 0 }} transition={{ duration: reducedMotion ? 0 : 0.2 }}>
-                <Image src={activeImage} alt={`${product.name}${gallery.length > 1 ? `, vista ${current + 1}` : ""}`} fill loading="eager" fetchPriority="high" sizes="(max-width: 800px) 100vw, 56vw" />
+                <Image src={activeImage} alt={`${product.name}, ${productImageView(activeImage, current).toLowerCase()}`} fill loading="eager" fetchPriority="high" sizes="(max-width: 800px) 100vw, 56vw" />
               </motion.div></AnimatePresence>
               <span className="product-zoom-hint"><ZoomIn size={16} strokeWidth={1.5} aria-hidden="true" /><span>Ver de cerca</span></span>
             </button>
             {gallery.length > 1 && <div className="product-gallery-controls"><button onClick={() => changeImage(-1)} aria-label="Foto anterior"><ChevronLeft size={20} aria-hidden="true" /></button><span aria-live="polite" aria-atomic="true">{current + 1} de {gallery.length}</span><button onClick={() => changeImage(1)} aria-label="Foto siguiente"><ChevronRight size={20} aria-hidden="true" /></button></div>}
           </div>
-          {gallery.length > 1 && <div className="product-thumbnails" aria-label="Elegir foto">{gallery.map((image, index) => <button key={image} className={current === index ? "is-selected" : ""} onClick={() => setCurrent(index)} aria-label={`Ver foto ${index + 1} de ${product.name}`} aria-pressed={current === index}><Image src={image} alt="" fill sizes="76px" /></button>)}</div>}
+          {gallery.length > 1 && <div className="product-thumbnails" aria-label="Elegir foto">{gallery.map((image, index) => <button key={image} className={current === index ? "is-selected" : ""} onClick={() => setCurrent(index)} aria-label={`Ver ${productImageView(image, index).toLowerCase()} de ${product.name}`} aria-pressed={current === index}><Image src={image} alt="" fill sizes="76px" /><span className="product-thumbnail-label">{productImageView(image, index)}</span></button>)}</div>}
         </section>
 
         <section className="product-purchase" id="product-purchase" aria-label="Información y compra" tabIndex={-1}>
-          <p className={`product-availability ${available ? "is-available" : ""}`}><span aria-hidden="true" />{stockUnconfirmed ? "Consultanos para confirmar disponibilidad" : available ? "Disponible · única unidad" : "Esta pieza ya no está disponible"}</p>
+          <p className={`product-availability ${available ? "is-available" : ""}`}><span aria-hidden="true" />{stockUnconfirmed ? "Consultanos para confirmar disponibilidad" : available ? "Disponible · única unidad" : reserved ? "Esta pieza está en proceso de compra. Consultanos." : "Esta pieza ya no está disponible"}</p>
           {product.description && <p className="product-description">{product.description}</p>}
           <button className="product-add" disabled={(!available && !inBag) || adding} aria-busy={adding} onClick={handleAdd}><span>{buttonText}</span>{inBag ? <Check size={20} strokeWidth={1.6} aria-hidden="true" /> : <Plus size={20} strokeWidth={1.6} aria-hidden="true" />}</button>
           <p className="product-add-status" role="status" aria-live="polite">{addError || (inBag ? "La pieza está en tu bolsa. El stock se confirma al comprar." : "El stock se confirma al comprar.")}</p>
@@ -135,7 +137,7 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
       }}>
         {zoomOpen && <>
           <div className="product-dialog-top"><span>{product.name}</span><button onClick={() => setZoomOpen(false)} aria-label="Cerrar vista ampliada" autoFocus><X size={24} strokeWidth={1.5} aria-hidden="true" /></button></div>
-          <div className="product-dialog-photo"><Image src={activeImage} alt={`${product.name}, vista ampliada ${current + 1}`} fill sizes="100vw" /></div>
+          <div className="product-dialog-photo"><Image src={activeImage} alt={`${product.name}, ${productImageView(activeImage, current).toLowerCase()}, ampliada`} fill sizes="100vw" /></div>
           {gallery.length > 1 && <div className="product-dialog-controls"><button onClick={() => changeImage(-1)} aria-label="Foto anterior"><ChevronLeft size={22} aria-hidden="true" /></button><span aria-live="polite">{current + 1} de {gallery.length}</span><button onClick={() => changeImage(1)} aria-label="Foto siguiente"><ChevronRight size={22} aria-hidden="true" /></button></div>}
         </>}
       </dialog>

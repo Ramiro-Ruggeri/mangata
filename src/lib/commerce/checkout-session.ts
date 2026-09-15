@@ -44,6 +44,8 @@ export type ProviderPayment = {
   currency_id?: string;
   transaction_amount?: number;
   date_last_updated?: string;
+  collector_id?: number;
+  live_mode?: boolean;
 };
 
 export function paymentMatchesIntent(payment: ProviderPayment, intent: CheckoutIntent): boolean {

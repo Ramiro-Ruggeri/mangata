@@ -10,6 +10,9 @@ services:
         NEXT_PUBLIC_SITE_URL: https://mangata.com.ar
     restart: unless-stopped
     init: true
+    env_file:
+      - path: /opt/mangata/shared/commerce.env
+        required: false
     environment:
       NEXT_PUBLIC_SITE_URL: https://mangata.com.ar
       MANGATA_COMMERCE_MODE: local
@@ -17,6 +20,7 @@ services:
     expose:
       - "3000"
     networks:
+      private: {}
       edge:
         aliases:
           - mangata_web
@@ -35,6 +39,9 @@ services:
         max-file: "3"
 
 networks:
+  private:
+    name: mangata_private
+    external: true
   edge:
     name: mangata_edge
     external: true

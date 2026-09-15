@@ -133,9 +133,10 @@ export const products: Product[] = [
     price: 30000,
     inStock: true,
     category: "Prendas",
-    img: "/catalog/2026-09/campera-corderoy-corregida.webp",
+    img: "/catalog/2026-09/campera-rituales-frente.webp",
     images: [
-      "/catalog/2026-09/campera-corderoy-corregida.webp"
+      "/catalog/2026-09/campera-rituales-frente.webp",
+      "/catalog/2026-09/campera-rituales-dorso.webp"
     ],
     description: "Campera de corderoy color caramelo, con parches negros y dibujos tribales en la espalda.",
     order: 70

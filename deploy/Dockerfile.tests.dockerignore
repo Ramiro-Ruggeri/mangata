@@ -1,0 +1,10 @@
+.git
+.next
+.vercel
+node_modules
+source-assets
+.env*
+**/*.pem
+**/*.key
+public
+docs
