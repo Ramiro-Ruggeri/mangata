@@ -82,13 +82,13 @@ function Hero({ products }: { products: StoreProduct[] }) {
   return <section className="mg-hero" id="inicio" aria-labelledby="hero-title">
     <div className="mg-hero-copy">
       <span className="mg-eyebrow"><i /> Streetwear recuperado</span>
-      <h1 id="hero-title">Diseñado<br />para<br /><em>vos.</em></h1>
+      <h1 id="hero-title">Diseñado<br />para <em>vos.</em></h1>
       <p>Piezas únicas de diseño y upcycling,<br /> hechas a mano.</p>
       <a href="#coleccion" className="mg-button mg-button-light">Ver las piezas <ArrowDown size={18} /></a>
       <span className="mg-hero-footnote"><CircleCheck size={13} strokeWidth={2} aria-hidden="true" /> Fotos reales. Hecho a mano en Córdoba.</span>
     </div>
     {featured && <div className="mg-hero-visual">
-      <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, 55vw" /></Link>
+      <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, (max-width: 1135px) 46vw, 520px" /></Link>
       <Link className="mg-hero-product" href={`/producto/${featured.id}`} onClick={() => selectProduct(featured, "hero_label")}><span><small>La pieza de portada</small><strong>{featured.name}</strong></span><span>{money(featured.price)} <ArrowUpRight size={22} /></span></Link>
     </div>}
     <div className="mg-hero-bottom"><span>Seguí dándole una historia a tus prendas.</span><a href="#manifiesto">El trabajo detrás <ArrowUpRight size={14} /></a></div>
@@ -116,8 +116,8 @@ function ProductCard({ product }: { product: StoreProduct }) {
   return <motion.article data-scroll-anchor={`product-${product.id}`} layout="position" initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .22 }} className="mg-product-card">
     <div className="mg-product-media" data-photo-surface={product.image.startsWith("/catalog/") ? "light" : undefined}>
       <Link href={`/producto/${product.id}`} className="mg-product-photo" aria-label={`Ver ${product.name}`} onPointerEnter={(event) => { if (event.pointerType === "mouse" && secondary) setSecondaryRequested(true); }} onClick={() => selectProduct(product, "collection")}>
-        <Image src={product.image} alt={product.name} fill loading="lazy" sizes="(max-width: 700px) 50vw, (max-width: 1024px) 33vw, 25vw" className="mg-image-primary" />
-        {secondary && secondaryRequested && <Image src={secondary} fill alt="" loading="lazy" sizes="(max-width: 700px) 50vw, (max-width: 1024px) 33vw, 25vw" className={`mg-image-secondary ${secondaryLoaded ? "is-ready" : ""}`} onLoad={() => setSecondaryLoaded(true)} />}
+        <Image src={product.image} alt={product.name} fill loading="lazy" sizes="(max-width: 700px) calc((100vw - 52px) / 2), (max-width: 1024px) 31vw, (max-width: 1440px) 23vw, 315px" className="mg-image-primary" />
+        {secondary && secondaryRequested && <Image src={secondary} fill alt="" loading="lazy" sizes="(max-width: 700px) calc((100vw - 52px) / 2), (max-width: 1024px) 31vw, (max-width: 1440px) 23vw, 315px" className={`mg-image-secondary ${secondaryLoaded ? "is-ready" : ""}`} onLoad={() => setSecondaryLoaded(true)} />}
       </Link>
       {product.isNew && product.inventory.isInStock && <span className="mg-new-label">Recién intervenida</span>}
       {!product.inventory.isInStock && <span className="mg-unavailable-label">{product.source === "local-fallback" || product.inventory.availability === "unconfirmed" ? "Consultar disponibilidad" : ["reserved", "review"].includes(product.inventory.availability ?? "") ? "En proceso de compra" : "Agotada"}</span>}
