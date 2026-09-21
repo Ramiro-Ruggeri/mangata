@@ -23,6 +23,7 @@ async function main() {
   try {
     await page.goto(base, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.evaluate(() => document.fonts.ready);
+    assert.equal(await page.locator('.brand-flash').evaluate(el => getComputedStyle(el).animationName), 'brand-flash');
     await page.getByRole('button', { name: 'Rechazar opcionales', exact: true }).click();
     const rows = [];
     for (const [width, height] of [[320,740],[360,800],[390,844],[430,932],[700,900],[720,450],[768,1024],[844,390],[1024,768],[1280,800],[1440,900],[1920,1080],[2560,1440]]) {
@@ -106,7 +107,7 @@ async function main() {
     await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
     await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.physics === 'ready');
     await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'false', null, { timeout: 6000 });
-    await page.getByRole('button', { name: 'Mover etiqueta DENIM', exact: true }).focus();
+    await page.getByRole('button', { name: 'Mover pieza MANGATA', exact: true }).first().focus();
     const oldTransform = await page.locator('.mg-material-tag').first().getAttribute('style');
     await page.keyboard.press('Enter');
     await page.waitForFunction(old => document.querySelector('.mg-material-tag')?.getAttribute('style') !== old, oldTransform);
@@ -122,6 +123,9 @@ async function main() {
     await page.getByRole('button', { name: 'Mezclar', exact: true }).click();
     await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
     await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'false');
+    await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'true');
+    assert.notEqual(await page.locator('.mg-hero-ticket').evaluate(el => getComputedStyle(el).animationName), 'none');
     // Native animated up/down restores position, on both long home and product pages.
     for (const path of ['/', '/producto/7']) {
       await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' });
@@ -149,6 +153,8 @@ async function main() {
     await page.waitForFunction(() => getComputedStyle(document.querySelector('.mg-hero-copy > p')).animationName === 'none');
     assert.equal(await page.locator('.mg-hero-copy > p').evaluate(el => getComputedStyle(el).animationName), 'none');
     assert.equal(await page.locator('.mg-hero .mg-button').evaluate(el => getComputedStyle(el).transitionDuration), '0s');
+    assert.equal(await page.locator('.mg-hero-ticket').evaluate(el => getComputedStyle(el).animationName), 'none');
+    assert.equal(await page.locator('.brand-flash').evaluate(el => getComputedStyle(el).display), 'none');
     await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
     assert.equal(await page.locator('.mg-material-arena').getAttribute('data-physics'), null);
     assert.equal(await page.getByRole('button', { name: 'Mezclar', exact: true }).isDisabled(), true);

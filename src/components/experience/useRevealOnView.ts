@@ -8,14 +8,13 @@ export function useRevealOnView(ref: RefObject<HTMLElement | null>) {
     const root = ref.current;
     if (!root || !window.IntersectionObserver || !root.animate) return;
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const seen = new WeakSet<Element>();
+    let visible = new WeakSet<Element>();
     const running = new Map<Element, Animation>();
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting || preference.matches) continue;
-        observer.unobserve(entry.target);
-        if (seen.has(entry.target)) continue;
-        seen.add(entry.target);
+        if (!entry.isIntersecting) { visible.delete(entry.target); continue; }
+        if (preference.matches || visible.has(entry.target)) continue;
+        visible.add(entry.target);
         // Keyboard navigation must never fade the control currently in use.
         if (entry.target.contains(document.activeElement)) continue;
         const animation = entry.target.animate(
@@ -30,9 +29,8 @@ export function useRevealOnView(ref: RefObject<HTMLElement | null>) {
       observer.disconnect();
       running.forEach((animation) => animation.cancel());
       running.clear();
-      if (!preference.matches) root.querySelectorAll("[data-reveal]").forEach((element) => {
-        if (!seen.has(element)) observer.observe(element);
-      });
+      visible = new WeakSet<Element>();
+      if (!preference.matches) root.querySelectorAll("[data-reveal]").forEach((element) => observer.observe(element));
     };
     const onFocus = (event: FocusEvent) => {
       if (!(event.target instanceof Node)) return;

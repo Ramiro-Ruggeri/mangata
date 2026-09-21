@@ -11,6 +11,24 @@
   --layer-overlay: 220;
 }
 
+.brand-flash {
+  position: fixed;
+  z-index: calc(var(--layer-overlay) + 10);
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background: #090909;
+  color: #eeeae2;
+  animation: brand-flash 680ms var(--motion-ease) forwards;
+}
+.brand-flash .brand-signature { transform: scale(.94); animation: brand-flash-mark 680ms var(--motion-ease) forwards; }
+.brand-flash .brand-signature img { width: 48px; height: 48px; flex-basis: 48px; }
+.brand-flash .brand-signature > span { font-size: 30px; }
+
+@keyframes brand-flash { 0%, 38% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+@keyframes brand-flash-mark { 0% { opacity: 0; transform: translateY(8px) scale(.94); } 28%, 62% { opacity: 1; transform: none; } 100% { opacity: 0; transform: translateY(-4px) scale(1.02); } }
+
 .experience-scroll-control {
   position: fixed;
   z-index: var(--layer-floating);
@@ -70,6 +88,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .brand-flash { display: none; }
   .experience-scroll-control, .experience-scroll-label, .experience-scroll-arrow { transition: none; }
   .experience-scroll-control:hover, .experience-scroll-control:active { transform: none; }
 }

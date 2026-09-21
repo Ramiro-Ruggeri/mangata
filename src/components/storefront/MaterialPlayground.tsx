@@ -4,12 +4,19 @@ import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "framer-motion";
 import { Pause, Shuffle } from "lucide-react";
 
-const labels = ["DENIM", "RECORTES", "A MANO", "TEXTURAS", "MANGATA", "OTRA FORMA"];
+const pieces = [
+  { id: "moon-1", label: "MANGATA", text: "M", kind: "disc" },
+  { id: "denim", label: "DENIM RECUPERADO", text: "DENIM", kind: "scrap" },
+  { id: "moon-2", label: "MANGATA", text: "M", kind: "disc" },
+  { id: "handmade", label: "HECHO A MANO", text: "A MANO", kind: "scrap" },
+  { id: "moon-3", label: "MANGATA", text: "M", kind: "disc" },
+  { id: "new-form", label: "OTRA FORMA", text: "OTRA FORMA", kind: "scrap" },
+] as const;
 
 /** Optional brand interaction. Physics stays out of the initial bundle and purchase flow. */
 export function MaterialPlayground() {
   const arenaRef = useRef<HTMLDivElement>(null);
-  const controls = useRef({ mix: () => {}, pause: () => {} });
+  const controls = useRef({ mix: () => {}, pause: () => {}, replay: () => {} });
   const reduced = useReducedMotion();
   const [ready, setReady] = useState(false);
   const [running, setRunning] = useState(false);
@@ -22,7 +29,7 @@ export function MaterialPlayground() {
     const observer = new IntersectionObserver(async ([entry]) => {
       visible = entry.isIntersecting;
       if (!visible) { controls.current.pause(); return; }
-      if (requested) return;
+      if (requested) { controls.current.replay(); return; }
       requested = true;
       try {
         const { default: Matter } = await import("matter-js");
@@ -50,11 +57,14 @@ export function MaterialPlayground() {
           pause(); Composite.clear(engine.world, false); Engine.clear(engine);
           const width = arena.clientWidth, height = arena.clientHeight;
           const columns = width < 440 ? 2 : 3;
-          bodies = buttons.map((button, index) => Bodies.rectangle(
-            width / columns * ((index % columns) + .5), 34 + Math.floor(index / columns) * 58,
-            button.offsetWidth, button.offsetHeight,
-            { chamfer: { radius: 16 }, restitution: .38, friction: .3, frictionAir: .035, angle: (index % 2 ? 1 : -1) * .2 },
-          ));
+          bodies = buttons.map((button, index) => {
+            const x = width / columns * ((index % columns) + .5);
+            const y = 34 + Math.floor(index / columns) * 58;
+            const options = { restitution: .38, friction: .3, frictionAir: .035, angle: (index % 2 ? 1 : -1) * .2 };
+            return button.dataset.kind === "disc"
+              ? Bodies.circle(x, y, button.offsetWidth / 2, options)
+              : Bodies.rectangle(x, y, button.offsetWidth, button.offsetHeight, { ...options, chamfer: { radius: 5 } });
+          });
           bodies.forEach((body, index) => { Body.setVelocity(body, { x: (Math.random() - .5) * 5, y: 0 }); Body.setAngularVelocity(body, (index % 2 ? 1 : -1) * .012); });
           Composite.add(engine.world, [...bodies,
             Bodies.rectangle(width / 2, height + 30, width + 120, 60, { isStatic: true }),
@@ -64,6 +74,14 @@ export function MaterialPlayground() {
           ]);
           arena.dataset.physics = "ready";
           draw(); play();
+        };
+        const replay = () => {
+          bodies.forEach((body, index) => {
+            Sleeping.set(body, false);
+            Body.setVelocity(body, { x: (Math.random() - .5) * 4, y: -3 - Math.random() * 3 });
+            Body.setAngularVelocity(body, (index % 2 ? 1 : -1) * .02);
+          });
+          play();
         };
         const draw = () => buttons.forEach((button, index) => {
           const body = bodies[index];
@@ -100,9 +118,9 @@ export function MaterialPlayground() {
         place();
         const resize = new ResizeObserver(place);
         resize.observe(arena);
-        const hidden = () => { if (document.hidden) pause(); };
+        const hidden = () => { if (document.hidden) pause(); else if (visible) replay(); };
         document.addEventListener("visibilitychange", hidden);
-        controls.current = { mix: place, pause };
+        controls.current = { mix: place, pause, replay };
         setReady(true);
         cleanup = () => {
           pause(); resize.disconnect(); document.removeEventListener("visibilitychange", hidden);
@@ -117,14 +135,14 @@ export function MaterialPlayground() {
       } catch { /* Static labels remain readable when the optional chunk cannot load. */ }
     }, { threshold: .25 });
     observer.observe(arena);
-    return () => { disposed = true; observer.disconnect(); cleanup(); controls.current = { mix: () => {}, pause: () => {} }; };
+    return () => { disposed = true; observer.disconnect(); cleanup(); controls.current = { mix: () => {}, pause: () => {}, replay: () => {} }; };
   }, [reduced]);
 
   return <section className="mg-materials mg-shell" aria-labelledby="materials-title">
-    <div className="mg-materials-copy"><span className="mg-eyebrow">El diseño empieza acá</span><h2 id="materials-title">Mezclamos.<br /><em>Transformamos.</em></h2><p id="materials-instructions">Arrastrá las etiquetas o activalas con Enter. Probá otra combinación.</p>
+    <div className="mg-materials-copy"><span className="mg-eyebrow">Reflejo sobre el agua</span><h2 id="materials-title">Mezclamos.<br /><em>Transformamos.</em></h2><p id="materials-instructions">Arrastrá las piezas o activalas con Enter. El movimiento vuelve cuando regresás a esta sección.</p>
       <div className="mg-material-controls"><button disabled={!ready || !!reduced} onClick={() => controls.current.mix()}><Shuffle size={16} aria-hidden="true" />Mezclar</button><button disabled={!running || !!reduced} onClick={() => controls.current.pause()}><Pause size={16} aria-hidden="true" />Pausar</button></div>
       {reduced && <p>Movimiento desactivado según tu preferencia.</p>}
     </div>
-    <div ref={arenaRef} className="mg-material-arena" aria-describedby="materials-instructions">{labels.map(label => <button className="mg-material-tag" key={label} disabled={!ready || !!reduced} aria-label={`Mover etiqueta ${label}`}>{label}</button>)}</div>
+    <div ref={arenaRef} className="mg-material-arena" aria-describedby="materials-instructions">{pieces.map(piece => <button className="mg-material-tag" data-kind={piece.kind} key={piece.id} disabled={!ready || !!reduced} aria-label={`Mover pieza ${piece.label}`}>{piece.text}</button>)}</div>
   </section>;
 }

@@ -6,6 +6,7 @@ import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { CartProvider } from "@/components/commerce/CartProvider";
 import { ExperienceProvider } from "@/components/experience/ExperienceProvider";
 import { ScrollReturnControl } from "@/components/experience/ScrollReturnControl";
+import { BrandFlash } from "@/components/experience/BrandFlash";
 import { ConsentProvider } from "@/components/privacy/ConsentProvider";
 import { PrivacyFooter } from "@/components/PrivacyFooter";
 import { getCommerceMode } from "@/lib/commerce/catalog";
@@ -142,6 +143,7 @@ export default function RootLayout({
 
       <body>
         <ExperienceProvider>
+          <BrandFlash />
           <ConsentProvider>
             <CartProvider mode={commerceMode} checkoutReady={getCheckoutReady(commerceMode)}>
               {children}
