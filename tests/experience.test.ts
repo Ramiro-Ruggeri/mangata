@@ -2,6 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { SITE, whatsappHref } from "../src/config/site";
 import { readFileSync } from "node:fs";
+import { getLocalCatalog } from "../src/lib/commerce/catalog";
+import { matchesCategory, searchProducts } from "../src/lib/catalog-view";
 import { nextOverlay, clampScrollY, resolveReturnY, isPastScrollThreshold, shouldDiscardReturn, type ScrollReturnPoint } from "../src/lib/experience/interaction";
 
 test("all purchase support links share MANGATA's verified WhatsApp and preserve the message", () => {
@@ -50,6 +52,30 @@ test("only one overlay is active; cleanup of a replaced modal cannot close its r
 });
 
 const point: ScrollReturnPoint = { route: "/", scrollY: 1600, anchor: { kind: "data", key: "product-3", offset: -80 } };
+
+test("search finds every match, supports accents and reordered words without mutating catalog", () => {
+  const products = getLocalCatalog();
+  const ids = products.map(product => product.id);
+  assert.equal(searchProducts(products, "MONITO bandoo")[0]?.name, "Bandoo Moñito");
+  assert.equal(searchProducts(products, "   ").length, 26);
+  assert.ok(searchProducts(products, "prendas").length > 8);
+  assert.equal(searchProducts(products, "zz-no-existe").length, 0);
+  assert.deepEqual(products.map(product => product.id), ids);
+});
+
+test("Denim requires an actual material, not foil or canesú construction", () => {
+  const products = getLocalCatalog();
+  assert.equal(products.filter(product => matchesCategory(product, "Denim")).length, 7);
+  for (const name of ["Pantalón Canesú", "Mini Foil"]) {
+    const product = products.find(product => product.name === name);
+    assert.ok(product, name);
+    assert.equal(matchesCategory(product, "Denim"), false);
+  }
+  for (const product of products.filter(product => product.category === "Accesorios")) {
+    assert.equal(matchesCategory(product, "Accesorios"), true);
+    assert.equal(matchesCategory(product, "Prendas"), false);
+  }
+});
 
 test("return follows the same card after layout changes, preserving its viewport offset", () => {
   assert.equal(resolveReturnY(point, "/", 8000, 800, 2080), 2000);

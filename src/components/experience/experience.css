@@ -40,6 +40,8 @@
 .experience-scroll-control:focus-visible { outline: 3px solid #7d64e8; outline-offset: 4px; }
 .experience-scroll-control:active { transform: scale(.95); }
 .experience-scroll-control svg { flex-shrink: 0; }
+.experience-scroll-arrow { transition: transform var(--motion-overlay) var(--motion-ease); }
+.experience-scroll-control[data-return="true"] .experience-scroll-arrow { transform: rotate(180deg); }
 .experience-scroll-label {
   position: absolute;
   right: calc(100% + 10px);
@@ -68,6 +70,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .experience-scroll-control, .experience-scroll-label { transition: none; }
+  .experience-scroll-control, .experience-scroll-label, .experience-scroll-arrow { transition: none; }
   .experience-scroll-control:hover, .experience-scroll-control:active { transform: none; }
 }

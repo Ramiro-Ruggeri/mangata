@@ -57,6 +57,11 @@ async function main() {
     await page.keyboard.press('Enter');
     await page.getByRole('textbox', { name: 'Buscar por nombre, categoría o SKU' }).fill('zz-no-existe');
     await page.getByText('No encontramos esa pieza.', { exact: true }).waitFor();
+    await page.getByRole('textbox', { name: 'Buscar por nombre, categoría o SKU' }).fill('prendas');
+    await page.waitForFunction(() => document.querySelectorAll('.mg-search-results > a').length > 8);
+    assert.equal(await page.locator('.mg-search-results > a').count(), Number((await page.locator('.mg-search-count').innerText()).split(' ')[0]));
+    await page.getByRole('button', { name: 'Borrar búsqueda', exact: true }).click();
+    assert.equal(await page.getByRole('textbox').evaluate(el => document.activeElement === el), true);
     await page.keyboard.press('Escape');
     await page.waitForFunction(() => document.activeElement?.getAttribute('aria-label') === 'Buscar una pieza');
     assert.equal(await page.getByRole('button', { name: 'Buscar una pieza', exact: true }).evaluate(el => el === document.activeElement), true);
@@ -69,6 +74,8 @@ async function main() {
     const returnTop = await page.locator('.mg-product-card').first().evaluate(el => el.getBoundingClientRect().top);
     await page.locator('.mg-product-photo').first().click();
     await page.waitForURL('**/producto/*');
+    assert.equal(await page.locator('.product-measurement strong').innerText(), '¿Qué tamaño tiene?');
+    assert.ok((await page.locator('.product-delivery-note').innerText()).includes('El envío no está incluido'));
     await page.goBack({ waitUntil: 'domcontentloaded' });
     await page.waitForURL(url => !url.pathname.includes('/producto/'));
     assert.equal(await page.getByRole('button', { name: 'Accesorios', exact: true }).getAttribute('aria-pressed'), 'true');
@@ -77,9 +84,16 @@ async function main() {
       const card = document.querySelector(`[data-scroll-anchor="${anchor}"]`);
       return card && Math.abs(card.getBoundingClientRect().top - top) < 4;
     }, { anchor: returnAnchor, top: returnTop });
-    await page.getByRole('button', { name: 'Todas', exact: true }).click();
-    await page.getByRole('button', { name: 'Ver más piezas', exact: true }).click();
+    await page.getByRole('button', { name: 'Restablecer colección', exact: true }).click();
+    await page.waitForFunction(() => document.querySelectorAll('.mg-product-card').length === 8);
+    assert.equal(await page.getByRole('combobox', { name: 'Ordenar piezas' }).inputValue(), 'selection');
+    assert.equal(await page.getByRole('button', { name: 'Todas', exact: true }).evaluate(el => document.activeElement === el), true);
+    await page.getByRole('button', { name: 'Ver más piezas', exact: true }).focus();
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(() => document.querySelectorAll('.mg-product-card').length === 16);
     assert.equal(await page.locator('.mg-product-card').count(), 16);
+    await page.waitForFunction(() => document.querySelectorAll('.mg-product-card')[8]?.querySelector('.mg-product-photo') === document.activeElement);
+    assert.equal(await page.locator('.mg-product-card').nth(8).locator('.mg-product-photo').evaluate(el => document.activeElement === el), true);
     await page.locator('.mg-faq summary').nth(1).click();
     assert.equal(await page.locator('.mg-faq details').nth(1).evaluate(el => el.open), true);
     await page.locator('.mg-faq summary').nth(1).focus();
@@ -88,9 +102,56 @@ async function main() {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.locator('.mg-product-photo').first().hover();
     await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('.mg-image-primary')).transform.match(/matrix\(([^,]+)/)?.[1]) > 1);
+    // The optional physics starts only near the section; native buttons work with keyboard too.
+    await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.physics === 'ready');
+    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'false', null, { timeout: 6000 });
+    await page.getByRole('button', { name: 'Mover etiqueta DENIM', exact: true }).focus();
+    const oldTransform = await page.locator('.mg-material-tag').first().getAttribute('style');
+    await page.keyboard.press('Enter');
+    await page.waitForFunction(old => document.querySelector('.mg-material-tag')?.getAttribute('style') !== old, oldTransform);
+    await page.getByRole('button', { name: 'Pausar', exact: true }).click();
+    assert.equal(await page.locator('.mg-material-arena').getAttribute('data-running'), 'false');
+    if (output) await page.screenshot({ path: join(output, 'materiales-desktop.png') });
+    const tag = await page.locator('.mg-material-tag').first().boundingBox();
+    await page.mouse.move(tag.x + tag.width / 2, tag.y + tag.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(tag.x + tag.width / 2 + 60, tag.y + tag.height / 2 - 25, { steps: 8 });
+    await page.mouse.up();
+    assert.equal(await page.locator('.mg-material-arena').getAttribute('data-running'), 'true');
+    await page.getByRole('button', { name: 'Mezclar', exact: true }).click();
+    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'false');
+    // Native animated up/down restores position, on both long home and product pages.
+    for (const path of ['/', '/producto/7']) {
+      await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' });
+      if (path !== '/') await page.locator('.product-page').waitFor();
+      for (const [width, height] of [[320,740],[390,844],[768,1024],[844,390],[1440,900],[2560,1440]]) {
+        await page.setViewportSize({ width, height });
+        await page.evaluate(() => document.fonts.ready);
+        assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${path} ${width}: overflow`);
+        const maxScroll = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
+        if (maxScroll <= Math.max(height, 480)) continue; // No scroll control needed when everything fits.
+        await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight - innerHeight - 20, behavior: 'instant' }));
+        await page.getByRole('button', { name: 'Subir al inicio', exact: true }).waitFor();
+        const origin = await page.evaluate(() => scrollY);
+        await page.getByRole('button', { name: 'Subir al inicio', exact: true }).click();
+        await page.waitForFunction(() => scrollY < 2);
+        await page.getByRole('button', { name: 'Volver a donde estaba', exact: true }).click();
+        await page.waitForFunction(y => Math.abs(scrollY - y) < 4, origin);
+      }
+    }
+    await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: 'Buscar una pieza', exact: true }).click();
+    await page.getByRole('dialog', { name: 'Buscar en MANGATA', exact: true }).waitFor();
+    await page.keyboard.press('Escape');
     await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('.mg-hero-copy > p')).animationName === 'none');
     assert.equal(await page.locator('.mg-hero-copy > p').evaluate(el => getComputedStyle(el).animationName), 'none');
     assert.equal(await page.locator('.mg-hero .mg-button').evaluate(el => getComputedStyle(el).transitionDuration), '0s');
+    await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
+    assert.equal(await page.locator('.mg-material-arena').getAttribute('data-physics'), null);
+    assert.equal(await page.getByRole('button', { name: 'Mezclar', exact: true }).isDisabled(), true);
     const touch = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
     await touch.route(paymentRoute, blockPayment);
     const mobile = await touch.newPage();
@@ -109,6 +170,13 @@ async function main() {
     await mobile.goto(base, { waitUntil: 'domcontentloaded' });
     await mobile.getByRole('button', { name: 'Rechazar opcionales', exact: true }).tap();
     await mobile.getByRole('link', { name: 'Ver las piezas', exact: true }).tap();
+    const withPhotos = mobile.locator('.mg-product-card').filter({ has: mobile.locator('.mg-card-views') }).first();
+    await withPhotos.locator('.mg-card-views button').nth(1).tap();
+    await mobile.waitForFunction(() => document.querySelector('.mg-product-photo[data-secondary="true"]'));
+    assert.equal(new URL(mobile.url()).pathname, '/', 'Selecting a thumbnail must not open product');
+    await withPhotos.locator('.mg-card-views button').first().tap();
+    assert.equal(await withPhotos.locator('.mg-product-photo').getAttribute('data-secondary'), 'false');
+    if (output) await mobile.screenshot({ path: join(output, 'cards-touch.png') });
     const card = mobile.locator('.mg-product-card').filter({ has: mobile.locator('.mg-add-button:not([disabled])') }).first();
     const piece = await card.locator('h3').innerText();
     const [cartResponse] = await Promise.all([
@@ -121,6 +189,25 @@ async function main() {
     await bag.getByText('Todavía no elegiste una pieza.', { exact: true }).waitFor();
     await bag.getByRole('button', { name: 'Cerrar', exact: true }).tap();
     assert.equal(await mobile.evaluate(() => matchMedia('(hover: hover) and (pointer: fine)').matches), false);
+    await mobile.goto(`${base}/producto/7`, { waitUntil: 'load' });
+    await mobile.locator('.product-image-stage img').waitFor();
+    await mobile.getByRole('button', { name: 'Foto siguiente', exact: true }).tap();
+    await mobile.getByRole('button', { name: /Ampliar foto/ }).tap();
+    const zoom = mobile.getByRole('dialog', { name: /Vista ampliada/ });
+    await zoom.waitFor();
+    await zoom.getByRole('button', { name: 'Foto anterior', exact: true }).tap();
+    assert.equal(await zoom.locator('.product-dialog-controls > span').innerText(), '1 de 2');
+    assert.equal(await mobile.locator('.experience-scroll-control').getAttribute('data-visible'), 'false');
+    await zoom.getByRole('button', { name: 'Cerrar vista ampliada', exact: true }).tap();
+    await mobile.waitForFunction(() => !document.querySelector('.product-image-dialog')?.open);
+    // Simulated image outage: the user can retry without losing the product or bag.
+    await touch.route('**/_next/image?*', route => route.abort());
+    await mobile.reload({ waitUntil: 'load' });
+    await mobile.getByText('No pudimos cargar esta foto.', { exact: true }).waitFor();
+    await touch.unroute('**/_next/image?*');
+    await mobile.getByRole('button', { name: 'Volver a cargar', exact: true }).tap();
+    await mobile.waitForFunction(() => !document.querySelector('.product-image-error'));
+    await mobile.waitForFunction(() => document.querySelector('.product-image-stage img')?.naturalWidth > 0);
     await touch.close();
     assert.deepEqual(errors, []);
     assert.deepEqual(paymentRequests, []);

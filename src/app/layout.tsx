@@ -45,18 +45,17 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
-    default: "MANGATA — Streetwear recuperado en Córdoba",
+    default: "MANGATA — Diseño de autor y upcycling en Córdoba",
     template: "%s · MANGATA",
   },
   description:
-    "Upcycling streetwear hecho en Córdoba, Argentina. Piezas únicas recuperadas, intervenidas y terminadas a mano.",
+    "Prendas y accesorios de diseño y upcycling en Córdoba, Argentina. Piezas únicas recuperadas e intervenidas a mano.",
   applicationName: "MANGATA",
   generator: "Next.js",
   keywords: [
     "mangata",
     "upcycling",
-    "streetwear",
-    "moda sustentable",
+    "diseño de autor",
     "diseño argentino",
     "prendas únicas",
   ],
@@ -65,9 +64,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/",
-    title: "MANGATA — Streetwear recuperado en Córdoba",
+    title: "MANGATA — Diseño de autor y upcycling en Córdoba",
     description:
-      "Piezas recuperadas, intervención manual y una sola unidad. Upcycling streetwear desde Córdoba.",
+      "Prendas y accesorios recuperados e intervenidos a mano. Diseño de autor y upcycling desde Córdoba.",
     siteName: "MANGATA",
     locale: "es_AR",
     images: [
@@ -81,7 +80,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "MANGATA — Streetwear recuperado en Córdoba",
+    title: "MANGATA — Diseño de autor y upcycling en Córdoba",
     description:
       "Prendas recuperadas e intervenidas a mano en Córdoba, Argentina. Cada pieza tiene una sola unidad.",
     images: ["/og/og-default.jpg"],

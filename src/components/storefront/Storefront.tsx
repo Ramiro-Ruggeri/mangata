@@ -13,6 +13,9 @@ import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { CatalogResult, CatalogSource, CommerceMode, StoreProduct } from "@/lib/commerce/types";
 import { SITE, whatsappHref } from "@/config/site";
+import { matchesCategory, searchProducts } from "@/lib/catalog-view";
+import { productImageView } from "@/lib/product-images";
+import { MaterialPlayground } from "./MaterialPlayground";
 import "./storefront.css";
 
 const INSTAGRAM = SITE.instagram;
@@ -20,7 +23,6 @@ const WHATSAPP = whatsappHref("Hola MANGATA, quiero consultar por una pieza.");
 const WHATSAPP_DROP = whatsappHref("Hola MANGATA, ¿cuándo sale el próximo drop?");
 const WHATSAPP_MEASURES = whatsappHref("Hola MANGATA, vi una pieza en la web y quiero consultar sus medidas.");
 const money = (value: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value);
-const clean = (value: string) => value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLocaleLowerCase("es");
 
 function selectProduct(product: StoreProduct, source: string) {
   trackCommerceEvent("select_item", { currency: "ARS", value: product.price, item_id: product.sku, item_name: product.name, item_category: product.category, source });
@@ -62,7 +64,9 @@ function Header({ onSearch }: { onSearch: () => void }) {
 
 function SearchDialog({ products, open, onClose }: { products: StoreProduct[]; open: boolean; onClose: () => void }) {
   const [query, setQuery] = useState("");
-  const result = useMemo(() => products.filter((product) => clean(`${product.name} ${product.category} ${product.sku}`).includes(clean(query.trim()))), [products, query]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const result = useMemo(() => searchProducts(products, query), [products, query]);
+  const searching = query.trim().length > 0;
   useEffect(() => {
     if (!open || query.trim().length < 2) return;
     const timer = window.setTimeout(() => trackCommerceEvent("search", { search_length: query.trim().length, result_count: result.length, source: "header" }), 600);
@@ -70,10 +74,11 @@ function SearchDialog({ products, open, onClose }: { products: StoreProduct[]; o
   }, [open, query, result.length]);
   return <Dialog open={open} onClose={onClose} label="Buscar en MANGATA" className="mg-search-dialog">
     <div className="mg-dialog-heading"><span className="mg-eyebrow">Buscá tu próxima pieza</span><button className="mg-icon-button" onClick={onClose} aria-label="Cerrar búsqueda"><X /></button></div>
-    <label className="mg-search-input"><Search size={23} /><input autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Denim, foil, accesorios…" aria-label="Buscar por nombre, categoría o SKU" /></label>
-    <p className="mg-search-count" role="status">{query ? `${result.length} ${result.length === 1 ? "pieza encontrada" : "piezas encontradas"}` : "Algunas para empezar"}</p>
-    <div className="mg-search-results">{result.slice(0, 8).map((product) => <Link key={product.id} href={`/producto/${product.id}`} onClick={() => { selectProduct(product, "search"); onClose(); }}><div className="mg-search-thumb"><Image src={product.image} fill alt="" sizes="72px" /></div><span><strong>{product.name}</strong><small>{product.category}{!product.inventory.isInStock ? " · No disponible" : ""}</small></span><b>{money(product.price)}</b><ArrowUpRight size={18} /></Link>)}</div>
-    {!result.length && <div className="mg-search-empty"><p>No encontramos esa pieza.</p><button className="mg-inline-link" onClick={() => setQuery("")}>Ver una selección <ArrowRight size={17} /></button></div>}
+    <div className="mg-search-input"><Search size={23} aria-hidden="true" /><input ref={inputRef} autoFocus value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Denim, foil, accesorios…" aria-label="Buscar por nombre, categoría o SKU" />{query && <button className="mg-icon-button" aria-label="Borrar búsqueda" onClick={() => { setQuery(""); inputRef.current?.focus(); }}><X size={18} /></button>}</div>
+    <p className="mg-search-count" role="status">{searching ? `${result.length} ${result.length === 1 ? "pieza encontrada" : "piezas encontradas"}` : "Algunas para empezar"}</p>
+    <div className="mg-search-results">{(searching ? result : result.slice(0, 8)).map((product) => <Link key={product.id} href={`/producto/${product.id}`} onClick={() => { selectProduct(product, "search"); onClose(); }}><div className="mg-search-thumb"><Image src={product.image} fill alt="" sizes="72px" /></div><span><strong>{product.name}</strong><small>{product.category}{!product.inventory.isInStock ? " · No disponible" : ""}</small></span><b>{money(product.price)}</b><ArrowUpRight size={18} /></Link>)}</div>
+    <a href="#coleccion" className="mg-inline-link mg-search-collection" onClick={onClose}>Explorar la colección <ArrowRight size={17} /></a>
+    {!result.length && <div className="mg-search-empty"><p>No encontramos esa pieza.</p><button className="mg-inline-link" onClick={() => { setQuery(""); inputRef.current?.focus(); }}>Ver una selección <ArrowRight size={17} /></button></div>}
   </Dialog>;
 }
 
@@ -81,7 +86,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
   const featured = products.find((product) => product.name === "Bermuda Tribal" && product.inventory.isInStock) ?? products.find((product) => product.inventory.isInStock) ?? products[0];
   return <section className="mg-hero" id="inicio" aria-labelledby="hero-title">
     <div className="mg-hero-copy">
-      <span className="mg-eyebrow"><i /> Streetwear recuperado</span>
+      <span className="mg-eyebrow"><i /> Diseño de autor y upcycling</span>
       <h1 id="hero-title">Diseñado<br />para <em>vos.</em></h1>
       <p>Piezas únicas de diseño y upcycling,<br /> hechas a mano.</p>
       <a href="#coleccion" className="mg-button mg-button-light">Ver las piezas <ArrowDown size={18} /></a>
@@ -96,11 +101,11 @@ function Hero({ products }: { products: StoreProduct[] }) {
 }
 
 function PurchaseNotes() {
-  const { checkoutReady, mode, openCart } = useCart();
+  const { checkoutReady, mode } = useCart();
   const mercadoPagoReady = checkoutReady && mode === "local";
   return <section className="mg-purchase-notes" aria-label="Información para comprar">
     <a href="#ayuda"><PackageCheck size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Entrega a coordinar</strong><small>Consultá envío o retiro en Córdoba.</small></span></a>
-    {mercadoPagoReady ? <button type="button" onClick={openCart}><span className="mg-trust-icon" aria-hidden="true"><LockKeyhole size={23} strokeWidth={1.4} /><CircleCheck size={13} strokeWidth={2.3} /></span><span><strong>Pago protegido</strong><small>Checkout seguro de Mercado Pago.</small></span></button> : <div><CreditCard size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Precios en pesos argentinos</strong><small>El envío se coordina antes de comprar.</small></span></div>}
+    {mercadoPagoReady ? <a href="#compra-entrega"><span className="mg-trust-icon" aria-hidden="true"><LockKeyhole size={23} strokeWidth={1.4} /><CircleCheck size={13} strokeWidth={2.3} /></span><span><strong>Pago protegido</strong><small>Checkout seguro de Mercado Pago.</small></span></a> : <div><CreditCard size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Precios en pesos argentinos</strong><small>El envío se coordina antes de comprar.</small></span></div>}
     <a href={WHATSAPP} target="_blank" rel="noopener noreferrer" aria-label="Contactar a MANGATA por WhatsApp (se abre en otra pestaña)"><MessageCircle size={23} strokeWidth={1.4} aria-hidden="true" /><span><strong>Atención por WhatsApp</strong><small>{SITE.whatsappDisplay}</small></span></a>
   </section>;
 }
@@ -110,12 +115,13 @@ function ProductCard({ product }: { product: StoreProduct }) {
   const [pending, setPending] = useState(false);
   const [secondaryRequested, setSecondaryRequested] = useState(false);
   const [secondaryLoaded, setSecondaryLoaded] = useState(false);
+  const [showSecondary, setShowSecondary] = useState(false);
   const inBag = items.some((item) => item.sku === product.sku);
   const secondary = product.images[1];
   const add = async () => { setPending(true); try { await addItem(product); } finally { setPending(false); } };
   return <motion.article data-scroll-anchor={`product-${product.id}`} layout="position" initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .22 }} className="mg-product-card">
     <div className="mg-product-media" data-photo-surface={product.image.startsWith("/catalog/") ? "light" : undefined}>
-      <Link href={`/producto/${product.id}`} className="mg-product-photo" aria-label={`Ver ${product.name}`} onPointerEnter={(event) => { if (event.pointerType === "mouse" && secondary) setSecondaryRequested(true); }} onClick={() => selectProduct(product, "collection")}>
+      <Link href={`/producto/${product.id}`} className="mg-product-photo" data-secondary={showSecondary && secondaryLoaded} aria-label={`Ver ${product.name}`} onPointerEnter={(event) => { if (event.pointerType === "mouse" && secondary) setSecondaryRequested(true); }} onClick={() => selectProduct(product, "collection")}>
         <Image src={product.image} alt={product.name} fill loading="lazy" sizes="(max-width: 700px) calc((100vw - 52px) / 2), (max-width: 1024px) 31vw, (max-width: 1440px) 23vw, 315px" className="mg-image-primary" />
         {secondary && secondaryRequested && <Image src={secondary} fill alt="" loading="lazy" sizes="(max-width: 700px) calc((100vw - 52px) / 2), (max-width: 1024px) 31vw, (max-width: 1440px) 23vw, 315px" className={`mg-image-secondary ${secondaryLoaded ? "is-ready" : ""}`} onLoad={() => setSecondaryLoaded(true)} />}
       </Link>
@@ -123,7 +129,10 @@ function ProductCard({ product }: { product: StoreProduct }) {
       {!product.inventory.isInStock && <span className="mg-unavailable-label">{product.source === "local-fallback" || product.inventory.availability === "unconfirmed" ? "Consultar disponibilidad" : ["reserved", "review"].includes(product.inventory.availability ?? "") ? "En proceso de compra" : "Agotada"}</span>}
       <Link href={`/producto/${product.id}`} className="mg-view-piece" aria-label={`Ver detalles de ${product.name}`} onClick={() => selectProduct(product, "collection_detail")}><ArrowUpRight size={18} /></Link>
     </div>
-    <div className="mg-product-info"><span className="mg-product-category">{product.category}</span><Link href={`/producto/${product.id}`} onClick={() => selectProduct(product, "collection_name")}><h3>{product.name}</h3></Link><div className="mg-product-prices"><strong>{money(product.price)}</strong>{product.compareAtPrice && <del>{money(product.compareAtPrice)}</del>}</div>{product.transferPrice && <p className="mg-transfer-price">{money(product.transferPrice)} por transferencia</p>}</div>
+    <div className="mg-product-info">
+      <div className="mg-card-meta"><span className="mg-product-category">{product.category}</span>{secondary && <div className="mg-card-views" role="group" aria-label={`Vistas de ${product.name}`}>{[product.image, secondary].map((image, index) => <button key={image} aria-label={`Mostrar ${productImageView(image, index).toLowerCase()} de ${product.name}`} aria-pressed={showSecondary === (index === 1)} onClick={() => { setShowSecondary(index === 1); if (index === 1) setSecondaryRequested(true); }}><Image src={image} alt="" fill sizes="44px" /></button>)}</div>}</div>
+      <Link href={`/producto/${product.id}`} onClick={() => selectProduct(product, "collection_name")}><h3>{product.name}</h3></Link><div className="mg-product-prices"><strong>{money(product.price)}</strong>{product.compareAtPrice && <del>{money(product.compareAtPrice)}</del>}</div>{product.transferPrice && <p className="mg-transfer-price">{money(product.transferPrice)} por transferencia</p>}
+    </div>
     <button className={`mg-add-button ${inBag ? "is-added" : ""}`} onClick={add} disabled={!product.inventory.isInStock || pending || syncState === "syncing"} aria-label={`${inBag ? "Ver" : "Sumar"} ${product.name} ${inBag ? "en" : "a"} la bolsa`}><span>{pending ? "Sumando…" : inBag ? "En tu bolsa" : "Sumar a la bolsa"}</span>{inBag ? <Check size={16} /> : <Plus size={16} />}</button>
   </motion.article>;
 }
@@ -132,7 +141,15 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
   const sectionRef = useRef<HTMLElement>(null);
   const { catalogView: view, setCatalogView: setView } = useExperience();
   const { category, sort, onlyAvailable, limit } = view;
+  const nextCardRef = useRef<string | null>(null);
   const updateView = (patch: Partial<typeof view>) => setView((current) => ({ ...current, ...patch }));
+  const restoreControl = (selector: string) => sectionRef.current?.querySelector<HTMLElement>(selector)?.focus({ preventScroll: true });
+  const resetView = () => { updateView({ category: "Todas", sort: "selection", onlyAvailable: false, limit: 8 }); restoreControl(".mg-category-tabs button"); };
+  useEffect(() => {
+    if (!nextCardRef.current) return;
+    sectionRef.current?.querySelector<HTMLElement>(`[data-scroll-anchor="product-${CSS.escape(nextCardRef.current)}"] .mg-product-photo`)?.focus();
+    nextCardRef.current = null;
+  }, [limit]);
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -145,7 +162,7 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     return () => observer.disconnect();
   }, [products.length, source]);
   const filtered = useMemo(() => {
-    const result = products.filter((product) => (!onlyAvailable || product.inventory.isInStock) && (category === "Todas" || (category === "Denim" ? /denim|jean|foil|canesu/.test(clean(`${product.name} ${product.description}`)) : product.category === category)));
+    const result = products.filter((product) => (!onlyAvailable || product.inventory.isInStock) && matchesCategory(product, category));
     if (sort === "price-low") return result.sort((a, b) => a.price - b.price);
     if (sort === "price-high") return result.sort((a, b) => b.price - a.price);
     if (sort === "new") return result.sort((a, b) => Number(b.isNew) - Number(a.isNew));
@@ -159,10 +176,11 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>huella.</em></h2></div><div className="mg-collection-context"><p>Prendas y accesorios exclusivos,<br /> diseñados e intervenidos a mano.</p>{source === "local" && <aside className="mg-opening-note" aria-label="Precios de apertura"><span className="mg-opening-dot" aria-hidden="true" /><span><strong>Precios de apertura</strong><small>Ya están aplicados.</small></span></aside>}</div></div>
     {source === "local-fallback" && <p className="mg-catalog-notice" role="status">Estamos revisando la disponibilidad de las piezas. Podés verlas y consultarnos por WhatsApp.</p>}
     <div className="mg-catalog-controls"><div className="mg-category-tabs" role="group" aria-label="Filtrar colección">{["Todas", "Denim", "Prendas", "Accesorios"].map((name) => <button key={name} aria-pressed={category === name} className={category === name ? "is-active" : ""} onClick={() => updateView({ category: name, limit: 8 })}>{name}</button>)}</div><label className="mg-sort"><SlidersHorizontal size={15} /><select aria-label="Ordenar piezas" value={sort} onChange={(event) => updateView({ sort: event.target.value, limit: 8 })}><option value="selection">Nuestra selección</option><option value="new">Recién intervenidas</option><option value="price-low">Menor precio</option><option value="price-high">Mayor precio</option></select><ChevronDown size={13} /></label></div>
-    <div className="mg-catalog-summary"><p role="status">{filtered.length} {filtered.length === 1 ? "pieza" : "piezas"}</p><label><input type="checkbox" checked={onlyAvailable} onChange={(event) => updateView({ onlyAvailable: event.target.checked, limit: 8 })} /> Sólo disponibles</label></div>
+    <div className="mg-catalog-summary"><p role="status" aria-atomic="true">{filtered.length} {filtered.length === 1 ? "pieza" : "piezas"}{category !== "Todas" ? ` · ${category}` : ""}</p><label><input type="checkbox" checked={onlyAvailable} onChange={(event) => updateView({ onlyAvailable: event.target.checked, limit: 8 })} /> Sólo disponibles</label></div>
+    {(category !== "Todas" || onlyAvailable || sort !== "selection") && <div className="mg-active-filters" role="group" aria-label="Selección actual"><span>Estás viendo</span>{category !== "Todas" && <button onClick={() => { updateView({ category: "Todas", limit: 8 }); restoreControl(".mg-category-tabs button"); }} aria-label={`Quitar filtro ${category}`}>{category}<X size={14} /></button>}{onlyAvailable && <button onClick={() => { updateView({ onlyAvailable: false, limit: 8 }); restoreControl(".mg-catalog-summary input"); }} aria-label="Quitar filtro Sólo disponibles">Sólo disponibles<X size={14} /></button>}{sort !== "selection" && <button onClick={() => { updateView({ sort: "selection", limit: 8 }); restoreControl(".mg-sort select"); }} aria-label="Quitar orden elegido">{sort === "price-low" ? "Menor precio" : sort === "price-high" ? "Mayor precio" : "Recién intervenidas"}<X size={14} /></button>}<button className="mg-reset-filters" onClick={resetView}>Restablecer colección<ArrowRight size={14} /></button></div>}
     <div className="mg-product-grid"><AnimatePresence mode="popLayout">{filtered.slice(0, limit).map((product) => <ProductCard key={product.id} product={product} />)}</AnimatePresence></div>
-    {!filtered.length && <div className="mg-empty"><h3>Por acá no quedan piezas.</h3><button className="mg-inline-link" onClick={() => updateView({ category: "Todas", onlyAvailable: false })}>Volver a ver la colección <ArrowRight size={17} /></button></div>}
-    {filtered.length > limit && <div className="mg-load-more"><button className="mg-button mg-button-outline" onClick={() => updateView({ limit: limit + 8 })}>Ver más piezas <Plus size={18} /></button><span>Mostrando {Math.min(limit, filtered.length)} de {filtered.length}</span></div>}
+    {!filtered.length && <div className="mg-empty"><h3>Por acá no quedan piezas.</h3><button className="mg-inline-link" onClick={resetView}>Volver a ver la colección <ArrowRight size={17} /></button></div>}
+    {filtered.length > limit && <div className="mg-load-more"><button className="mg-button mg-button-outline" onClick={(event) => { if (event.detail === 0) nextCardRef.current = filtered[limit]?.id ?? null; updateView({ limit: limit + 8 }); }}>Ver más piezas <Plus size={18} /></button><span>Mostrando {Math.min(limit, filtered.length)} de {filtered.length}</span></div>}
   </section>;
 }
 
@@ -174,7 +192,10 @@ function CraftStory() {
 }
 
 function Help() {
-  return <section id="ayuda" className="mg-help mg-shell" aria-labelledby="help-title"><div className="mg-help-intro"><span className="mg-eyebrow">Antes de elegir</span><h2 id="help-title">Que te guste.<br /><em>Que sea para vos.</em></h2><p>Si tenés dudas sobre una pieza, te ayudamos a resolverlas antes de comprar.</p><a className="mg-button mg-button-dark" href={WHATSAPP} target="_blank" rel="noreferrer">Hablemos por WhatsApp <MessageCircle size={19} /></a></div><div className="mg-faq"><details><summary>¿Cómo sé si me va a quedar?<Plus size={18} /></summary><p>Desde cada ficha podés pedirnos las medidas exactas por WhatsApp. El mensaje ya incluye la pieza que estás mirando, así la ubicamos enseguida.</p></details><details><summary>¿Qué pieza voy a recibir?<Plus size={18} /></summary><p>Cada publicación corresponde a una pieza única. La prenda que ves disponible es la que vas a recibir.</p></details><details><summary>¿Cómo coordino el envío o retiro?<Plus size={18} /></summary><p>Escribinos con la pieza y tu localidad para consultar las opciones de entrega o coordinar un retiro en Córdoba.</p></details><details><summary>¿Querés ver más detalles de una pieza?<Plus size={18} /></summary><p>Si necesitás fotos, medidas o querés consultar algún detalle antes de comprar, escribime.</p></details></div></section>;
+  const { checkoutReady, mode } = useCart();
+  return <section id="ayuda" className="mg-help mg-shell" aria-labelledby="help-title"><div className="mg-help-intro"><span className="mg-eyebrow">Antes de elegir</span><h2 id="help-title">Que te guste.<br /><em>Que sea para vos.</em></h2><p>Si tenés dudas sobre una pieza, te ayudamos a resolverlas antes de comprar.</p><a className="mg-button mg-button-dark" href={WHATSAPP} target="_blank" rel="noreferrer">Hablemos por WhatsApp <MessageCircle size={19} /></a>
+      <div className="mg-buying-guide" id="compra-entrega" tabIndex={-1}><h3>Pago y entrega</h3>{checkoutReady && mode === "local" && <p><LockKeyhole size={17} aria-hidden="true" /><span>Pagás las piezas en el checkout de Mercado Pago. Los precios están en pesos argentinos.</span></p>}<p><PackageCheck size={18} aria-hidden="true" /><span>El envío no está incluido en el precio. Coordiná el costo y la entrega o el retiro antes de pagar.</span></p><a className="mg-inline-link" href={whatsappHref("Hola MANGATA, quiero consultar el costo de envío o coordinar un retiro antes de comprar.")} target="_blank" rel="noopener noreferrer">Consultar entrega <ArrowUpRight size={16} /></a></div>
+    </div><div className="mg-faq"><details><summary>¿Cómo sé si me va a quedar?<Plus size={18} /></summary><p>Desde cada ficha podés pedirnos las medidas exactas por WhatsApp. El mensaje ya incluye la pieza que estás mirando, así la ubicamos enseguida.</p></details><details><summary>¿Qué pieza voy a recibir?<Plus size={18} /></summary><p>Cada publicación corresponde a una pieza única. La prenda que ves disponible es la que vas a recibir.</p></details><details><summary>¿Cómo coordino el envío o retiro?<Plus size={18} /></summary><p>Escribinos con la pieza y tu localidad para consultar las opciones de entrega o coordinar un retiro en Córdoba.</p></details><details><summary>¿Querés ver más detalles de una pieza?<Plus size={18} /></summary><p>Si necesitás fotos, medidas o querés consultar algún detalle antes de comprar, escribime.</p></details></div></section>;
 }
 
 function Footer() {
@@ -200,6 +221,7 @@ function Footer() {
         <nav className="mg-footer-nav" aria-label="Explorar MANGATA">
           <a href="#manifiesto">Cómo lo hacemos</a>
           <a href="#ayuda">Antes de comprar</a>
+          <a href="#compra-entrega">Pago y entrega</a>
         </nav>
       </div>
     </div>
@@ -236,5 +258,5 @@ export default function Storefront({ initialProducts, mode, source: initialSourc
     const interval = window.setInterval(refresh, 60_000);
     return () => window.clearInterval(interval);
   }, [mode]);
-  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><Help /></main><Footer /></div></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><MaterialPlayground /><Help /></main><Footer /></div></MotionConfig>;
 }

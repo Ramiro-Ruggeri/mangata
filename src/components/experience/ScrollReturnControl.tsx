@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { ArrowDown, ArrowUp } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { useExperience } from "./ExperienceProvider";
 import { isPastScrollThreshold, resolveReturnY, shouldDiscardReturn, type ScrollReturnPoint } from "@/lib/experience/interaction";
 
@@ -207,7 +207,7 @@ function ScrollReturnSession({ route }: { route: string }) {
         tabIndex={visible ? 0 : -1}
         onClick={navigate}
       >
-        {returnPoint ? <ArrowDown size={21} aria-hidden="true" /> : <ArrowUp size={21} aria-hidden="true" />}
+        <ArrowUp className="experience-scroll-arrow" size={21} aria-hidden="true" />
         <span className="experience-scroll-label" aria-hidden="true">{label}</span>
       </button>
       <span className="experience-status" role="status" aria-live="polite" aria-atomic="true">{status}</span>

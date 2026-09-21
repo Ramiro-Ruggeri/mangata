@@ -10,10 +10,10 @@ if (!Array.isArray(catalog.products) || catalog.products.length < 1) throw new E
 
 const paths = new Set([
   "/campaign/rework-still-life-v2.webp",
-  ...catalog.products.map(product => product.image).filter(path => typeof path === "string" && path.startsWith("/")),
+  ...catalog.products.flatMap(product => [product.image, ...(product.images || [])]).filter(path => typeof path === "string" && path.startsWith("/")),
 ]);
 const formats = ["image/avif,image/webp", "image/webp"];
-const widths = [360, 640];
+const widths = [96, 256, 360, 640];
 const jobs = [...paths].flatMap(path => formats.flatMap(accept => widths.map(width => ({ path, accept, width }))));
 
 let completed = 0;
