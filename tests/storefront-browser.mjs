@@ -131,7 +131,7 @@ async function main() {
         await page.evaluate(() => document.fonts.ready);
         assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1), `${path} ${width}: overflow`);
         const maxScroll = await page.evaluate(() => document.documentElement.scrollHeight - innerHeight);
-        if (maxScroll <= Math.max(height, 480)) continue; // No scroll control needed when everything fits.
+        if (maxScroll - 20 <= Math.max(height, 480)) continue; // The chosen position must pass the control's threshold.
         await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight - innerHeight - 20, behavior: 'instant' }));
         await page.getByRole('button', { name: 'Subir al inicio', exact: true }).waitFor();
         const origin = await page.evaluate(() => scrollY);
@@ -190,6 +190,7 @@ async function main() {
     await bag.getByRole('button', { name: 'Cerrar', exact: true }).tap();
     assert.equal(await mobile.evaluate(() => matchMedia('(hover: hover) and (pointer: fine)').matches), false);
     await mobile.goto(`${base}/producto/7`, { waitUntil: 'load' });
+    await mobile.waitForFunction(() => document.querySelectorAll('.product-image-stage img').length === 1);
     await mobile.locator('.product-image-stage img').waitFor();
     await mobile.getByRole('button', { name: 'Foto siguiente', exact: true }).tap();
     await mobile.getByRole('button', { name: /Ampliar foto/ }).tap();
