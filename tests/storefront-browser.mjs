@@ -141,7 +141,7 @@ async function main() {
         await page.waitForFunction(y => Math.abs(scrollY - y) < 4, origin);
       }
     }
-    await page.goto(base, { waitUntil: 'domcontentloaded' });
+    await page.goto(base, { waitUntil: 'networkidle' });
     await page.getByRole('button', { name: 'Buscar una pieza', exact: true }).click();
     await page.getByRole('dialog', { name: 'Buscar en MANGATA', exact: true }).waitFor();
     await page.keyboard.press('Escape');

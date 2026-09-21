@@ -24,3 +24,12 @@ No se publicó la frase absoluta “no realizamos devoluciones de dinero”. En 
 ## Pendiente operativo
 
 Emilia debe aportar la próxima semana las medidas físicas de las diez piezas restantes e indicar cómo se tomó cada ancho. También debe atender las solicitudes de arrepentimiento y emitir el código comprometido dentro de 24 horas. Siguen pendientes la identidad fiscal, el domicilio comercial y una validación legal integral del negocio.
+
+## Publicación verificada
+
+- Commit de aplicación: `19b487b2aee99f60ca0335717aeecfb3eaa36076`, enviado a `origin/main`.
+- Imagen activa: `mangata/web:19b487b2aee99f60ca0335717aeecfb3eaa36076`; release `/opt/mangata/releases/19b487b2aee99f60ca0335717aeecfb3eaa36076` enlazado desde `/opt/mangata/current`.
+- Archivo de publicación validado por SHA-256: `0bf781c0ce9fd722115879b63faaa1aa0354a9ebd8278b5d653dc1bb3359515a`.
+- Candidato aislado saludable antes del cambio; contenedor final saludable después. El archivo privado de configuración comercial conservó el mismo hash, y la base, volumen de imágenes, stock, pagos, proxy y certificados no se migraron ni reinicializaron.
+- Smoke HTTPS público: health, catálogo, `/cambios`, ficha de Rituales y sitemap respondieron 200; 26 productos, 16 con medidas, Rituales 108 × 63 cm, Blazer sin medidas inventadas y 28 URLs. HTTP y `www` redirigen al apex HTTPS.
+- La prueba específica volvió a pasar en el dominio público con Chromium y WebKit. La suite integral de producción pasó en Chromium para 13 viewports de 320 a 2560 px; bloqueó toda solicitud de checkout. Los demás contenedores del VPS conservaron su ejecución.
