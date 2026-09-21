@@ -89,6 +89,31 @@ test("September catalog contains exactly the 26 confirmed final ARS prices and r
   assert.equal(rituales[0].image, rituales[0].images[0]);
 });
 
+test("confirmed measurements stay attached only to the matching pieces", () => {
+  const expected = new Map<string, Array<[string, string]>>([
+    ["Bandoo Moñito", [["Ancho", "67 cm (contiene elástico)"], ["Largo", "36 cm"]]],
+    ["Bermuda Oscuridad", [["Ancho", "97 cm"], ["Largo", "50 cm"]]],
+    ["Camisa Jappon", [["Ancho de pecho", "102 cm"], ["Largo de prenda", "47 cm"], ["Largo de manga", "60 cm"]]],
+    ["Vaquero Tribal", [["Ancho de cadera/cintura", "88 cm"], ["Largo de prenda", "107 cm"]]],
+    ["Pantalón Foil", [["Ancho de cintura/cadera", "85 cm"], ["Largo de prenda", "96 cm"]]],
+    ["Pantalón Canesú", [["Ancho de cintura", "75 cm"], ["Largo de prenda", "102 cm"]]],
+    ["Buzo Alitas", [["Ancho", "120 cm"], ["Largo de prenda", "34 cm"]]],
+    ["Campera Rituales", [["Ancho de pecho", "108 cm"], ["Largo de prenda", "63 cm"]]],
+    ["Campera Reverso", [["Ancho de pecho", "108 cm"], ["Largo de prenda", "63 cm"]]],
+    ["Campera Deseos", [["Ancho", "102 cm"], ["Largo", "44 cm"]]],
+    ["Bermuda Tribal", [["Ancho de cadera/cintura", "84 cm"], ["Largo de prenda", "64 cm"]]],
+    ["Mono Black", [["Ancho de pecho", "90 cm"], ["Largo de prenda", "80 cm"]]],
+    ["Cartera Crocco", [["Dimensiones", "26 × 18 cm"]]],
+    ["Top Cruz", [["Largo de la pieza que rodea el cuello", "70 cm"]]],
+    ["Boxy Black", [["Ancho de pecho", "102 cm"], ["Largo de prenda", "60 cm"]]],
+    ["Corbata Pistolera", [["Largo", "102 cm"]]],
+  ]);
+  assert.equal(products.filter(item => item.measurements?.length).length, expected.size);
+  for (const [name, measurements] of expected) {
+    assert.deepEqual(products.find(item => item.name === name)?.measurements?.map(({ label, value }) => [label, value]), measurements, name);
+  }
+});
+
 test("saved local bags refresh prices and photos, deduplicate, and remove unavailable identities", () => {
   const current = products.find((item) => item.id === "11")!;
   const saved = { id: current.id, sku: current.sku, name: current.name, price: 69900, image: "/products/11/bermudaTribal.webp", qty: 1 };
@@ -153,7 +178,8 @@ test("retired pieces cannot return through product URLs, sitemap, cart API or sa
       const saved = { id: String(id), sku, name: "Previous selection", price: 10000, image: "/old.webp", qty: 1 };
       assert.deepEqual(refreshLocalCart([saved], products), []);
     }
-    assert.equal(sitemapUrls.length, products.length + 1);
+    assert.equal(sitemapUrls.length, products.length + 2);
+    assert.ok(sitemapUrls.some(url => url.endsWith("/cambios")));
   } finally {
     if (previousMode === undefined) delete process.env.MANGATA_COMMERCE_MODE;
     else process.env.MANGATA_COMMERCE_MODE = previousMode;

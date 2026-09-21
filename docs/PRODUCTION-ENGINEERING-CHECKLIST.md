@@ -24,7 +24,8 @@ Este registro distingue evidencia técnica de aprobaciones comerciales pendiente
 - [x] Conciliación cada cinco minutos, backup diario y renovación TLS con timers activos. Estado de lanzamiento: 26 productos, 0 pedidos reales, 0 revisiones, 0 atrasos.
 - [x] `MANGATA_CHECKOUT_ENABLED=1` habilitado tras estas verificaciones; bolsa publicada muestra Mercado Pago y bloquea el botón hasta confirmar entrega.
 - [ ] Compra real completa realizada por un comprador distinto de Emilia. No se ejecutó ni se afirma haber probado un cargo real, autenticación bancaria o acreditación bancaria.
-- [ ] Validar identidad fiscal, domicilio comercial, política de entrega/cambios y conservación de datos con la titular antes de declarar cerrado el cumplimiento comercial/legal.
+- [x] Política comercial de cambios y encargos confirmada por Emilia el 21/09/2026; publicada sin limitar el arrepentimiento ni las garantías legales de compras online.
+- [ ] Validar identidad fiscal, domicilio comercial y conservación de datos con la titular antes de declarar cerrado el cumplimiento comercial/legal.
 
 ## Publicación comprobada
 

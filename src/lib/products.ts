@@ -9,6 +9,7 @@ export type Product = {
   img?: string;
   images?: string[];
   description?: string;
+  measurements?: Array<{ label: string; value: string }>;
   inStock?: boolean;
   transferDiscount?: number;
   category: Category;
@@ -31,6 +32,10 @@ export const products: Product[] = [
       "/catalog/2026-09/bandoo-monito.webp"
     ],
     description: "Bandoo negro con moñito y terminación de encaje.",
+    measurements: [
+      { label: "Ancho", value: "67 cm (contiene elástico)" },
+      { label: "Largo", value: "36 cm" }
+    ],
     order: 5
   },
   {
@@ -44,6 +49,10 @@ export const products: Product[] = [
       "/catalog/2026-09/bermuda-oscuridad.webp"
     ],
     description: "Bermuda de denim gris, con ruedo desflecado y apliques negros.",
+    measurements: [
+      { label: "Ancho", value: "97 cm" },
+      { label: "Largo", value: "50 cm" }
+    ],
     order: 6
   },
   {
@@ -57,6 +66,11 @@ export const products: Product[] = [
       "/catalog/2026-09/camisa-jappon.webp"
     ],
     description: "Camisa corta azul, con textura marcada y mangas largas.",
+    measurements: [
+      { label: "Ancho de pecho", value: "102 cm" },
+      { label: "Largo de prenda", value: "47 cm" },
+      { label: "Largo de manga", value: "60 cm" }
+    ],
     order: 7
   },
   {
@@ -70,6 +84,10 @@ export const products: Product[] = [
       "/catalog/2026-09/vaquero-tribal.webp"
     ],
     description: "Jean azul con dibujo tribal bordado en una pierna.",
+    measurements: [
+      { label: "Ancho de cadera/cintura", value: "88 cm" },
+      { label: "Largo de prenda", value: "107 cm" }
+    ],
     order: 10
   },
   {
@@ -84,6 +102,10 @@ export const products: Product[] = [
       "/catalog/2026-09/pant-foil-atras.webp"
     ],
     description: "Pantalón negro con paneles de denim y detalles de foil.",
+    measurements: [
+      { label: "Ancho de cintura/cadera", value: "85 cm" },
+      { label: "Largo de prenda", value: "96 cm" }
+    ],
     order: 30
   },
   {
@@ -97,6 +119,10 @@ export const products: Product[] = [
       "/catalog/2026-09/pantalon-con-canesu.webp"
     ],
     description: "Pantalón negro de pierna ancha, con canesú y botones a la vista.",
+    measurements: [
+      { label: "Ancho de cintura", value: "75 cm" },
+      { label: "Largo de prenda", value: "102 cm" }
+    ],
     order: 40
   },
   {
@@ -125,6 +151,10 @@ export const products: Product[] = [
       "/catalog/2026-09/buzo-alitas-atras.webp"
     ],
     description: "Buzo corto de mangas largas, con tiras y recortes.",
+    measurements: [
+      { label: "Ancho", value: "120 cm" },
+      { label: "Largo de prenda", value: "34 cm" }
+    ],
     order: 60
   },
   {
@@ -139,6 +169,10 @@ export const products: Product[] = [
       "/catalog/2026-09/campera-rituales-dorso.webp"
     ],
     description: "Campera de corderoy color caramelo, con parches negros y dibujos tribales en la espalda.",
+    measurements: [
+      { label: "Ancho de pecho", value: "108 cm" },
+      { label: "Largo de prenda", value: "63 cm" }
+    ],
     order: 70
   },
   {
@@ -152,6 +186,10 @@ export const products: Product[] = [
       "/catalog/2026-09/campera-deseos.webp"
     ],
     description: "Campera corta de jean con detalles aplicados en el frente.",
+    measurements: [
+      { label: "Ancho", value: "102 cm" },
+      { label: "Largo", value: "44 cm" }
+    ],
     order: 80
   },
   {
@@ -180,6 +218,10 @@ export const products: Product[] = [
       "/catalog/2026-09/bermuda-tribal-azul-atras.webp"
     ],
     description: "Bermuda denim con apliques tribales.",
+    measurements: [
+      { label: "Ancho de cadera/cintura", value: "84 cm" },
+      { label: "Largo de prenda", value: "64 cm" }
+    ],
     order: 110
   },
   {
@@ -193,6 +235,10 @@ export const products: Product[] = [
       "/catalog/2026-09/mono-black.webp"
     ],
     description: "Mono negro minimal con ajuste cómodo.",
+    measurements: [
+      { label: "Ancho de pecho", value: "90 cm" },
+      { label: "Largo de prenda", value: "80 cm" }
+    ],
     order: 120
   },
   {
@@ -206,6 +252,9 @@ export const products: Product[] = [
       "/catalog/2026-09/cartera-crocco.webp"
     ],
     description: "Bolso textura croco upcycled. Compacto y robusto.",
+    measurements: [
+      { label: "Dimensiones", value: "26 × 18 cm" }
+    ],
     order: 220
   },
   {
@@ -219,6 +268,9 @@ export const products: Product[] = [
       "/catalog/2026-09/top-cruz.webp"
     ],
     description: "Top cruzado con recortes y ajuste firme.",
+    measurements: [
+      { label: "Largo de la pieza que rodea el cuello", value: "70 cm" }
+    ],
     order: 140
   },
   {
@@ -284,6 +336,10 @@ export const products: Product[] = [
       "/catalog/2026-09/boxy.webp"
     ],
     description: "Remera negra de corte boxy y manga corta.",
+    measurements: [
+      { label: "Ancho de pecho", value: "102 cm" },
+      { label: "Largo de prenda", value: "60 cm" }
+    ],
     order: 250
   },
   {
@@ -308,6 +364,10 @@ export const products: Product[] = [
     img: "/catalog/2026-09/campera-corderoy-2.webp",
     images: ["/catalog/2026-09/campera-corderoy-2.webp"],
     description: "Campera de corderoy caramelo, con parches negros en el frente y un panel tribal en la espalda.",
+    measurements: [
+      { label: "Ancho de pecho", value: "108 cm" },
+      { label: "Largo de prenda", value: "63 cm" }
+    ],
     order: 75
   },
   {
@@ -319,6 +379,9 @@ export const products: Product[] = [
     img: "/catalog/2026-09/corbata-1.webp",
     images: ["/catalog/2026-09/corbata-1.webp"],
     description: "Corbata oscura intervenida con alfileres, dijes de pistolas y detalles metálicos.",
+    measurements: [
+      { label: "Largo", value: "102 cm" }
+    ],
     order: 225
   },
   {

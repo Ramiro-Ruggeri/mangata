@@ -202,13 +202,17 @@ async function main() {
     await zoom.getByRole('button', { name: 'Cerrar vista ampliada', exact: true }).tap();
     await mobile.waitForFunction(() => !document.querySelector('.product-image-dialog')?.open);
     // Simulated image outage: the user can retry without losing the product or bag.
-    await touch.route('**/_next/image?*', route => route.abort());
-    await mobile.reload({ waitUntil: 'load' });
-    await mobile.getByText('No pudimos cargar esta foto.', { exact: true }).waitFor();
-    await touch.unroute('**/_next/image?*');
-    await mobile.getByRole('button', { name: 'Volver a cargar', exact: true }).tap();
-    await mobile.waitForFunction(() => !document.querySelector('.product-image-error'));
-    await mobile.waitForFunction(() => document.querySelector('.product-image-stage img')?.naturalWidth > 0);
+    const outage = await browser.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+    await outage.route(paymentRoute, blockPayment);
+    await outage.route('**/_next/image?*', route => route.abort());
+    const outagePage = await outage.newPage();
+    await outagePage.goto(`${base}/producto/7`, { waitUntil: 'load' });
+    await outagePage.getByText('No pudimos cargar esta foto.', { exact: true }).waitFor();
+    await outage.unroute('**/_next/image?*');
+    await outagePage.getByRole('button', { name: 'Volver a cargar', exact: true }).tap();
+    await outagePage.waitForFunction(() => !document.querySelector('.product-image-error'));
+    await outagePage.waitForFunction(() => document.querySelector('.product-image-stage img')?.naturalWidth > 0);
+    await outage.close();
     await touch.close();
     assert.deepEqual(errors, []);
     assert.deepEqual(paymentRequests, []);

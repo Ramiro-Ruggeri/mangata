@@ -38,6 +38,7 @@ export function getLocalCatalog(): StoreProduct[] {
         description:
           product.description ||
           "Pieza única recuperada, intervenida y terminada a mano.",
+        measurements: product.measurements,
         price: product.price,
         transferPrice: product.transferDiscount
           ? Math.round(product.price * (1 - product.transferDiscount))

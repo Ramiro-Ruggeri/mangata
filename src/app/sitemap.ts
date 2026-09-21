@@ -22,6 +22,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 1,
     },
+    {
+      url: `${siteUrl}/cambios`,
+      lastModified: new Date(catalog.syncedAt),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
     ...products,
   ];
 }

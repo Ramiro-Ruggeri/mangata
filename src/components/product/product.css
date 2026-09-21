@@ -56,6 +56,13 @@
 .product-availability.is-available { color: var(--product-paper); }
 .product-availability.is-available > span { background: #c5b9ee; }
 .product-description { margin: 26px 0; color: #c2beb8; font-size: 15px; line-height: 1.8; }
+.product-measures { margin: 24px 0 4px; border-block: 1px solid var(--product-line); padding: 20px 0; }
+.product-measures h2 { margin: 0 0 14px; font-size: 15px; font-weight: 600; }
+.product-measures dl { margin: 0; }
+.product-measures dl > div { display: flex; justify-content: space-between; gap: 20px; padding-block: 8px; border-top: 1px solid #ffffff12; font-size: 13px; line-height: 1.5; }
+.product-measures dt { color: var(--product-muted); }
+.product-measures dd { margin: 0; text-align: right; }
+.product-measures > p { margin: 12px 0 0; color: var(--product-muted); font-size: 11px; line-height: 1.65; }
 .product-delivery-note { margin: 16px 0 0; color: var(--product-muted); font-size: 13px; line-height: 1.7; }
 .product-delivery-note a { color: var(--product-paper); text-decoration: underline; text-underline-offset: 3px; }
 .product-delivery { border-bottom: 1px solid var(--product-line); padding-block: 24px; scroll-margin-top: 24px; }

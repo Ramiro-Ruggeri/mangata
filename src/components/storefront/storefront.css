@@ -213,6 +213,8 @@
 .mg-faq summary svg { flex-shrink: 0; transition: transform .2s ease; }
 .mg-faq details[open] summary svg { transform: rotate(45deg); }
 .mg-faq details p { max-width: 52ch; padding: 0 24px 24px 0; color: #66635e; font-size: 15px; line-height: 1.8; }
+.mg-faq details p a { color: #171717; text-decoration: underline; text-underline-offset: 4px; }
+.mg-faq details[id] { scroll-margin-top: 96px; }
 .mg-footer { overflow: hidden; background: #101010; color: var(--mg-paper); }
 .mg-footer-top { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: clamp(32px, 5vw, 72px); padding-block: 40px 32px; }
 .mg-footer h2 { font-size: clamp(32px, 3.2vw, 46px); line-height: 1.08; }

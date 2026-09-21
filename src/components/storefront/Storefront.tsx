@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { CatalogResult, CatalogSource, CommerceMode, StoreProduct } from "@/lib/commerce/types";
-import { SITE, whatsappHref } from "@/config/site";
+import { PURCHASE_POLICY, SITE, WITHDRAWAL_HREF, whatsappHref } from "@/config/site";
 import { matchesCategory, searchProducts } from "@/lib/catalog-view";
 import { productImageView } from "@/lib/product-images";
 import { MaterialPlayground } from "./MaterialPlayground";
@@ -195,7 +195,7 @@ function Help() {
   const { checkoutReady, mode } = useCart();
   return <section id="ayuda" className="mg-help mg-shell" aria-labelledby="help-title"><div className="mg-help-intro"><span className="mg-eyebrow">Antes de elegir</span><h2 id="help-title">Que te guste.<br /><em>Que sea para vos.</em></h2><p>Si tenés dudas sobre una pieza, te ayudamos a resolverlas antes de comprar.</p><a className="mg-button mg-button-dark" href={WHATSAPP} target="_blank" rel="noreferrer">Hablemos por WhatsApp <MessageCircle size={19} /></a>
       <div className="mg-buying-guide" id="compra-entrega" tabIndex={-1}><h3>Pago y entrega</h3>{checkoutReady && mode === "local" && <p><LockKeyhole size={17} aria-hidden="true" /><span>Pagás las piezas en el checkout de Mercado Pago. Los precios están en pesos argentinos.</span></p>}<p><PackageCheck size={18} aria-hidden="true" /><span>El envío no está incluido en el precio. Coordiná el costo y la entrega o el retiro antes de pagar.</span></p><a className="mg-inline-link" href={whatsappHref("Hola MANGATA, quiero consultar el costo de envío o coordinar un retiro antes de comprar.")} target="_blank" rel="noopener noreferrer">Consultar entrega <ArrowUpRight size={16} /></a></div>
-    </div><div className="mg-faq"><details><summary>¿Cómo sé si me va a quedar?<Plus size={18} /></summary><p>Desde cada ficha podés pedirnos las medidas exactas por WhatsApp. El mensaje ya incluye la pieza que estás mirando, así la ubicamos enseguida.</p></details><details><summary>¿Qué pieza voy a recibir?<Plus size={18} /></summary><p>Cada publicación corresponde a una pieza única. La prenda que ves disponible es la que vas a recibir.</p></details><details><summary>¿Cómo coordino el envío o retiro?<Plus size={18} /></summary><p>Escribinos con la pieza y tu localidad para consultar las opciones de entrega o coordinar un retiro en Córdoba.</p></details><details><summary>¿Querés ver más detalles de una pieza?<Plus size={18} /></summary><p>Si necesitás fotos, medidas o querés consultar algún detalle antes de comprar, escribime.</p></details></div></section>;
+    </div><div className="mg-faq"><details><summary>¿Cómo sé si me va a quedar?<Plus size={18} /></summary><p>Las piezas con medidas confirmadas las muestran en su ficha. Si una todavía no las tiene, podés pedirlas por WhatsApp desde esa misma página.</p></details><details><summary>¿Qué pieza voy a recibir?<Plus size={18} /></summary><p>Cada publicación corresponde a una pieza única. La prenda que ves disponible es la que vas a recibir.</p></details><details><summary>¿Cómo coordino el envío o retiro?<Plus size={18} /></summary><p>Escribinos con la pieza y tu localidad para consultar las opciones de entrega o coordinar un retiro en Córdoba.</p></details><details id="cambios"><summary>¿Cómo funcionan los cambios?<Plus size={18} /></summary><p>{PURCHASE_POLICY.uniquePieces} {PURCHASE_POLICY.exchanges} <Link href="/cambios">Ver condiciones y derecho de arrepentimiento.</Link></p></details><details><summary>¿Querés ver más detalles de una pieza?<Plus size={18} /></summary><p>Si necesitás fotos, medidas o querés consultar algún detalle antes de comprar, escribime.</p></details></div></section>;
 }
 
 function Footer() {
@@ -222,6 +222,7 @@ function Footer() {
           <a href="#manifiesto">Cómo lo hacemos</a>
           <a href="#ayuda">Antes de comprar</a>
           <a href="#compra-entrega">Pago y entrega</a>
+          <Link href="/cambios">Cambios y encargos</Link>
         </nav>
       </div>
     </div>
@@ -232,6 +233,7 @@ function Footer() {
         <a href={INSTAGRAM} target="_blank" rel="noopener noreferrer">Instagram <ArrowUpRight size={13} aria-hidden="true" /></a>
         <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">WhatsApp · {SITE.whatsappDisplay} <ArrowUpRight size={13} aria-hidden="true" /></a>
         <a href="mailto:mangataclothing777@gmail.com">Email <ArrowUpRight size={13} aria-hidden="true" /></a>
+        <a href={WITHDRAWAL_HREF} target="_blank" rel="noopener noreferrer">BOTÓN DE ARREPENTIMIENTO <ArrowUpRight size={13} aria-hidden="true" /></a>
       </nav>
     </div>
   </footer>;

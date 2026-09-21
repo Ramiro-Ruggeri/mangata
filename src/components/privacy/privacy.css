@@ -61,6 +61,7 @@
 .privacy-page > section { padding-block: 30px; border-bottom: 1px solid #c3bcb0; }
 .privacy-page h2 { font: 600 25px/1.2 var(--font-display), sans-serif; letter-spacing: -.02em; margin: 0 0 20px; }
 .privacy-page-button { min-height: 48px; padding: 12px 20px; margin-top: 8px; border: 1px solid #171716; font-size: 13px; cursor: pointer; }
+.privacy-page a.privacy-page-button { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
 .privacy-page-button:hover { background: #171716; color: #eeeae2; }
 .privacy-page button:focus-visible, .privacy-page a:focus-visible { outline: 2px solid #4f4389; outline-offset: 5px; }
 .privacy-storage-list > div { padding-block: 20px; border-bottom: 1px solid #c3bcb080; }

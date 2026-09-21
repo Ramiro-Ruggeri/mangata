@@ -11,7 +11,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { StoreProduct } from "@/lib/commerce/types";
-import { whatsappHref } from "@/config/site";
+import { PURCHASE_POLICY, whatsappHref } from "@/config/site";
 import { productImageView } from "@/lib/product-images";
 import "./product/product.css";
 
@@ -41,6 +41,7 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
   const reserved = ["reserved", "review"].includes(product.inventory.availability ?? "");
   const available = product.inventory.isInStock && !stockUnconfirmed;
   const accessory = product.category === "Accesorios";
+  const hasMeasurements = Boolean(product.measurements?.length);
   const deliveryHref = whatsappHref(`Hola MANGATA, quiero coordinar el envío o retiro de ${product.name} (${product.sku}). Mi localidad es: `);
   const measurementHref = whatsappHref(`Hola MANGATA, ¿me pasan las medidas de ${product.name} (${product.sku})?`);
   const helpHref = whatsappHref(`Hola MANGATA, quiero consultar por ${product.name} (${product.sku}).`);
@@ -121,11 +122,16 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
         <section className="product-purchase" id="product-purchase" aria-label="Información y compra" tabIndex={-1}>
           <p className={`product-availability ${available ? "is-available" : ""}`}><span aria-hidden="true" />{stockUnconfirmed ? "Consultanos para confirmar disponibilidad" : available ? "Disponible · única unidad" : reserved ? "Esta pieza está en proceso de compra. Consultanos." : "Esta pieza ya no está disponible"}</p>
           {product.description && <p className="product-description">{product.description}</p>}
+          {hasMeasurements && <section className="product-measures" aria-labelledby="product-measures-title">
+            <h2 id="product-measures-title">Medidas de esta pieza</h2>
+            <dl>{product.measurements?.map((measurement) => <div key={measurement.label}><dt>{measurement.label}</dt><dd>{measurement.value}</dd></div>)}</dl>
+            <p>Medidas informadas por MANGATA. Si necesitás saber cómo se tomó alguna, consultanos antes de comprar.</p>
+          </section>}
           <p className="product-delivery-note">Precio en pesos argentinos. El envío no está incluido. <a href="#product-delivery">Ver cómo coordinarlo</a>.</p>
           <button className="product-add" disabled={(!available && !inBag) || adding} aria-busy={adding} onClick={handleAdd}><span>{buttonText}</span>{inBag ? <Check size={20} strokeWidth={1.6} aria-hidden="true" /> : <Plus size={20} strokeWidth={1.6} aria-hidden="true" />}</button>
           <p className="product-add-status" role="status" aria-live="polite">{addError || (inBag ? "La pieza está en tu bolsa. El stock se confirma al comprar." : "El stock se confirma al comprar.")}</p>
           <a className="product-measurement" href={measurementHref} target="_blank" rel="noopener noreferrer" onClick={() => trackCommerceEvent("measurement_inquiry", { item_id: product.sku, item_category: product.category, source: "product_page" })}>
-            <MessageCircle size={23} strokeWidth={1.35} aria-hidden="true" /><span><strong>{accessory ? "¿Qué tamaño tiene?" : "¿Dudas con el calce?"}</strong><small>{accessory ? "Consultá las dimensiones de este accesorio." : "Pedinos las medidas de esta pieza."}</small></span><ArrowUpRight size={20} strokeWidth={1.5} aria-hidden="true" />
+            <MessageCircle size={23} strokeWidth={1.35} aria-hidden="true" /><span><strong>{accessory ? "¿Qué tamaño tiene?" : "¿Dudas con el calce?"}</strong><small>{hasMeasurements ? "Confirmá con nosotros cualquier detalle de las medidas." : accessory ? "Consultá las dimensiones de este accesorio." : "Pedinos las medidas de esta pieza."}</small></span><ArrowUpRight size={20} strokeWidth={1.5} aria-hidden="true" />
           </a>
         </section>
 
@@ -137,6 +143,7 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
             <a href={deliveryHref} target="_blank" rel="noopener noreferrer">Coordinar entrega <ArrowUpRight size={15} aria-hidden="true" /></a>
           </div>
           <details><summary>Antes de comprar <Plus size={17} strokeWidth={1.5} aria-hidden="true" /></summary><p>Consultanos por {accessory ? "las dimensiones" : "el calce"}, los cuidados o la entrega. En el mensaje ya va el nombre de esta pieza para que podamos ayudarte.</p><a href={helpHref} target="_blank" rel="noopener noreferrer">Hablar con MANGATA <ArrowUpRight size={15} aria-hidden="true" /></a></details>
+          <details><summary>Cambios y encargos <Plus size={17} strokeWidth={1.5} aria-hidden="true" /></summary><p>{PURCHASE_POLICY.uniquePieces} {PURCHASE_POLICY.exchanges}</p><Link href="/cambios">Ver condiciones y derecho de arrepentimiento <ArrowUpRight size={15} aria-hidden="true" /></Link></details>
           <Link className="product-continue" href="/#coleccion"><span>{available ? "Seguir viendo la colección" : "Ver otras piezas de la colección"}</span><ArrowRight size={20} strokeWidth={1.4} aria-hidden="true" /></Link>
         </div>
       </div>

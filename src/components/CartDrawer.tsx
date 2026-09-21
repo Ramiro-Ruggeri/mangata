@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { AnimatePresence, motion, useIsPresent, useReducedMotion } from "framer-motion";
 import { Check, CircleCheck, LockKeyhole, MessageCircle, ShoppingBag, Trash2, X } from "lucide-react";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -8,7 +9,7 @@ import { BrandSignature } from "@/components/brand/BrandSignature";
 import { useCart } from "@/components/commerce/CartProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import { motionTokens } from "@/lib/experience/interaction";
-import { whatsappHref } from "@/config/site";
+import { PURCHASE_POLICY, whatsappHref } from "@/config/site";
 
 const money = (value: number) =>
   new Intl.NumberFormat("es-AR", {
@@ -170,6 +171,7 @@ export default function CartDrawer() {
               </div>
               <div className="cart-total"><span>Subtotal</span><strong>{money(subtotal)}</strong></div>
               <p className="cart-note">{checkoutReady && mode === "local" ? "Este pago incluye sólo las prendas. El envío o retiro se coordina y paga aparte; no está incluido en el total." : checkoutReady ? "Revisá el total y las opciones de entrega antes de pagar." : "Por ahora coordinamos la compra por WhatsApp."}</p>
+              <details className="cart-policy"><summary>Cambios y derecho de arrepentimiento</summary><p>{PURCHASE_POLICY.uniquePieces}</p><Link href="/cambios" onClick={closeCart}>Ver condiciones</Link></details>
               {checkoutReady && mode === "local" && <label className="cart-delivery-confirm"><input type="checkbox" checked={deliveryAcknowledged} onChange={event => setDeliverySelection(event.target.checked ? selectionKey : "")} /><span>Ya coordiné el envío o retiro.</span></label>}
               {checkoutReady && mode === "local" && <a className="text-link" href={whatsappHref("Hola MANGATA, quiero coordinar el envío o retiro antes de pagar mi selección.")} target="_blank" rel="noopener noreferrer">Coordinar entrega</a>}
               {checkoutReady ? (

@@ -40,8 +40,8 @@ export function MaterialPlayground() {
           arena.dataset.running = "false";
           if (!disposed) setRunning(false);
         };
-        const play = () => {
-          if (!visible || document.hidden || disposed) return;
+        const play = (userInitiated = false) => {
+          if ((!visible && !userInitiated) || document.hidden || disposed) return;
           if (!playing) { Runner.run(runner, engine); playing = true; }
           clearTimeout(timer); timer = setTimeout(pause, 4500);
           arena.dataset.running = "true"; setRunning(true);
@@ -78,19 +78,19 @@ export function MaterialPlayground() {
           const button = event.currentTarget as HTMLButtonElement;
           const body = bodies[buttons.indexOf(button)];
           Sleeping.set(body, false);
-          play();
+          play(true);
           const p = point(event);
           drag = Constraint.create({ pointA: p, bodyB: body, pointB: { x: p.x - body.position.x, y: p.y - body.position.y }, stiffness: .15, length: 0 });
           Composite.add(engine.world, drag);
           button.setPointerCapture(event.pointerId);
         };
-        const move = (event: PointerEvent) => { if (drag) { drag.pointA = point(event); play(); } };
+        const move = (event: PointerEvent) => { if (drag) { drag.pointA = point(event); play(true); } };
         const up = () => { if (drag) { Composite.remove(engine.world, drag); drag = null; } };
         const keyboard = (event: MouseEvent) => {
           if (event.detail !== 0) return;
           const index = buttons.indexOf(event.currentTarget as HTMLButtonElement);
           Sleeping.set(bodies[index], false);
-          Body.setVelocity(bodies[index], { x: index % 2 ? 2 : -2, y: -8 }); play();
+          Body.setVelocity(bodies[index], { x: index % 2 ? 2 : -2, y: -8 }); play(true);
         };
         buttons.forEach(button => {
           button.addEventListener("pointerdown", down); button.addEventListener("pointermove", move);

@@ -337,6 +337,13 @@ section[id] { scroll-margin-top: 5rem; }
 .cart-total span { font-size: .7rem; font-weight: 600; text-transform: uppercase; }
 .cart-total strong { font-family: var(--font-display), sans-serif; font-size: 1.5rem; }
 .cart-note { margin: .55rem 0 1rem; color: #68645c; font-size: .6875rem; line-height: 1.7; }
+.cart-policy { border-block: 1px solid #c9c4ba; margin-bottom: .5rem; padding-block: .1rem; color: #504c46; font-size: .6875rem; line-height: 1.6; }
+.cart-policy summary { display: flex; min-height: 44px; cursor: pointer; align-items: center; justify-content: space-between; gap: 1rem; color: #171717; font-weight: 600; list-style: none; }
+.cart-policy summary::-webkit-details-marker { display: none; }
+.cart-policy summary::after { content: "+"; font-size: 1rem; font-weight: 400; }
+.cart-policy[open] summary::after { content: "−"; }
+.cart-policy p { margin: 0 0 .5rem; }
+.cart-policy a { display: inline-flex; min-height: 36px; align-items: center; margin-bottom: .55rem; color: #171717; text-decoration: underline; text-underline-offset: 3px; }
 .cart-delivery-confirm { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; min-height: 44px; font-size: 12px; line-height: 1.5; cursor: pointer; }
 .cart-delivery-confirm input { flex: 0 0 auto; width: 20px; height: 20px; accent-color: #171717; }
 .cart-delivery-confirm + a { margin-bottom: 14px; font-size: 11px; }

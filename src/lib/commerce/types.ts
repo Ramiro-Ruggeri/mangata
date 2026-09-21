@@ -15,6 +15,7 @@ export type StoreProduct = {
   name: string;
   slug: string;
   description: string;
+  measurements?: Array<{ label: string; value: string }>;
   price: number;
   compareAtPrice?: number;
   transferPrice?: number;
