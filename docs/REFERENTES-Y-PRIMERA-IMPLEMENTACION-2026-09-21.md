@@ -87,7 +87,7 @@ Límites: no se ejecutó un cobro, prueba de carga, auditoría exhaustiva WCAG n
 
 ## Publicación y rollback
 
-Esta tanda queda preparada y probada localmente; no se presenta como desplegada. Antes del despliegue:
+Al cerrar la implementación inicial, esta tanda estaba preparada y probada localmente, sin desplegar. El usuario autorizó después su publicación; el cierre comprobado está debajo. Procedimiento de despliegue:
 
 1. Revisar el diff de los dos archivos de presentación; no incluir cambios de pagos o infraestructura ajenos.
 2. Crear una release identificada por commit y conservar la imagen/ruta productiva vigente como rollback.
@@ -96,3 +96,17 @@ Esta tanda queda preparada y probada localmente; no se presenta como desplegada.
 5. Si hay regresión, reponer la imagen web previa compatible con el mismo esquema. No revertir base, pedidos, pagos o reservas.
 
 La activación del plan editorial, la recopilación de medidas y los experimentos de posicionamiento siguen separados de este release visual. No se modificaron cuentas sociales, campañas ni analítica externa.
+
+## Cierre de publicación — 21/09/2026, 14:06 ART
+
+- Aplicación publicada en https://mangata.com.ar, VPS Hostinger: commit `880610df48e3a42e8994120fe93659c7500a4d05`, subido a `origin/main`. Este cierre documental es posterior y no cambia la imagen de aplicación.
+- Build Linux/Next.js de producción aprobado. Imagen `mangata/web:880610df48e3a42e8994120fe93659c7500a4d05`, contenedor `mangata-web-1` saludable. `/opt/mangata/current` apunta a la release del mismo hash.
+- Candidato aislado sin puertos públicos: salud y HTML correctos; 26 identidades, nombres, precios y fotografías idénticos a la versión productiva anterior. Se retiró exclusivamente ese contenedor temporal después del cambio.
+- El archivo privado de configuración comercial permaneció idéntico durante la activación. Sin cambios de base, reservas, pedidos, claves, DNS, proxy ni certificados; los demás contenedores conservaron su ejecución.
+- HTTPS raíz devuelve 200; HTTP y `www` redirigen 301 al dominio HTTPS oficial. HSTS, CSP y `nosniff` presentes; salud y catálogo sin caché compartida; ruta interna protegida con 404; sitemap de 27 URLs canónicas.
+- Suite de navegador repetida contra el dominio público en Chromium y WebKit: 13 tamaños entre 320 y 2560 px, sin desbordamiento horizontal; filtros, orden y retorno al producto, búsqueda/foco, FAQ, paginación, hover y reduced motion aprobados. Capturas desktop/móvil de producción inspeccionadas.
+- Smoke adicional **sin simulación de bolsa**: POST real de alta respondió 200; prenda retirada y sesión aislada vacía al terminar. Mercado Pago conservó su botón disponible sólo tras marcar la condición de entrega. Ninguna petición de checkout ni cobro ejecutado; cero errores JavaScript capturados. Esto cierra la limitación del POST local descrita arriba, no certifica una transacción nueva con el proveedor.
+- Caché de imágenes: 108 variantes servidas correctamente (27 imágenes, anchos 360/640, AVIF/WebP). Sin borrar el volumen existente.
+- Rollback conservado: imagen `mangata/web:e47441e` y ruta `/opt/mangata/releases/e47441e`. Restaurar sólo la aplicación compatible con el esquema vigente; no restaurar datos ni anular reservas.
+
+Las 38 pruebas, lint y tipos se repitieron antes de publicar. No hubo pruebas de carga ni cobros reales en este release visual.
