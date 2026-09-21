@@ -82,8 +82,8 @@ function Hero({ products }: { products: StoreProduct[] }) {
   return <section className="mg-hero" id="inicio" aria-labelledby="hero-title">
     <div className="mg-hero-copy">
       <span className="mg-eyebrow"><i /> Streetwear recuperado</span>
-      <h1 id="hero-title">El diseño<br />no termina<br /><em>acá.</em></h1>
-      <p>Piezas recuperadas, intervenidas una a una.<br />{" "}La que elegís es la que recibís.</p>
+      <h1 id="hero-title">Diseñado<br />para<br /><em>vos.</em></h1>
+      <p>Piezas únicas de diseño y upcycling,<br /> hechas a mano.</p>
       <a href="#coleccion" className="mg-button mg-button-light">Ver las piezas <ArrowDown size={18} /></a>
       <span className="mg-hero-footnote"><CircleCheck size={13} strokeWidth={2} aria-hidden="true" /> Fotos reales. Hecho a mano en Córdoba.</span>
     </div>
@@ -91,7 +91,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
       <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, 55vw" /></Link>
       <Link className="mg-hero-product" href={`/producto/${featured.id}`} onClick={() => selectProduct(featured, "hero_label")}><span><small>La pieza de portada</small><strong>{featured.name}</strong></span><span>{money(featured.price)} <ArrowUpRight size={22} /></span></Link>
     </div>}
-    <div className="mg-hero-bottom"><span>Una prenda anterior. Otra forma de usarla.</span><a href="#manifiesto">El trabajo detrás <ArrowUpRight size={14} /></a></div>
+    <div className="mg-hero-bottom"><span>Seguí dándole una historia a tus prendas.</span><a href="#manifiesto">El trabajo detrás <ArrowUpRight size={14} /></a></div>
   </section>;
 }
 
@@ -130,10 +130,9 @@ function ProductCard({ product }: { product: StoreProduct }) {
 
 function Catalog({ products, source }: { products: StoreProduct[]; source: CatalogSource }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const [category, setCategory] = useState("Todas");
-  const [sort, setSort] = useState("selection");
-  const [onlyAvailable, setOnlyAvailable] = useState(false);
-  const [limit, setLimit] = useState(8);
+  const { catalogView: view, setCatalogView: setView } = useExperience();
+  const { category, sort, onlyAvailable, limit } = view;
+  const updateView = (patch: Partial<typeof view>) => setView((current) => ({ ...current, ...patch }));
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -157,25 +156,25 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     });
   }, [products, category, onlyAvailable, sort]);
   return <section ref={sectionRef} id="coleccion" className="mg-collection mg-shell" aria-labelledby="collection-title">
-    <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>otra historia.</em></h2></div><div className="mg-collection-context"><p>Denim, prendas y accesorios.<br /> Recuperados e intervenidos a mano.</p>{source === "local" && <aside className="mg-opening-note" aria-label="Precios de apertura"><span className="mg-opening-dot" aria-hidden="true" /><span><strong>Precios de apertura</strong><small>Ya están aplicados.</small></span></aside>}</div></div>
+    <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>huella.</em></h2></div><div className="mg-collection-context"><p>Prendas y accesorios exclusivos,<br /> diseñados e intervenidos a mano.</p>{source === "local" && <aside className="mg-opening-note" aria-label="Precios de apertura"><span className="mg-opening-dot" aria-hidden="true" /><span><strong>Precios de apertura</strong><small>Ya están aplicados.</small></span></aside>}</div></div>
     {source === "local-fallback" && <p className="mg-catalog-notice" role="status">Estamos revisando la disponibilidad de las piezas. Podés verlas y consultarnos por WhatsApp.</p>}
-    <div className="mg-catalog-controls"><div className="mg-category-tabs" role="group" aria-label="Filtrar colección">{["Todas", "Denim", "Prendas", "Accesorios"].map((name) => <button key={name} aria-pressed={category === name} className={category === name ? "is-active" : ""} onClick={() => { setCategory(name); setLimit(8); }}>{name}</button>)}</div><label className="mg-sort"><SlidersHorizontal size={15} /><select aria-label="Ordenar piezas" value={sort} onChange={(event) => { setSort(event.target.value); setLimit(8); }}><option value="selection">Nuestra selección</option><option value="new">Recién intervenidas</option><option value="price-low">Menor precio</option><option value="price-high">Mayor precio</option></select><ChevronDown size={13} /></label></div>
-    <div className="mg-catalog-summary"><p role="status">{filtered.length} {filtered.length === 1 ? "pieza" : "piezas"}</p><label><input type="checkbox" checked={onlyAvailable} onChange={(event) => { setOnlyAvailable(event.target.checked); setLimit(8); }} /> Sólo disponibles</label></div>
+    <div className="mg-catalog-controls"><div className="mg-category-tabs" role="group" aria-label="Filtrar colección">{["Todas", "Denim", "Prendas", "Accesorios"].map((name) => <button key={name} aria-pressed={category === name} className={category === name ? "is-active" : ""} onClick={() => updateView({ category: name, limit: 8 })}>{name}</button>)}</div><label className="mg-sort"><SlidersHorizontal size={15} /><select aria-label="Ordenar piezas" value={sort} onChange={(event) => updateView({ sort: event.target.value, limit: 8 })}><option value="selection">Nuestra selección</option><option value="new">Recién intervenidas</option><option value="price-low">Menor precio</option><option value="price-high">Mayor precio</option></select><ChevronDown size={13} /></label></div>
+    <div className="mg-catalog-summary"><p role="status">{filtered.length} {filtered.length === 1 ? "pieza" : "piezas"}</p><label><input type="checkbox" checked={onlyAvailable} onChange={(event) => updateView({ onlyAvailable: event.target.checked, limit: 8 })} /> Sólo disponibles</label></div>
     <div className="mg-product-grid"><AnimatePresence mode="popLayout">{filtered.slice(0, limit).map((product) => <ProductCard key={product.id} product={product} />)}</AnimatePresence></div>
-    {!filtered.length && <div className="mg-empty"><h3>Por acá no quedan piezas.</h3><button className="mg-inline-link" onClick={() => { setCategory("Todas"); setOnlyAvailable(false); }}>Volver a ver la colección <ArrowRight size={17} /></button></div>}
-    {filtered.length > limit && <div className="mg-load-more"><button className="mg-button mg-button-outline" onClick={() => setLimit((value) => value + 8)}>Ver más piezas <Plus size={18} /></button><span>Mostrando {Math.min(limit, filtered.length)} de {filtered.length}</span></div>}
+    {!filtered.length && <div className="mg-empty"><h3>Por acá no quedan piezas.</h3><button className="mg-inline-link" onClick={() => updateView({ category: "Todas", onlyAvailable: false })}>Volver a ver la colección <ArrowRight size={17} /></button></div>}
+    {filtered.length > limit && <div className="mg-load-more"><button className="mg-button mg-button-outline" onClick={() => updateView({ limit: limit + 8 })}>Ver más piezas <Plus size={18} /></button><span>Mostrando {Math.min(limit, filtered.length)} de {filtered.length}</span></div>}
   </section>;
 }
 
 function CraftStory() {
   return <section id="manifiesto" className="mg-story" aria-labelledby="story-title">
     <div className="mg-story-image"><Image src="/campaign/rework-still-life-v2.webp" alt="Composición conceptual de denim recuperado, bordes deshilachados y metal" fill quality={85} sizes="(max-width: 700px) 100vw, (max-width: 1400px) 52vw, 720px" /><span>Estudio de materiales · campaña conceptual</span></div>
-    <div className="mg-story-copy" data-reveal><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">No arrancamos<br /><em>de cero.</em></h2><p>Arrancamos de un jean. De una costura que todavía sirve. De una tela que merece seguir.</p><p>Desarmamos prendas, cambiamos recortes y trabajamos cada intervención a mano. Por eso dos piezas nunca salen iguales.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div>
+    <div className="mg-story-copy" data-reveal><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">MANGATA nace de una forma distinta de mirar lo que ya existe.</h2><p>El nombre viene del reflejo de la luna sobre el agua: una huella de luz que aparece y muta con el movimiento.</p><p>Esa idea atraviesa nuestra forma de diseñar. Recuperamos prendas y materiales que ya existen y los transformamos en algo nuevo: mezclamos texturas, intervenimos, desarmamos, reconstruimos y probamos otras formas de vestir.</p><p>MANGATA es una marca autogestiva de diseño y upcycling, trabajada 100% a mano. Cada pieza se desarrolla de manera individual y no repetimos diseños ni molderías.</p><p>Creemos en una moda más consciente, donde le damos valor a lo que quedó en desuso.</p><p>No buscamos que todas las prendas sean iguales. Buscamos que cada una encuentre su propia forma de brillar y que vos brilles con ella.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div>
   </section>;
 }
 
 function Help() {
-  return <section id="ayuda" className="mg-help mg-shell" aria-labelledby="help-title"><div className="mg-help-intro"><span className="mg-eyebrow">Antes de elegir</span><h2 id="help-title">Que te guste.<br /><em>Que te quede.</em></h2><p>Si tenés dudas sobre una pieza, te ayudamos a resolverlas antes de comprar.</p><a className="mg-button mg-button-dark" href={WHATSAPP} target="_blank" rel="noreferrer">Hablemos por WhatsApp <MessageCircle size={19} /></a></div><div className="mg-faq"><details><summary>¿Cómo sé si me va a quedar?<Plus size={18} /></summary><p>Desde cada ficha podés pedirnos las medidas exactas por WhatsApp. El mensaje ya incluye la pieza que estás mirando, así la ubicamos enseguida.</p></details><details><summary>¿La prenda de la foto es la que recibo?<Plus size={18} /></summary><p>Sí. Las fotos del catálogo corresponden a cada pieza. Las intervenciones y las marcas del textil forman parte de esa prenda.</p></details><details><summary>¿Cómo coordino el envío o retiro?<Plus size={18} /></summary><p>Escribinos con la pieza y tu localidad para consultar las opciones de entrega o coordinar un retiro en Córdoba.</p></details><details><summary>¿Y si tengo una duda antes de pagar?<Plus size={18} /></summary><p>Podés consultarnos por WhatsApp. Te ayudamos con el calce, las medidas, los medios de pago y la entrega.</p></details></div></section>;
+  return <section id="ayuda" className="mg-help mg-shell" aria-labelledby="help-title"><div className="mg-help-intro"><span className="mg-eyebrow">Antes de elegir</span><h2 id="help-title">Que te guste.<br /><em>Que sea para vos.</em></h2><p>Si tenés dudas sobre una pieza, te ayudamos a resolverlas antes de comprar.</p><a className="mg-button mg-button-dark" href={WHATSAPP} target="_blank" rel="noreferrer">Hablemos por WhatsApp <MessageCircle size={19} /></a></div><div className="mg-faq"><details><summary>¿Cómo sé si me va a quedar?<Plus size={18} /></summary><p>Desde cada ficha podés pedirnos las medidas exactas por WhatsApp. El mensaje ya incluye la pieza que estás mirando, así la ubicamos enseguida.</p></details><details><summary>¿Qué pieza voy a recibir?<Plus size={18} /></summary><p>Cada publicación corresponde a una pieza única. La prenda que ves disponible es la que vas a recibir.</p></details><details><summary>¿Cómo coordino el envío o retiro?<Plus size={18} /></summary><p>Escribinos con la pieza y tu localidad para consultar las opciones de entrega o coordinar un retiro en Córdoba.</p></details><details><summary>¿Querés ver más detalles de una pieza?<Plus size={18} /></summary><p>Si necesitás fotos, medidas o querés consultar algún detalle antes de comprar, escribime.</p></details></div></section>;
 }
 
 function Footer() {
@@ -183,8 +182,8 @@ function Footer() {
     <div className="mg-footer-top mg-shell">
       <div className="mg-footer-intro" data-reveal>
         <span className="mg-eyebrow">Seguimos por acá</span>
-        <h2>¿Te quedó una<br /><em>en la cabeza?</em></h2>
-        <p>Volvé a mirarla. Si dudás con el calce, lo vemos con vos antes de que elijas.</p>
+        <h2>¿Te quedó algo<br /><em>en la cabeza?</em></h2>
+        <p>Volvé a mirarlo. Si dudás con el calce, lo vemos con vos antes de que elijas.</p>
         <a href="#coleccion" className="mg-button mg-button-lilac mg-footer-collection" onClick={() => trackCommerceEvent("footer_navigation", { source: "footer_collection" })}>Volver a la colección <ArrowUp size={18} aria-hidden="true" /></a>
       </div>
       <div className="mg-footer-support" data-reveal>

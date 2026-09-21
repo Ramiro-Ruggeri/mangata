@@ -18,12 +18,10 @@ test("all purchase support links share MANGATA's verified WhatsApp and preserve 
   }
 });
 
-test("the storefront uses specific hero copy and visible payment trust signals", () => {
+test("the storefront uses the approved editorial copy and visible payment trust signals", () => {
   const storefront = readFileSync("src/components/storefront/Storefront.tsx", "utf8");
   const cart = readFileSync("src/components/CartDrawer.tsx", "utf8");
-  assert.match(storefront, /El diseño/);
-  assert.doesNotMatch(storefront, /El denim/);
-  assert.match(storefront, /La que elegís es la que recibís/);
+  for (const copy of ["Diseñado", "Piezas únicas de diseño y upcycling", "Prendas con", "huella.", "MANGATA nace de una forma distinta", "Que sea para vos.", "¿Qué pieza voy a recibir?", "¿Querés ver más detalles de una pieza?", "¿Te quedó algo", "Volvé a mirarlo."]) assert.match(storefront, new RegExp(copy.replace(/[¿?.]/g, "\\$&")));
   assert.match(storefront, /Pago protegido/);
   assert.match(storefront, /Checkout seguro de Mercado Pago/);
   assert.match(storefront, /LockKeyhole/);
@@ -31,6 +29,13 @@ test("the storefront uses specific hero copy and visible payment trust signals",
   assert.match(cart, /Pago protegido por Mercado Pago/);
   assert.match(cart, /LockKeyhole/);
   assert.match(cart, /CircleCheck/);
+});
+
+test("catalog choices live above the route so browser back restores the selected view", () => {
+  const provider = readFileSync("src/components/experience/ExperienceProvider.tsx", "utf8");
+  const storefront = readFileSync("src/components/storefront/Storefront.tsx", "utf8");
+  assert.match(provider, /catalogView, setCatalogView/);
+  assert.match(storefront, /catalogView: view, setCatalogView: setView/);
 });
 
 test("only one overlay is active; cleanup of a replaced modal cannot close its replacement", () => {

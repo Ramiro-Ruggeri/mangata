@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type Dispatch, type ReactNode, type SetStateAction } from "react";
 import { usePathname } from "next/navigation";
 import { nextOverlay } from "@/lib/experience/interaction";
 import "./experience.css";
@@ -9,6 +9,8 @@ type ExperienceContextValue = {
   activeOverlay: string | null;
   openOverlay: (name: string) => void;
   closeOverlay: (name: string) => void;
+  catalogView: { category: string; sort: string; onlyAvailable: boolean; limit: number };
+  setCatalogView: Dispatch<SetStateAction<ExperienceContextValue["catalogView"]>>;
 };
 
 const ExperienceContext = createContext<ExperienceContextValue | null>(null);
@@ -16,6 +18,7 @@ const ExperienceContext = createContext<ExperienceContextValue | null>(null);
 export function ExperienceProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [overlay, setOverlay] = useState<{ route: string; name: string | null }>({ route: pathname, name: null });
+  const [catalogView, setCatalogView] = useState({ category: "Todas", sort: "selection", onlyAvailable: false, limit: 8 });
 
   // Reset only coordination state, not children/cart, when a route changes.
   if (overlay.route !== pathname) setOverlay({ route: pathname, name: null });
@@ -35,7 +38,9 @@ export function ExperienceProvider({ children }: { children: ReactNode }) {
     activeOverlay: overlay.route === pathname ? overlay.name : null,
     openOverlay,
     closeOverlay,
-  }), [overlay, pathname, openOverlay, closeOverlay]);
+    catalogView,
+    setCatalogView,
+  }), [overlay, pathname, openOverlay, closeOverlay, catalogView]);
 
   useEffect(() => {
     if (value.activeOverlay) document.documentElement.dataset.activeOverlay = value.activeOverlay;
