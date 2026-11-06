@@ -126,12 +126,12 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
     <PrivacyContext.Provider value={{ openPreferences }}>
       {children}
       <div className="privacy-bottom-space" aria-hidden="true" />
-      {showBanner && <section ref={bannerRef} className="privacy-banner" aria-labelledby="privacy-banner-title">
-        <div className="privacy-banner-copy"><h2 id="privacy-banner-title">¿Nos dejás contar tu visita?</h2><p>Es anónimo y nos ayuda a mejorar. La tienda funciona igual si decís que no. <Link href="/privacidad">Privacidad</Link>.</p></div>
-        <button type="button" className="privacy-configure" data-privacy-configure onClick={openPreferences}>Configurar</button>
+      {showBanner && <section ref={bannerRef} className="privacy-banner" aria-label="Aviso de medición">
+        <p>Medimos visitas de forma anónima para mejorar la tienda. <Link href="/privacidad">Privacidad</Link></p>
         <div className="privacy-banner-actions">
-          <button type="button" className="privacy-action" onClick={() => save(false)}>Rechazar opcionales</button>
-          <button type="button" className="privacy-action" onClick={() => save(true)}>Aceptar opcionales</button>
+          <button type="button" onClick={openPreferences} data-privacy-configure>Configurar</button>
+          <button type="button" onClick={() => save(false)}>Rechazar</button>
+          <button type="button" className="privacy-banner-accept" onClick={() => save(true)}>Aceptar</button>
         </div>
       </section>}
       {activeOverlay === "privacy" && <PreferencesDialog analytics={consent?.analytics ?? false} onSave={save} onClose={closePreferences} />}
