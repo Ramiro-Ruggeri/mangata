@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import PDPClient from "@/components/PDPClient";
+import { currentCampaign } from "@/config/campaign";
 import { getCatalog, getProduct } from "@/lib/commerce/catalog";
 import { relatedPieces } from "@/lib/catalog-view";
 import { getSiteUrl } from "@/config/site-url";
@@ -84,6 +85,6 @@ export default async function Page({ params }: Props) {
   };
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-    <PDPClient key={product.id} product={product} related={related} />
+    <PDPClient key={product.id} product={product} related={related} campaignPercent={currentCampaign()?.percent} />
   </>;
 }

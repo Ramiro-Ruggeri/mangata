@@ -77,11 +77,6 @@
 .mg-hero-photo[data-photo-surface="light"] { background: var(--plate); }
 .mg-hero-photo img { object-fit: contain; object-position: center; transition: transform var(--motion-editorial) var(--motion-ease); }
 @media (hover: hover) and (pointer: fine) { .mg-hero-photo:hover img { transform: scale(1.025); } }
-.mg-hero-ticket { position: absolute; z-index: 2; top: 42px; left: -18px; display: flex; align-items: center; gap: 10px; padding: 8px 12px 8px 8px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--surface-2); pointer-events: none; }
-.mg-hero-ticket > i { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: var(--accent); color: var(--accent-ink); font-family: Georgia, serif; font-size: 15px; font-style: normal; }
-.mg-hero-ticket strong, .mg-hero-ticket small { display: block; white-space: nowrap; }
-.mg-hero-ticket strong { font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
-.mg-hero-ticket small { margin-top: 2px; color: var(--text-2); font-size: 8px; letter-spacing: .05em; }
 .mg-hero-product { position: absolute; right: 0; bottom: 24px; left: 0; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px 0 0; border-top: 1px solid var(--line); }
 .mg-hero-product > span:first-child { display: grid; gap: 5px; }
 .mg-hero-product small { color: var(--text-2); font-size: 11px; }
@@ -107,10 +102,6 @@
 .mg-collection h2, .mg-story h2, .mg-help h2, .mg-footer h2 { margin: 17px 0 0; font-family: var(--font-display), sans-serif; font-size: clamp(38px, 4.5vw, 68px); font-weight: 500; line-height: 1; letter-spacing: -.055em; }
 .mg-collection-context { display: grid; justify-items: start; gap: 18px; max-width: 320px; }
 .mg-collection-context > p { padding-bottom: 3px; color: var(--text-2); font-size: 15px; line-height: 1.7; }
-.mg-opening-note { display: inline-flex; align-items: center; gap: 11px; max-width: 100%; padding: 12px 17px; border: 1px solid var(--line); border-radius: 4px; background: var(--accent-soft); color: var(--text); box-shadow: 0 3px 10px #30213f06; }
-.mg-opening-dot { width: 6px; height: 6px; flex-shrink: 0; border-radius: 50%; background: var(--accent); }
-.mg-opening-note strong { display: block; font-size: 12px; line-height: 1.5; font-weight: 600; }
-.mg-opening-note small { display: block; margin-top: 2px; font-size: 11px; line-height: 1.5; }
 .mg-catalog-notice { margin-bottom: 24px !important; padding: 18px; border: 1px solid var(--line-strong); background: var(--surface-3); font-size: 13px; line-height: 1.6; }
 .mg-catalog-controls { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid var(--mg-line); }
 .mg-category-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
@@ -298,10 +289,6 @@
   .mg-hero-footnote { display: none; }
   .mg-hero-visual { min-height: 380px; }
   .mg-hero-photo { inset: 18px 0 124px; }
-  .mg-hero-ticket { top: 26px; right: 7px; left: auto; gap: 6px; padding: 6px 8px 6px 6px; }
-  .mg-hero-ticket > i { width: 24px; height: 24px; font-size: 12px; }
-  .mg-hero-ticket strong { font-size: 8px; }
-  .mg-hero-ticket small { font-size: 7px; }
   .mg-hero-product { bottom: 28px; left: 0; gap: 9px; padding-top: 12px; }
   .mg-hero-product small { font-size: 10px; }
   .mg-hero-product strong { font-size: 14px; }
@@ -323,7 +310,6 @@
   .mg-collection-context { gap: 14px; }
   .mg-collection-context > p { max-width: 32ch; margin-top: 0; font-size: 14px; line-height: 1.7; }
   .mg-collection-context > p br { display: none; }
-  .mg-opening-note { padding: 9px 13px; }
   .mg-catalog-controls { align-items: flex-start; flex-direction: column; gap: 8px; padding-bottom: 6px; }
   .mg-category-tabs { justify-content: space-between; width: 100%; gap: 1px; }
   .mg-category-tabs button { min-height: 44px; padding: 9px 11px; font-size: 12px; }
@@ -439,8 +425,6 @@
 .mg-footer h2 { font-size: clamp(34px, 3.8vw, 56px); }
 /* The serif italic belongs to the first two headlines. Repeated four times it read as a template. */
 .mg-help h2 em, .mg-footer h2 em { color: var(--text-2); font-family: inherit; font-style: normal; }
-.mg-hero-ticket small { font-size: 11px; letter-spacing: 0; }
-.mg-hero-ticket strong { font-size: 11px; }
 .mg-announcement { font-size: 12px; }
 .mg-desktop-nav a, .mg-storefront .mg-cart-button, .mg-category-tabs button, .mg-catalog-summary, .mg-sort select { font-size: 13px; }
 .mg-craft-signature > small, .mg-story-image > span { font-size: 12px; }
@@ -463,7 +447,6 @@
   .mg-product-grid { gap: 30px 12px; }
   .mg-product-info { padding-top: 10px; }
   .mg-product-info h3, .mg-product-prices strong { font-size: 15px; }
-  .mg-hero-ticket strong, .mg-hero-ticket small { font-size: 10px; }
   .mg-announcement { font-size: 11px; }
   .mg-collection h2, .mg-help h2 { font-size: clamp(40px, 11vw, 56px); }
   .mg-eyebrow, .mg-collection .mg-eyebrow, .mg-help .mg-eyebrow, .mg-story .mg-eyebrow, .mg-footer .mg-eyebrow, .mg-hero .mg-eyebrow { font-size: 11px; }
@@ -494,7 +477,7 @@
 }
 
 /* MANGATA's own tribals, still and oversized, cut by the edge of the page. */
-.mg-tribal { padding-block: 72px 0; overflow: hidden; border-bottom: 1px solid var(--mg-line); background: linear-gradient(var(--surface-2), var(--bg) 240px); }
+.mg-tribal { padding-block: 72px 0; overflow: hidden; border-bottom: 1px solid var(--mg-line); background: var(--bg); }
 .mg-storefront .mg-tribal h2 { margin: 17px 0 0; font-family: var(--font-display), sans-serif; font-size: clamp(44px, 6vw, 92px); font-weight: 500; line-height: .98; letter-spacing: -.055em; }
 .mg-tribal-field { position: relative; height: clamp(380px, 44vw, 660px); margin-top: 28px; }
 .mg-tribal-canvas { position: absolute !important; inset: 0; opacity: 0; transition: opacity 700ms ease; }
@@ -522,20 +505,71 @@
 @media (max-width: 700px) { .mg-hero-footnote.mg-hero-trust { display: flex; font-size: 11px; margin-top: 14px; } }
 
 /* Campaign notice. Bottom left on desktop; a bar on phones that leaves room for the scroll button. */
-.campaign-notice { position: fixed; z-index: 70; bottom: calc(20px + var(--consent-banner-height, 0px)); left: 20px; display: grid; grid-template-columns: 56px minmax(0, 1fr) 44px; align-items: start; gap: 12px; width: min(380px, calc(100vw - 40px)); border: 1px solid var(--line-strong); padding: 12px 6px 12px 12px; background: var(--surface-2); color: var(--text); box-shadow: 0 12px 34px #0004; animation: campaign-in 320ms var(--motion-ease, ease) both; }
-.campaign-notice-mark { width: 56px; height: 72px; background: var(--text); -webkit-mask: url(/tribals/sigilo-cruz.svg) center / contain no-repeat; mask: url(/tribals/sigilo-cruz.svg) center / contain no-repeat; }
-.campaign-notice strong { display: block; font-family: var(--font-display), sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -.03em; line-height: 1.2; }
-.campaign-notice p { margin: 3px 0 2px; color: var(--text-2); font-size: 13px; line-height: 1.45; }
-.campaign-notice a { display: inline-flex; min-height: 44px; align-items: center; font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
-.campaign-notice button { display: grid; width: 44px; height: 44px; place-items: center; border: 0; background: transparent; color: var(--text); cursor: pointer; }
-.campaign-notice :is(a, button):focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 @keyframes campaign-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 @media (max-width: 700px) {
-  .campaign-notice { right: 72px; bottom: calc(10px + env(safe-area-inset-bottom) + var(--consent-banner-height, 0px)); left: 10px; width: auto; grid-template-columns: minmax(0, 1fr) 44px; padding: 6px 2px 6px 12px; }
-  .campaign-notice-mark { display: none; }
-  .campaign-notice strong { font-size: 15px; }
-  .campaign-notice p { font-size: 12px; }
-  .campaign-notice a { min-height: 36px; }
 }
-@media (prefers-reduced-motion: reduce) { .campaign-notice { animation: none; } }
 .mg-cart-button { position: relative; }
+
+/* The story is one continuous reading that flows into the tribals. */
+.mg-story { display: block; padding-inline: 0; background: var(--bg); }
+.mg-story-copy { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; gap: 18px clamp(32px, 6vw, 96px); padding: clamp(64px, 8vw, 120px) var(--mg-gutter) 0; }
+.mg-story-copy > .mg-eyebrow { grid-column: 1 / -1; }
+.mg-story-copy > h2 { position: sticky; top: 104px; margin: 0; }
+.mg-story-body p { max-width: 52ch; margin: 0 0 18px; color: var(--text-2); font-size: 16px; line-height: 1.8; }
+.mg-story-body .mg-craft-signature { margin-top: 36px; }
+.mg-tribal { padding-top: clamp(56px, 7vw, 96px); }
+@media (max-width: 860px) {
+  .mg-story-copy { display: block; padding: 56px var(--mg-gutter) 0; }
+  .mg-story-copy > h2 { position: static; margin: 16px 0 26px; }
+}
+
+/* The stamp on the cover piece. */
+.mg-hero-seal { position: absolute; z-index: 2; top: 40px; left: -30px; display: block; width: 124px; height: 124px; border-radius: 50%; background: #0b0d12; color: #e9eaf0; pointer-events: none; }
+.mg-hero-seal-ring { position: absolute; inset: 0; animation: mg-seal-turn 26s linear infinite; }
+.mg-hero-seal-ring text { fill: currentColor; font-family: var(--font-display), sans-serif; font-size: 9.5px; font-weight: 600; }
+.mg-hero-seal-static, .mg-hero-seal-canvas { position: absolute !important; inset: 17% !important; width: 66% !important; height: 66% !important; }
+.mg-hero-seal-static { background: currentColor; -webkit-mask: url(/tribals/bermuda-garra.svg) center / contain no-repeat; mask: url(/tribals/bermuda-garra.svg) center / contain no-repeat; transition: opacity 400ms ease; }
+.mg-hero-seal[data-live="true"] .mg-hero-seal-static { opacity: 0; }
+@keyframes mg-seal-turn { to { transform: rotate(360deg); } }
+@media (max-width: 1000px) { .mg-hero-seal { left: 10px; top: 30px; width: 100px; height: 100px; } }
+@media (prefers-reduced-motion: reduce) { .mg-hero-seal-ring { animation: none; } }
+
+/* Campaign: the strip, the opening, the catalog. It never touches a price. */
+.mg-campaign-bar { display: block; overflow: hidden; background: var(--accent); color: var(--accent-ink); }
+.mg-campaign-bar-track { display: flex; width: max-content; animation: mg-campaign-run 44s linear infinite; }
+.mg-campaign-bar:hover .mg-campaign-bar-track, .mg-campaign-bar:focus-visible .mg-campaign-bar-track { animation-play-state: paused; }
+.mg-campaign-bar-item { display: inline-flex; align-items: center; gap: 12px; padding: 9px 26px; white-space: nowrap; font-size: 13px; }
+.mg-campaign-bar-item .mangata-mark { width: 22px; height: 22px; }
+.mg-campaign-bar-item b { font-weight: 500; }
+.mg-campaign-bar-item strong { font-family: var(--font-display), sans-serif; font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
+@keyframes mg-campaign-run { to { transform: translateX(-50%); } }
+.mg-takeover { position: fixed; inset: 0; width: 100vw; max-width: none; height: 100dvh; max-height: none; margin: 0; border: 0; padding: 0; overflow: hidden; background: #0b0d12; color: #e9eaf0; }
+.mg-takeover[open] { display: grid; place-items: center; animation: mg-takeover-in 420ms ease both; }
+.mg-takeover::backdrop { background: #0b0d12; }
+@keyframes mg-takeover-in { from { opacity: 0; } }
+.mg-takeover-glow { position: absolute; left: calc(50% + var(--tilt-x, 0) * 30%); top: calc(50% + var(--tilt-y, 0) * 30%); width: 70vmax; height: 70vmax; border-radius: 50%; background: radial-gradient(closest-side, #c9d3ff40, transparent); transform: translate(-50%, -50%); }
+.mg-takeover-tribal { position: absolute; background: #e9eaf0; opacity: .16; transition: transform 500ms cubic-bezier(.22,1,.36,1); }
+.mg-takeover-reflejo { left: -6vmin; bottom: -10vmin; width: 62vmin; height: 62vmin; -webkit-mask: url(/tribals/luna-reflejo.svg) center / contain no-repeat; mask: url(/tribals/luna-reflejo.svg) center / contain no-repeat; transform: translate(calc(var(--tilt-x, 0) * -34px), calc(var(--tilt-y, 0) * -34px)); }
+.mg-takeover-cruz { right: -6vmin; top: -10vmin; width: 70vmin; height: 70vmin; -webkit-mask: url(/tribals/sigilo-cruz.svg) center / contain no-repeat; mask: url(/tribals/sigilo-cruz.svg) center / contain no-repeat; transform: translate(calc(var(--tilt-x, 0) * 34px), calc(var(--tilt-y, 0) * 34px)); }
+.mg-takeover-close { position: absolute; z-index: 2; top: 16px; right: 16px; display: grid; width: 48px; height: 48px; place-items: center; border: 0; background: transparent; color: inherit; cursor: pointer; }
+.mg-takeover-body { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; padding: 24px; text-align: center; transform: perspective(900px) rotateY(calc(var(--tilt-x, 0) * 7deg)) rotateX(calc(var(--tilt-y, 0) * -7deg)); transition: transform 400ms cubic-bezier(.22,1,.36,1); }
+.mg-takeover-body .mangata-mark { width: 72px; height: 72px; margin-bottom: 18px; }
+.mg-storefront .mg-takeover-title { margin: 0 0 14px; font-size: clamp(18px, 2.4vw, 26px); }
+.mg-storefront .mg-takeover-number { display: flex; align-items: flex-start; gap: .05em; margin: 0 0 18px; font-family: var(--font-display), sans-serif; font-size: clamp(120px, 26vmin, 300px); font-weight: 700; line-height: .95; letter-spacing: -.07em; }
+.mg-takeover-number sup { display: block; padding-top: .14em; font-size: .42em; line-height: 1; }
+.mg-takeover-number span { align-self: flex-end; padding-bottom: .2em; margin-left: -1.75em; font-size: .24em; letter-spacing: -.03em; }
+.mg-storefront .mg-takeover-message { margin: 0 0 30px; color: #b9bcc9; font-size: 16px; }
+.mg-takeover-cta { display: inline-flex; min-height: 54px; align-items: center; gap: 14px; border: 0; padding: 0 26px; background: #c9d3ff; color: #11131a; font-size: 15px; font-weight: 600; cursor: pointer; }
+.mg-takeover :is(button):focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+.mg-storefront .mg-campaign-strip { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; margin: 0 0 28px; padding: 16px 20px; background: var(--accent); color: var(--accent-ink); }
+.mg-campaign-strip strong { font-weight: 500; }
+.mg-campaign-strip span { font-family: var(--font-display), sans-serif; font-size: 24px; font-weight: 700; letter-spacing: -.03em; }
+.mg-campaign-strip small { font-size: 13px; }
+.mg-sale-chip { position: absolute; z-index: 2; top: 10px; left: 10px; padding: 5px 8px; background: var(--accent); color: var(--accent-ink); font-size: 12px; font-weight: 700; pointer-events: none; }
+.mg-sale-chip-inline { position: static; align-self: center; margin-left: 10px; }
+@media (prefers-reduced-motion: reduce) { .mg-campaign-bar-track, .mg-takeover[open] { animation: none; } .mg-takeover-body, .mg-takeover-tribal { transform: none; } }
+
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.mg-takeover-number strong { display: flex; align-items: flex-start; font-weight: inherit; }
+@media (max-width: 700px) { .mg-hero-seal { top: 6px; left: -8px; width: 80px; height: 80px; } }
+.mg-storefront .mg-takeover-title { margin-bottom: 30px; }

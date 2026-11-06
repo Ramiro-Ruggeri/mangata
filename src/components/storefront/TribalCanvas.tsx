@@ -250,3 +250,42 @@ export default function TribalCanvas({ field, onReady, onFail }: { field: RefObj
     <Scene geometries={geometries} field={field} onReady={onReady} />
   </Canvas>;
 }
+
+function Adorn({ geometry, onReady }: { geometry: BufferGeometry; onReady: () => void }) {
+  const group = useRef<Group>(null);
+  const reflections = useReflections();
+  const frames = useRef(0);
+  useFrame((state, delta) => {
+    if (group.current) {
+      group.current.rotation.y += Math.min(delta, .05) * .7;
+      group.current.rotation.x = Math.sin(state.clock.elapsedTime * .6) * .14;
+    }
+    frames.current += 1;
+    if (frames.current === 2) onReady();
+  });
+  return <group ref={group} scale={3.4}>
+    <directionalLight position={[-2, 5, 4]} intensity={1.3} />
+    <mesh geometry={geometry} scale={[1, -1, 1]}>
+      <meshStandardMaterial color="#eceef6" metalness={1} roughness={.17} envMap={reflections} envMapIntensity={1} />
+    </mesh>
+  </group>;
+}
+
+/** The Bermuda Tribal's own applique, small and turning, for the stamp on the cover. */
+export function AdornCanvas({ onReady }: { onReady: () => void }) {
+  const [geometry, setGeometry] = useState<BufferGeometry | null>(null);
+  useEffect(() => {
+    let built: BufferGeometry | null = null;
+    let cancelled = false;
+    fetch("/tribals/bermuda-garra.svg").then((response) => response.text()).then((svg) => {
+      if (cancelled) return;
+      built = buildGeometry(svg);
+      setGeometry(built);
+    }).catch(() => { /* The still drawing stays. */ });
+    return () => { cancelled = true; built?.dispose(); };
+  }, []);
+  if (!geometry) return null;
+  return <Canvas className="mg-hero-seal-canvas" dpr={[1, 2]} camera={{ position: [0, 0, 8], fov: 30 }} gl={{ alpha: true, antialias: true }}>
+    <Adorn geometry={geometry} onReady={onReady} />
+  </Canvas>;
+}

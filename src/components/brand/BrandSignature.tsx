@@ -1,9 +1,7 @@
-import Image from "next/image";
-
-/** Original raster symbol, unchanged. The adjacent name is UI typography, not a reconstructed logo. */
+/** MANGATA's own symbol, traced to a vector. Its letters are cut out, so it has no edge on any background. */
 export function BrandSignature({ symbolOnly = false }: { symbolOnly?: boolean }) {
   return <span className={`brand-signature ${symbolOnly ? "brand-signature-symbol" : ""}`}>
-    <Image src="/brand/logoAnimacionMANGATA.png" width={40} height={40} sizes="40px" alt={symbolOnly ? "MANGATA" : ""} />
+    <i className="mangata-mark" role={symbolOnly ? "img" : undefined} aria-label={symbolOnly ? "MANGATA" : undefined} aria-hidden={symbolOnly ? undefined : true} />
     {!symbolOnly && <span>MANGATA</span>}
   </span>;
 }

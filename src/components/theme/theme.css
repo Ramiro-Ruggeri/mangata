@@ -60,7 +60,7 @@ body { color: var(--text); }
 .mg-search-thumb, .cart-line-image { background: var(--plate); }
 
 /* The supplied PNG has opaque black corners, invisible only on pure black. */
-.brand-signature img { border-radius: 50%; }
+.brand-signature .mangata-mark { border-radius: 50%; }
 
 /* The first paint of a session only. See the script in layout.tsx. */
 :root[data-flash="seen"] .brand-flash { display: none; }

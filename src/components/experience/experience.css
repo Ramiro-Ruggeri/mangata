@@ -23,7 +23,7 @@
   animation: brand-flash 460ms var(--motion-ease) forwards;
 }
 .brand-flash .brand-signature { transform: scale(.94); animation: brand-flash-mark 460ms var(--motion-ease) forwards; }
-.brand-flash .brand-signature img { width: 48px; height: 48px; flex-basis: 48px; }
+.brand-flash .brand-signature .mangata-mark { width: 48px; height: 48px; flex-basis: 48px; }
 .brand-flash .brand-signature > span { font-size: 30px; }
 
 @keyframes brand-flash { 0%, 38% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }

@@ -2,6 +2,8 @@ export type Campaign = {
   /** Remembers a visitor's dismissal per campaign, so a new campaign can be seen again. */
   id: string;
   title: string;
+  /** The discount already inside the listed prices. It never changes a price. */
+  percent: number;
   message: string;
   linkLabel: string;
   href: string;
@@ -16,12 +18,13 @@ export type Campaign = {
  */
 export const CAMPAIGN: Campaign | null = null;
 
-/** Only for looking at the design on a private server, with MANGATA_CAMPAIGN_PREVIEW=1. It never reads as a real offer. */
+/** Only for looking at the design on a private server, with MANGATA_CAMPAIGN_PREVIEW=1. Never set it in production. */
 const PREVIEW: Campaign = {
   id: "vista-previa",
   title: "Cyber Monday",
-  message: "Vista previa: acá va el beneficio real.",
-  linkLabel: "Ver las piezas",
+  percent: 20,
+  message: "Ya aplicado en los precios que ves.",
+  linkLabel: "Ver el catálogo",
   href: "/#coleccion",
   startsAt: "2000-01-01T00:00:00-03:00",
   endsAt: "2100-01-01T00:00:00-03:00",

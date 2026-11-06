@@ -19,7 +19,7 @@ import "./product/product.css";
 
 const money = (value: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value);
 
-export default function PDPClient({ product, related = [] }: { product: StoreProduct; related?: StoreProduct[] }) {
+export default function PDPClient({ product, related = [], campaignPercent }: { product: StoreProduct; related?: StoreProduct[]; campaignPercent?: number }) {
   const [current, setCurrent] = useState(0);
   const { activeOverlay, openOverlay, closeOverlay } = useExperience();
   const zoomOpen = activeOverlay === "zoom";
@@ -103,7 +103,7 @@ export default function PDPClient({ product, related = [] }: { product: StorePro
         <div className="product-heading">
           <div className="product-heading-top"><span>{product.category}</span><span className="product-sku">{product.sku}</span></div>
           <h1>{product.name}</h1>
-          <div className="product-price-row"><strong>{money(product.price)}</strong>{product.compareAtPrice != null && product.compareAtPrice > product.price && <del>{money(product.compareAtPrice)}</del>}</div>
+          <div className="product-price-row"><strong>{money(product.price)}</strong>{product.compareAtPrice != null && product.compareAtPrice > product.price && <del>{money(product.compareAtPrice)}</del>}{campaignPercent != null && available && <span className="mg-sale-chip mg-sale-chip-inline">{campaignPercent}% OFF · ya aplicado</span>}</div>
           {product.transferPrice != null && product.transferPrice < product.price && <p className="product-transfer"><span>{money(product.transferPrice)}</span> por transferencia</p>}
         </div>
 

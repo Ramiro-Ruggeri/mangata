@@ -13,7 +13,7 @@ class SceneBoundary extends Component<{ onFail: () => void; children: ReactNode 
   render() { return this.state.failed ? null : this.props.children; }
 }
 
-function canDraw3D() {
+export function canDraw3D() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
   if (connection?.saveData) return false;

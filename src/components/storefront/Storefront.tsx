@@ -17,7 +17,8 @@ import { PURCHASE_POLICY, SITE, WITHDRAWAL_HREF, whatsappHref } from "@/config/s
 import { matchesCategory, searchProducts } from "@/lib/catalog-view";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { TribalScene } from "./TribalScene";
-import { CampaignNotice } from "./CampaignNotice";
+import { CampaignBar, CampaignTakeover } from "./CampaignExperience";
+import { HeroSeal } from "./HeroSeal";
 import type { Campaign } from "@/config/campaign";
 import "./storefront.css";
 
@@ -101,7 +102,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
     {featured && <div className="mg-hero-visual">
       <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, 345px" /></Link>
       <div className="mg-hero-reflection" aria-hidden="true"><span><Image src={featured.image} alt="" fill sizes="(max-width: 700px) 50vw, 345px" /></span></div>
-      <span className="mg-hero-ticket"><i aria-hidden="true">M</i><span><strong>Pieza única</strong><small>Sin reposición</small></span></span>
+      <HeroSeal />
       <Link className="mg-hero-product" href={`/producto/${featured.id}`} onClick={() => selectProduct(featured, "hero_label")}><span><small>La pieza de portada</small><strong>{featured.name}</strong></span><span>{money(featured.price)} <ArrowUpRight size={22} /></span></Link>
     </div>}
     <div className="mg-hero-bottom"><span>Seguí dándole una historia a tus prendas.</span><a href="#manifiesto">El trabajo detrás <ArrowUpRight size={14} /></a></div>
@@ -118,7 +119,7 @@ function PurchaseNotes() {
   </section>;
 }
 
-function ProductCard({ product }: { product: StoreProduct }) {
+function ProductCard({ product, percent }: { product: StoreProduct; percent?: number }) {
   const { addItem, items, syncState } = useCart();
   const [pending, setPending] = useState(false);
   const [secondaryRequested, setSecondaryRequested] = useState(false);
@@ -132,6 +133,7 @@ function ProductCard({ product }: { product: StoreProduct }) {
         <Image src={product.image} alt={product.name} fill loading="lazy" sizes="(max-width: 700px) calc((100vw - 52px) / 2), (max-width: 1024px) 31vw, (max-width: 1440px) 23vw, 315px" className="mg-image-primary" />
         {secondary && secondaryRequested && <Image src={secondary} fill alt="" loading="lazy" sizes="(max-width: 700px) calc((100vw - 52px) / 2), (max-width: 1024px) 31vw, (max-width: 1440px) 23vw, 315px" className={`mg-image-secondary ${secondaryLoaded ? "is-ready" : ""}`} onLoad={() => setSecondaryLoaded(true)} />}
       </Link>
+      {percent != null && product.inventory.isInStock && <span className="mg-sale-chip">{percent}% OFF</span>}
       {product.isNew && product.inventory.isInStock && <span className="mg-new-label">Recién intervenida</span>}
       {!product.inventory.isInStock && <span className="mg-unavailable-label">{product.source === "local-fallback" || product.inventory.availability === "unconfirmed" ? "Consultar disponibilidad" : ["reserved", "review"].includes(product.inventory.availability ?? "") ? "En proceso de compra" : "Agotada"}</span>}
     </div>
@@ -143,7 +145,7 @@ function ProductCard({ product }: { product: StoreProduct }) {
   </motion.article>;
 }
 
-function Catalog({ products, source }: { products: StoreProduct[]; source: CatalogSource }) {
+function Catalog({ products, source, campaign }: { products: StoreProduct[]; source: CatalogSource; campaign: Campaign | null }) {
   const sectionRef = useRef<HTMLElement>(null);
   const { catalogView: view, setCatalogView: setView } = useExperience();
   const { category, sort, onlyAvailable } = view;
@@ -174,20 +176,20 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     });
   }, [products, category, onlyAvailable, sort]);
   return <section ref={sectionRef} id="coleccion" className="mg-collection mg-shell" aria-labelledby="collection-title">
-    <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>huella.</em></h2></div><div className="mg-collection-context"><p>Prendas y accesorios exclusivos,<br /> diseñados e intervenidos a mano.</p>{source === "local" && <aside className="mg-opening-note" aria-label="Precios de apertura"><span className="mg-opening-dot" aria-hidden="true" /><span><strong>Precios de apertura</strong><small>Ya están aplicados.</small></span></aside>}</div></div>
+    <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>huella.</em></h2></div><div className="mg-collection-context"><p>Prendas y accesorios exclusivos,<br /> diseñados e intervenidos a mano.</p></div></div>
     {source === "local-fallback" && <p className="mg-catalog-notice" role="status">Estamos revisando la disponibilidad de las piezas. Podés verlas y consultarnos por WhatsApp.</p>}
+    {campaign && <p className="mg-campaign-strip"><strong>{campaign.title}</strong><span>{campaign.percent}% OFF</span><small>{campaign.message}</small></p>}
     <div className="mg-catalog-controls"><div className="mg-category-tabs" role="group" aria-label="Filtrar colección">{["Todas", "Denim", "Prendas", "Accesorios"].map((name) => <button key={name} aria-pressed={category === name} className={category === name ? "is-active" : ""} onClick={() => updateView({ category: name })}>{name}</button>)}</div><label className="mg-sort"><SlidersHorizontal size={15} /><select aria-label="Ordenar piezas" value={sort} onChange={(event) => updateView({ sort: event.target.value })}><option value="selection">Nuestra selección</option><option value="new">Recién intervenidas</option><option value="price-low">Menor precio</option><option value="price-high">Mayor precio</option></select><ChevronDown size={13} /></label></div>
     <div className="mg-catalog-summary"><p role="status" aria-atomic="true">{filtered.length} {filtered.length === 1 ? "pieza" : "piezas"}{category !== "Todas" ? ` · ${category}` : ""}</p><label><input type="checkbox" checked={onlyAvailable} onChange={(event) => updateView({ onlyAvailable: event.target.checked })} /> Sólo disponibles</label></div>
     {(category !== "Todas" || onlyAvailable || sort !== "selection") && <div className="mg-active-filters" role="group" aria-label="Selección actual"><span>Estás viendo</span>{category !== "Todas" && <button onClick={() => { updateView({ category: "Todas" }); restoreControl(".mg-category-tabs button"); }} aria-label={`Quitar filtro ${category}`}>{category}<X size={14} /></button>}{onlyAvailable && <button onClick={() => { updateView({ onlyAvailable: false }); restoreControl(".mg-catalog-summary input"); }} aria-label="Quitar filtro Sólo disponibles">Sólo disponibles<X size={14} /></button>}{sort !== "selection" && <button onClick={() => { updateView({ sort: "selection" }); restoreControl(".mg-sort select"); }} aria-label="Quitar orden elegido">{sort === "price-low" ? "Menor precio" : sort === "price-high" ? "Mayor precio" : "Recién intervenidas"}<X size={14} /></button>}<button className="mg-reset-filters" onClick={resetView}>Restablecer colección<ArrowRight size={14} /></button></div>}
-    <div className="mg-product-grid"><AnimatePresence mode="popLayout">{filtered.map((product) => <ProductCard key={product.id} product={product} />)}</AnimatePresence></div>
+    <div className="mg-product-grid"><AnimatePresence mode="popLayout">{filtered.map((product) => <ProductCard key={product.id} product={product} percent={campaign?.percent} />)}</AnimatePresence></div>
     {!filtered.length && <div className="mg-empty"><h3>Por acá no quedan piezas.</h3><button className="mg-inline-link" onClick={resetView}>Volver a ver la colección <ArrowRight size={17} /></button></div>}
   </section>;
 }
 
 function CraftStory() {
   return <section id="manifiesto" className="mg-story" aria-labelledby="story-title">
-    <div className="mg-story-image"><Image src="/campaign/rework-still-life-v2.webp" alt="Composición conceptual de denim recuperado, bordes deshilachados y metal" fill quality={85} sizes="(max-width: 700px) 100vw, (max-width: 1400px) 52vw, 720px" /><span>Estudio de materiales · campaña conceptual</span></div>
-    <div className="mg-story-copy" data-reveal><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">MANGATA nace de una forma distinta de mirar lo que ya existe.</h2><p>El nombre viene del reflejo de la luna sobre el agua: una huella de luz que aparece y muta con el movimiento.</p><p>Esa idea atraviesa nuestra forma de diseñar. Recuperamos prendas y materiales que ya existen y los transformamos en algo nuevo: mezclamos texturas, intervenimos, desarmamos, reconstruimos y probamos otras formas de vestir.</p><p>MANGATA es una marca autogestiva de diseño y upcycling, trabajada 100% a mano. Cada pieza se desarrolla de manera individual y no repetimos diseños ni molderías.</p><p>Creemos en una moda más consciente, donde le damos valor a lo que quedó en desuso.</p><p>No buscamos que todas las prendas sean iguales. Buscamos que cada una encuentre su propia forma de brillar y que vos brilles con ella.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div>
+        <div className="mg-story-copy" data-reveal><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">MANGATA nace de una forma distinta de mirar lo que ya existe.</h2><div className="mg-story-body"><p>El nombre viene del reflejo de la luna sobre el agua: una huella de luz que aparece y muta con el movimiento.</p><p>Esa idea atraviesa nuestra forma de diseñar. Recuperamos prendas y materiales que ya existen y los transformamos en algo nuevo: mezclamos texturas, intervenimos, desarmamos, reconstruimos y probamos otras formas de vestir.</p><p>MANGATA es una marca autogestiva de diseño y upcycling, trabajada 100% a mano. Cada pieza se desarrolla de manera individual y no repetimos diseños ni molderías.</p><p>Creemos en una moda más consciente, donde le damos valor a lo que quedó en desuso.</p><p>No buscamos que todas las prendas sean iguales. Buscamos que cada una encuentre su propia forma de brillar y que vos brilles con ella.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div></div>
   </section>;
 }
 
@@ -260,5 +262,5 @@ export default function Storefront({ initialProducts, mode, source: initialSourc
     const interval = window.setInterval(refresh, 60_000);
     return () => window.clearInterval(interval);
   }, [mode]);
-  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><TribalScene /><Help /></main><Footer />{campaign && <CampaignNotice campaign={campaign} />}</div></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a>{campaign && <CampaignBar campaign={campaign} />}<Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} campaign={campaign} /><CraftStory /><TribalScene /><Help /></main><Footer />{campaign && <CampaignTakeover campaign={campaign} />}</div></MotionConfig>;
 }

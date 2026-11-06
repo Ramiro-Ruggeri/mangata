@@ -46,7 +46,7 @@ test("related pieces only offer what can be bought, same category first", () => 
   assert.equal(relatedPieces(Array.from({ length: 9 }, (_, i) => piece(String(i + 2), "Denim")), current).length, 4);
 });
 
-const campaign: Campaign = { id: "x", title: "T", message: "M", linkLabel: "L", href: "/", startsAt: "2026-11-27T00:00:00-03:00", endsAt: "2026-11-30T00:00:00-03:00" };
+const campaign: Campaign = { id: "x", title: "T", percent: 20, message: "M", linkLabel: "L", href: "/", startsAt: "2026-11-27T00:00:00-03:00", endsAt: "2026-11-30T00:00:00-03:00" };
 
 test("a campaign starts and ends by itself, in Argentine time", () => {
   assert.equal(isOnAir(campaign, Date.parse("2026-11-26T23:59:59-03:00")), false);
