@@ -22,7 +22,9 @@ El catálogo pasa de `src/lib/products.ts` a PostgreSQL, para que el panel de la
 
 ## Publicación (requiere aprobación)
 
-La migración es aditiva y el código anterior la ignora, por eso va primero.
+Publicada el 06/11/2026: ver `RELEASE-FASE-B-8BA58BD.md`. El candidato se probó antes del paso 1, para no tocar la base si el build fallaba.
+
+La migración es aditiva y el código anterior la ignora, por eso va antes que la imagen nueva.
 
 1. Backup: `systemctl start mangata-commerce-backup.service`; confirmar el dump nuevo.
 2. Migración, como dueño de la base:
