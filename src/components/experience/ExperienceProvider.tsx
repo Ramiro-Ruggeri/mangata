@@ -9,7 +9,7 @@ type ExperienceContextValue = {
   activeOverlay: string | null;
   openOverlay: (name: string) => void;
   closeOverlay: (name: string) => void;
-  catalogView: { category: string; sort: string; onlyAvailable: boolean; limit: number };
+  catalogView: { category: string; sort: string; onlyAvailable: boolean };
   setCatalogView: Dispatch<SetStateAction<ExperienceContextValue["catalogView"]>>;
 };
 
@@ -18,7 +18,7 @@ const ExperienceContext = createContext<ExperienceContextValue | null>(null);
 export function ExperienceProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [overlay, setOverlay] = useState<{ route: string; name: string | null }>({ route: pathname, name: null });
-  const [catalogView, setCatalogView] = useState({ category: "Todas", sort: "selection", onlyAvailable: false, limit: 8 });
+  const [catalogView, setCatalogView] = useState({ category: "Todas", sort: "selection", onlyAvailable: false });
 
   // Reset only coordination state, not children/cart, when a route changes.
   if (overlay.route !== pathname) setOverlay({ route: pathname, name: null });

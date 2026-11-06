@@ -139,7 +139,7 @@ export function MaterialPlayground() {
   }, [reduced]);
 
   return <section className="mg-materials mg-shell" aria-labelledby="materials-title">
-    <div className="mg-materials-copy"><span className="mg-eyebrow">Reflejo sobre el agua</span><h2 id="materials-title">Mezclamos.<br /><em>Transformamos.</em></h2><p id="materials-instructions">Arrastrá las piezas o activalas con Enter. El movimiento vuelve cuando regresás a esta sección.</p>
+    <div className="mg-materials-copy"><span className="mg-eyebrow"><b>03</b> Reflejo sobre el agua</span><h2 id="materials-title">Mezclamos.<br /><em>Transformamos.</em></h2><p id="materials-instructions">Arrastrá las piezas o activalas con Enter. El movimiento vuelve cuando regresás a esta sección.</p>
       <div className="mg-material-controls"><button disabled={!ready || !!reduced} onClick={() => controls.current.mix()}><Shuffle size={16} aria-hidden="true" />Mezclar</button><button disabled={!running || !!reduced} onClick={() => controls.current.pause()}><Pause size={16} aria-hidden="true" />Pausar</button></div>
       {reduced && <p>Movimiento desactivado según tu preferencia.</p>}
     </div>

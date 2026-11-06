@@ -174,3 +174,12 @@
   .product-mobile-buy { position: static; }
   .product-page { padding-bottom: 0; }
 }
+
+/* No plate behind the photo: its own background meets the page, without two-tone bands. */
+.product-image-stage, .product-image-stage[data-photo-surface="light"] { background: transparent; }
+.product-thumbnails button { background: var(--surface-2); }
+.product-thumbnails img { object-fit: cover; }
+.product-add-status, .product-measures > p, .product-measurement small, .product-breadcrumb, .product-sku, .product-heading-top { font-size: 12px; }
+.product-header-back, .product-header-bag { font-size: 13px; }
+/* The stage takes the shape of most photos, so its controls sit on the image and not beside it. */
+.product-image-stage { width: auto; max-width: 100%; aspect-ratio: 3 / 4; margin-inline: auto; }

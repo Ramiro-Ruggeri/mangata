@@ -97,7 +97,7 @@ body { color: var(--text); }
 .product-related h2 { margin: 0 0 24px; font-family: var(--font-display), Arial, sans-serif; font-size: clamp(24px, 2.2vw, 32px); font-weight: 500; letter-spacing: -.04em; }
 .product-related-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
 .product-related-photo { position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden; background: var(--plate); filter: var(--plate-filter); }
-.product-related-photo img { object-fit: contain; transition: transform var(--motion-editorial, 400ms) var(--motion-ease, ease); }
+.product-related-photo img { object-fit: cover; transition: transform var(--motion-editorial, 400ms) var(--motion-ease, ease); }
 @media (hover: hover) and (pointer: fine) { .product-related a:hover img { transform: scale(1.03); } }
 .product-related-name { display: block; margin-top: 12px; font-size: 14px; font-weight: 500; }
 .product-related-price { display: block; margin-top: 3px; color: var(--text-2); font-size: 14px; }

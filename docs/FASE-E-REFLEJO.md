@@ -12,6 +12,13 @@ La tienda ya vende por búsqueda orgánica, así que se evoluciona: misma estruc
 - **Producto:** suma "Otras piezas disponibles", en el HTML inicial, con la categoría más cercana primero.
 - **Almacenamiento:** `mangata_theme` y `mangata_intro` no guardan datos personales y figuran en `/privacidad`.
 
+## Revisión de dirección de arte
+
+- **Grilla completa:** las 26 piezas se muestran en la colección. Reemplaza a "Ver más piezas" y a la lista "Todas las piezas", que existía solo para que los buscadores encontraran cada producto. Los enlaces ahora son las propias tarjetas. Si el catálogo crece mucho, corresponde una página de colección.
+- **Encuadre:** las tarjetas llenan su formato 3:4, porque 22 de 33 fotos ya lo tienen. Las más altas se recortan arriba y abajo en la tarjeta; la ficha de producto siempre muestra la foto entera.
+- **Tarjetas:** foto, categoría, nombre, precio y bolsa. Sin miniaturas ni flecha: la foto es el enlace.
+- **Ritmo:** secciones numeradas y una banda invertida en "Antes de elegir".
+
 ## Rollback
 
 Volver a la imagen anterior. No hay cambios de base ni de datos.
