@@ -491,3 +491,27 @@
   .mg-collection h2, .mg-help h2, .mg-materials h2 { font-size: clamp(40px, 11vw, 56px); }
   .mg-eyebrow, .mg-collection .mg-eyebrow, .mg-help .mg-eyebrow, .mg-story .mg-eyebrow, .mg-footer .mg-eyebrow, .mg-hero .mg-eyebrow { font-size: 11px; }
 }
+
+/* Proportions come from the image, never from the height of the text beside it. */
+.mg-story { align-items: start; }
+.mg-story-image { position: sticky; top: 96px; min-height: 0; aspect-ratio: 4 / 5; }
+.mg-desktop-nav a { white-space: nowrap; }
+@media (max-width: 900px) {
+  .mg-story { grid-template-columns: 1fr; padding-inline: 0; }
+  .mg-story-image { position: relative; top: auto; aspect-ratio: 16 / 10; }
+  .mg-story-copy { padding: 44px var(--mg-gutter); }
+}
+/* Below this the three links no longer fit on one line next to the logo and the actions. */
+@media (max-width: 860px) {
+  .mg-desktop-nav { display: none; }
+  .mg-storefront .mg-menu-toggle { display: inline-grid; }
+}
+@media (max-width: 700px) {
+  .mg-story-image { aspect-ratio: 1; }
+  .mg-story-copy { padding: 40px 24px 42px; }
+  .mg-hero-visual { display: flex; flex-direction: column; justify-content: center; min-height: 0; padding-block: 18px 16px; }
+  .mg-hero-photo { position: relative; inset: auto; width: 100%; height: auto; aspect-ratio: 3 / 4; }
+  .mg-hero-product { position: static; margin-top: 14px; }
+  .mg-category-tabs { justify-content: flex-start; gap: 6px; }
+  .mg-category-tabs button { flex: 1 1 auto; padding: 9px 12px; font-size: 13px; }
+}

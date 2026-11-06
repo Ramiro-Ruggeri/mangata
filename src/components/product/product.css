@@ -183,3 +183,7 @@
 .product-header-back, .product-header-bag { font-size: 13px; }
 /* The stage takes the shape of most photos, so its controls sit on the image and not beside it. */
 .product-image-stage { width: auto; max-width: 100%; aspect-ratio: 3 / 4; margin-inline: auto; }
+@media (max-width: 1000px) and (min-width: 801px) {
+  /* The column is narrow here: let the width decide the height, so the photo keeps its shape. */
+  .product-image-stage { width: 100%; height: auto; min-height: 0; }
+}

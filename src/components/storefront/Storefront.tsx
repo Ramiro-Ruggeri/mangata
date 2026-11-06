@@ -94,8 +94,8 @@ function Hero({ products }: { products: StoreProduct[] }) {
       <span className="mg-hero-footnote"><CircleCheck size={13} strokeWidth={2} aria-hidden="true" /> Fotos reales. Hecho a mano en Córdoba.</span>
     </div>
     {featured && <div className="mg-hero-visual">
-      <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, (max-width: 1135px) 46vw, 520px" /></Link>
-      <div className="mg-hero-reflection" aria-hidden="true"><span><Image src={featured.image} alt="" fill sizes="(max-width: 700px) 50vw, (max-width: 1135px) 46vw, 520px" /></span></div>
+      <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, 345px" /></Link>
+      <div className="mg-hero-reflection" aria-hidden="true"><span><Image src={featured.image} alt="" fill sizes="(max-width: 700px) 50vw, 345px" /></span></div>
       <span className="mg-hero-ticket"><i aria-hidden="true">M</i><span><strong>Pieza única</strong><small>Sin reposición</small></span></span>
       <Link className="mg-hero-product" href={`/producto/${featured.id}`} onClick={() => selectProduct(featured, "hero_label")}><span><small>La pieza de portada</small><strong>{featured.name}</strong></span><span>{money(featured.price)} <ArrowUpRight size={22} /></span></Link>
     </div>}
