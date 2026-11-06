@@ -16,7 +16,16 @@ export type Campaign = {
  * The campaign on air. Until the panel exists, this is the one place to change it.
  * Only a real benefit with real dates goes here: no invented urgency, no inflated prices, no official event logos.
  */
-export const CAMPAIGN: Campaign | null = null;
+export const CAMPAIGN: Campaign | null = {
+  id: "cyber-monday-2026",
+  title: "Cyber Monday",
+  percent: 20,
+  message: "Ya aplicado en los precios que ves.",
+  linkLabel: "Ver el catálogo",
+  href: "/#coleccion",
+  startsAt: "2026-11-06T00:00:00-03:00",
+  endsAt: "2026-12-01T00:00:00-03:00",
+};
 
 /** Only for looking at the design on a private server, with MANGATA_CAMPAIGN_PREVIEW=1. Never set it in production. */
 const PREVIEW: Campaign = {
