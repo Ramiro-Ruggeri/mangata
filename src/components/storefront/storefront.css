@@ -573,3 +573,16 @@
 .mg-takeover-number strong { display: flex; align-items: flex-start; font-weight: inherit; }
 @media (max-width: 700px) { .mg-hero-seal { top: 6px; left: -8px; width: 80px; height: 80px; } }
 .mg-storefront .mg-takeover-title { margin-bottom: 30px; }
+
+/* Phones: readable small print and comfortable targets. */
+.mg-takeover-body:focus { outline: none; }
+.mg-takeover-close { top: max(16px, env(safe-area-inset-top)); }
+@media (max-width: 700px) {
+  .mg-hero-seal { top: 4px; left: -12px; width: 90px; height: 90px; }
+  .mg-hero-seal-ring text { font-size: 10.5px; font-weight: 700; }
+  .mg-hero-footnote, .mg-hero-bottom span, .mg-hero-bottom a, .mg-hero-product small { font-size: 12px; }
+  .mg-hero-bottom a { display: inline-flex; min-height: 44px; align-items: center; }
+  .mg-unavailable-label { font-size: 12px; }
+  .mg-catalog-summary label { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; }
+  .mg-catalog-summary input { width: 20px; height: 20px; }
+}

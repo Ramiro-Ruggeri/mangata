@@ -242,7 +242,7 @@ export default function TribalCanvas({ field, onReady, onFail }: { field: RefObj
   return <Canvas
     className="mg-tribal-canvas"
     frameloop={onScreen ? "always" : "never"}
-    dpr={[1, 1.75]}
+    dpr={[1, 1.5]}
     camera={{ position: [0, 0, 8], fov: 30 }}
     gl={{ alpha: true, antialias: true }}
     onCreated={({ gl }) => gl.domElement.addEventListener("webglcontextlost", onFail, { once: true })}

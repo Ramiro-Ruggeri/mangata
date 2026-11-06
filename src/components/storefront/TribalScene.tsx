@@ -17,6 +17,9 @@ export function canDraw3D() {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
   const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
   if (connection?.saveData) return false;
+  // Modest phones keep the still drawings: the page must stay smooth while shopping.
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory;
+  if ((memory && memory <= 2) || navigator.hardwareConcurrency <= 2) return false;
   const context = document.createElement("canvas").getContext("webgl2");
   context?.getExtension("WEBGL_lose_context")?.loseContext();
   return Boolean(context);

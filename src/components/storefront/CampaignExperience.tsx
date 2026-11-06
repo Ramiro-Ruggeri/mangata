@@ -65,12 +65,12 @@ export function CampaignTakeover({ campaign }: { campaign: Campaign }) {
     <span className="mg-takeover-tribal mg-takeover-reflejo" aria-hidden="true" />
     <span className="mg-takeover-tribal mg-takeover-cruz" aria-hidden="true" />
     <button type="button" className="mg-takeover-close" onClick={close} aria-label="Cerrar"><X size={22} aria-hidden="true" /></button>
-    <div className="mg-takeover-body">
+    <div className="mg-takeover-body" tabIndex={-1} autoFocus>
       <i className="mangata-mark" aria-hidden="true" />
       <p className="mg-takeover-title">{campaign.title}</p>
       <p className="mg-takeover-number"><strong>{campaign.percent}<sup>%</sup></strong><span>OFF</span></p>
       <p className="mg-takeover-message">{campaign.message}</p>
-      <button type="button" className="mg-takeover-cta" onClick={enter} autoFocus>{campaign.linkLabel} <ArrowDown size={18} aria-hidden="true" /></button>
+      <button type="button" className="mg-takeover-cta" onClick={enter}>{campaign.linkLabel} <ArrowDown size={18} aria-hidden="true" /></button>
     </div>
   </dialog>;
 }
