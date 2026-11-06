@@ -24,6 +24,8 @@ No GTM, Google Analytics, Meta Pixel, Vercel Analytics, marketing SDK, tracking 
 
 ## Consent contract
 
+The first-layer banner is off (`ASK_FOR_CONSENT` in `ConsentProvider.tsx`) since 2026-11-06: no collector is connected and optional measurement stays off without an explicit choice, available from the footer. It must come back, or be replaced, before connecting any measurement service. This is an engineering decision, not legal advice: confirm it in the pending legal review.
+
 - No choice, false, invalid JSON, expired timestamp, future timestamp, changed version, or a duration extended beyond the configured interval means no optional measurement.
 - SSR emits no permission. `useSyncExternalStore` uses a hydration sentinel so a returning decision does not flash a consent banner.
 - First-layer accept and reject use identical size, border, color and placement. Configure is a separate accessible action. Browsing and bag operations are never gated.

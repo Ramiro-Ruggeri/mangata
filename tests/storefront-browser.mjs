@@ -24,7 +24,6 @@ async function main() {
     await page.goto(base, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.locator('.brand-flash').evaluate(el => getComputedStyle(el).animationName), 'brand-flash');
-    await page.getByRole('button', { name: 'Rechazar opcionales', exact: true }).click();
     const rows = [];
     for (const [width, height] of [[320,740],[360,800],[390,844],[430,932],[700,900],[720,450],[768,1024],[844,390],[1024,768],[1280,800],[1440,900],[1920,1080],[2560,1440]]) {
       await page.setViewportSize({ width, height });
@@ -149,7 +148,6 @@ async function main() {
       return route.fulfill({ status: product ? 200 : 400, json: product ? { synced: true, product } : { code: 'invalid_cart' } });
     });
     await mobile.goto(base, { waitUntil: 'domcontentloaded' });
-    await mobile.getByRole('button', { name: 'Rechazar opcionales', exact: true }).tap();
     await mobile.getByRole('link', { name: 'Ver las piezas', exact: true }).tap();
     if (output) await mobile.screenshot({ path: join(output, 'cards-touch.png') });
     const card = mobile.locator('.mg-product-card').filter({ has: mobile.locator('.mg-add-button:not([disabled])') }).first();
