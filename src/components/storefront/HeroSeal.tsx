@@ -12,8 +12,8 @@ class Boundary extends Component<{ children: ReactNode }> {
   render() { return this.state.failed ? null : this.props.children; }
 }
 
-/** The stamp on the cover piece: the garment's own applique turning in 3D, with the promise around it. */
-export function HeroSeal() {
+/** The stamp on the cover piece: an adorn turning in 3D, with the promise around it. */
+export function HeroSeal({ adorn }: { adorn: string }) {
   const [load, setLoad] = useState(false);
   const [live, setLive] = useState(false);
   const onReady = useCallback(() => setLive(true), []);
@@ -35,7 +35,7 @@ export function HeroSeal() {
       <defs><path id="mg-seal-ring" d="M60 60m-47 0a47 47 0 1 1 94 0a47 47 0 1 1-94 0" /></defs>
       <text><textPath href="#mg-seal-ring" textLength="292">PIEZA ÚNICA · SIN REPOSICIÓN ·</textPath></text>
     </svg>
-    <span className="mg-hero-seal-static" aria-hidden="true" />
-    {load && <Boundary><AdornCanvas onReady={onReady} /></Boundary>}
+    <span className="mg-hero-seal-static" aria-hidden="true" style={{ WebkitMaskImage: `url(${adorn})`, maskImage: `url(${adorn})` }} />
+    {load && <Boundary><AdornCanvas src={adorn} onReady={onReady} /></Boundary>}
   </span>;
 }

@@ -85,3 +85,10 @@
   .privacy-category-heading { align-items: flex-start; flex-direction: column; }
 }
 @media (prefers-reduced-motion: reduce) { .privacy-dialog[open] { animation: none; } .privacy-action, .privacy-toggle input, .privacy-toggle input::before { transition: none; } .privacy-dialog::backdrop { backdrop-filter: none; } }
+
+/* A small card in the corner, not a bar across the page. It never covers the buying controls. */
+.privacy-banner { inset: auto auto 20px 20px; width: min(360px, calc(100vw - 40px)); grid-template-columns: minmax(0, 1fr); grid-template-areas: "copy" "actions" "configure"; gap: 10px; padding: 16px; border: 1px solid var(--line-strong); background: var(--surface-2); box-shadow: 0 10px 34px #0005; }
+.privacy-banner .privacy-configure { justify-self: start; padding: 0; }
+@media (max-width: 700px) {
+  .privacy-banner { inset: auto 10px calc(10px + env(safe-area-inset-bottom) + var(--mobile-purchase-height, 0px)) 10px; width: auto; padding: 12px; gap: 6px; }
+}

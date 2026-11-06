@@ -271,19 +271,19 @@ function Adorn({ geometry, onReady }: { geometry: BufferGeometry; onReady: () =>
   </group>;
 }
 
-/** The Bermuda Tribal's own applique, small and turning, for the stamp on the cover. */
-export function AdornCanvas({ onReady }: { onReady: () => void }) {
+/** A small adorn turning, for the stamp on the cover. */
+export function AdornCanvas({ src, onReady }: { src: string; onReady: () => void }) {
   const [geometry, setGeometry] = useState<BufferGeometry | null>(null);
   useEffect(() => {
     let built: BufferGeometry | null = null;
     let cancelled = false;
-    fetch("/tribals/bermuda-garra.svg").then((response) => response.text()).then((svg) => {
+    fetch(src).then((response) => response.text()).then((svg) => {
       if (cancelled) return;
       built = buildGeometry(svg);
       setGeometry(built);
     }).catch(() => { /* The still drawing stays. */ });
     return () => { cancelled = true; built?.dispose(); };
-  }, []);
+  }, [src]);
   if (!geometry) return null;
   return <Canvas className="mg-hero-seal-canvas" dpr={[1, 2]} camera={{ position: [0, 0, 8], fov: 30 }} gl={{ alpha: true, antialias: true }}>
     <Adorn geometry={geometry} onReady={onReady} />

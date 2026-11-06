@@ -102,7 +102,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
     {featured && <div className="mg-hero-visual">
       <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, 345px" /></Link>
       <div className="mg-hero-reflection" aria-hidden="true"><span><Image src={featured.image} alt="" fill sizes="(max-width: 700px) 50vw, 345px" /></span></div>
-      <HeroSeal />
+      <HeroSeal adorn={featured.name === "Bermuda Tribal" ? "/tribals/bermuda-garra.svg" : "/tribals/sigilo-cruz.svg"} />
       <Link className="mg-hero-product" href={`/producto/${featured.id}`} onClick={() => selectProduct(featured, "hero_label")}><span><small>La pieza de portada</small><strong>{featured.name}</strong></span><span>{money(featured.price)} <ArrowUpRight size={22} /></span></Link>
     </div>}
     <div className="mg-hero-bottom"><span>Seguí dándole una historia a tus prendas.</span><a href="#manifiesto">El trabajo detrás <ArrowUpRight size={14} /></a></div>

@@ -43,7 +43,7 @@ function PreferencesDialog({ analytics, onSave, onClose }: { analytics: boolean;
           <label className="privacy-toggle" htmlFor="privacy-analytics"><span><strong id="privacy-analytics-title">Medición de uso</strong><small>Opcional · MANGATA</small></span>
             <input id="privacy-analytics" type="checkbox" checked={allowAnalytics} onChange={(event) => setAllowAnalytics(event.target.checked)} aria-describedby="privacy-analytics-description" />
           </label>
-          <p id="privacy-analytics-description">Registra en este navegador acciones como ver una pieza o agregarla a la bolsa. Hoy no hay un proveedor externo de analítica conectado ni píxeles publicitarios. No guardamos el texto de tus búsquedas.</p>
+          <p id="privacy-analytics-description">Registra acciones como ver una pieza o agregarla a la bolsa, y suma a contadores diarios anónimos en nuestro servidor, sin guardar tu IP ni identificarte. No hay proveedores externos de analítica ni píxeles publicitarios. No guardamos el texto de tus búsquedas.</p>
           <p>Al desactivarla, detenemos los eventos y borramos la medición local que controla MANGATA. Tu bolsa se conserva.</p>
         </section>
         <p className="privacy-duration">Recordamos tu decisión durante 180 días, o hasta que cambie esta configuración. <Link href="/privacidad" onClick={onClose}>Ver privacidad y almacenamiento</Link>.</p>
@@ -57,18 +57,13 @@ function PreferencesDialog({ analytics, onSave, onClose }: { analytics: boolean;
   );
 }
 
-/**
- * No measurement service is connected, so nothing optional leaves the browser and there is nothing to ask yet.
- * Measurement stays off without an explicit choice, available from the footer. Turn this on with the first real collector.
- */
-const ASK_FOR_CONSENT: boolean = false;
 
 export function ConsentProvider({ children }: { children: React.ReactNode }) {
   const { activeOverlay, openOverlay, closeOverlay } = useExperience();
   const raw = useSyncExternalStore(subscribeConsent, getConsentSnapshot, getServerConsentSnapshot);
   const consent = parseConsent(raw);
   const ready = raw !== "";
-  const showBanner = ASK_FOR_CONSENT && ready && !consent && !activeOverlay;
+  const showBanner = ready && !consent && !activeOverlay;
   const [message, setMessage] = useState("");
   const [memoryOnly, setMemoryOnly] = useState(false);
   const bannerRef = useRef<HTMLElement>(null);
@@ -132,7 +127,7 @@ export function ConsentProvider({ children }: { children: React.ReactNode }) {
       {children}
       <div className="privacy-bottom-space" aria-hidden="true" />
       {showBanner && <section ref={bannerRef} className="privacy-banner" aria-labelledby="privacy-banner-title">
-        <div className="privacy-banner-copy"><h2 id="privacy-banner-title">Sobre tus cookies</h2><p>La medición de uso es opcional. <Link href="/privacidad">Privacidad</Link>.</p></div>
+        <div className="privacy-banner-copy"><h2 id="privacy-banner-title">¿Nos dejás contar tu visita?</h2><p>Es anónimo y nos ayuda a mejorar. La tienda funciona igual si decís que no. <Link href="/privacidad">Privacidad</Link>.</p></div>
         <button type="button" className="privacy-configure" data-privacy-configure onClick={openPreferences}>Configurar</button>
         <div className="privacy-banner-actions">
           <button type="button" className="privacy-action" onClick={() => save(false)}>Rechazar opcionales</button>

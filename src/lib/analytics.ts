@@ -42,15 +42,10 @@ declare global {
   }
 }
 
-/**
- * Anonymous daily counters: no cookie, storage or identifier. Off until Ramiro decides how they relate to consent.
- * Turning them on also requires updating the privacy page, which says no measurement service is connected.
- */
-const COUNTERS_ON: boolean = false;
-
+/** Anonymous daily counters on our own server: no cookie or identifier, and only after the visitor accepts. */
 export function countMetric(event: string, detail: { sku?: string; referrer?: string } = {}) {
   if (typeof window === "undefined") return;
-  if (!COUNTERS_ON) return;
+  if (!hasAnalyticsConsent()) return;
   try {
     const body = JSON.stringify({ event, ...detail });
     if (!navigator.sendBeacon?.("/api/store/metric", new Blob([body], { type: "application/json" }))) {

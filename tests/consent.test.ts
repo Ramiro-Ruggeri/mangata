@@ -76,6 +76,8 @@ test("analytics never creates a queue, event, purchase marker or request before 
     localStorage.setItem("mangata_cart_v2", "[real-bag]");
     sessionStorage.setItem("unrelated", "keep");
     browser.dataLayer!.push({ event: "unrelated", event_source: "another-app" });
+    const countedWithConsent = requests;
+    assert.ok(countedWithConsent > 0, "anonymous counters run after accepting");
     savePrivacyChoice(false);
     assert.equal(hasAnalyticsConsent(), false);
     assert.deepEqual(browser.dataLayer, [{ event: "unrelated", event_source: "another-app" }]);
@@ -84,7 +86,7 @@ test("analytics never creates a queue, event, purchase marker or request before 
     assert.equal(localStorage.getItem("mangata_cart_v2"), "[real-bag]");
     trackVerifiedPurchase("new-but-revoked", 1000, 1);
     assert.equal(events.length, 2);
-    assert.equal(requests, 0);
+    assert.equal(requests, countedWithConsent, "nothing is counted after revoking");
 
     localStorage.setItem(CONSENT_KEY, JSON.stringify(createConsent(true, Date.now() - CONSENT_TTL_MS - 1)));
     assert.equal(hasAnalyticsConsent(), false);

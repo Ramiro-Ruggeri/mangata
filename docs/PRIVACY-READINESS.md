@@ -51,3 +51,7 @@ The first-layer banner is off (`ASK_FOR_CONSENT` in `ConsentProvider.tsx`) since
 The official [updated Ley 25.326](https://www.argentina.gob.ar/normativa/nacional/ley-25326-64790/actualizacion) requires clear information about purposes, recipients and responsible identity, and addresses consent and data security. The [AAIP rights guide](https://www.argentina.gob.ar/aaip/datospersonales/derechos) explains access, correction and deletion requests. These sources were checked on 2026-09-14; no claim is made that an EU-style cookie banner is specifically mandated by Argentine law or establishes complete compliance.
 
 Before publication Emilia must confirm the legal controller identity/address, formal rights contact, actual hosting/commerce providers and destinations, processing purposes, storage periods for orders/logs, and applicable markets. Obtain appropriate legal review of the resulting notice and operational procedures. The public privacy page visibly marks these missing facts and is noindex pending validation. Do not invent controller data or legal commitments to remove this release blocker.
+
+## 2026-11-06: counters and banner
+
+Ramiro chose to count visits with a notice. The banner is back as a small corner card. After accepting, `POST /api/store/metric` adds to `metrics_daily`: totals per day, event and piece or traffic family. No IP, cookie, identifier or full referrer is stored. Rejecting or not answering sends nothing. Legal review still pending.
