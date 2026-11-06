@@ -1,0 +1,5 @@
+# These run on the Linux VPS. A release archived from Windows must not get CRLF: /bin/sh cannot run it.
+*.sh text eol=lf
+*.sql text eol=lf
+deploy/** text eol=lf
+Dockerfile text eol=lf
