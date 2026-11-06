@@ -24,7 +24,7 @@
 .mg-wordmark { display: block; font-family: var(--font-display), sans-serif; font-size: 28px; font-weight: 800; line-height: 1; letter-spacing: -.075em; }
 .mg-announcement { display: flex; justify-content: space-between; gap: 16px; padding: 10px var(--mg-gutter); color: var(--text-2); background: var(--surface-2); font-size: 11px; line-height: 1.5; }
 .mg-announcement a { display: flex; align-items: center; gap: 6px; }
-.mg-header { position: sticky; top: 0; z-index: 80; display: flex; justify-content: space-between; align-items: center; gap: 24px; min-height: 82px; padding: 10px var(--mg-gutter); border-bottom: 1px solid var(--line); background: var(--header-bg); color: var(--text); backdrop-filter: blur(14px); }
+.mg-header { position: sticky; top: 0; z-index: 80; display: flex; justify-content: space-between; align-items: center; gap: 24px; min-height: 82px; padding: 10px var(--mg-gutter); border-bottom: 1px solid var(--line); background: var(--header-bg); color: var(--text); }
 .mg-brand { display: inline-flex; align-items: center; min-height: 44px; }
 .mg-desktop-nav { display: flex; align-items: center; gap: clamp(18px, 3vw, 46px); }
 .mg-desktop-nav a { position: relative; display: flex; align-items: center; min-height: 44px; font-size: 12px; }
@@ -398,7 +398,6 @@
 .mg-hero-product { bottom: 12px; }
 .mg-hero h1 { font-weight: 500; letter-spacing: -.055em; }
 .mg-hero h1 em { color: var(--accent); }
-.mg-storefront .mg-header { -webkit-backdrop-filter: blur(14px); }
 .mg-header { min-height: 72px; }
 .mg-cart-count { border-color: var(--line-strong); }
 .mg-storefront .mg-cart-button, .mg-storefront .mg-button, .mg-category-tabs button, .mg-opening-note, .mg-active-filters button, .mg-material-controls button { border-radius: 2px; }
@@ -495,10 +494,14 @@
 }
 
 /* MANGATA's own tribals, still and oversized, cut by the edge of the page. */
-.mg-tribal { padding-block: 72px 0; overflow: hidden; border-bottom: 1px solid var(--mg-line); }
+.mg-tribal { padding-block: 72px 0; overflow: hidden; border-bottom: 1px solid var(--mg-line); background: linear-gradient(var(--surface-2), var(--bg) 240px); }
 .mg-storefront .mg-tribal h2 { margin: 17px 0 0; font-family: var(--font-display), sans-serif; font-size: clamp(44px, 6vw, 92px); font-weight: 500; line-height: .98; letter-spacing: -.055em; }
 .mg-tribal-field { position: relative; height: clamp(380px, 44vw, 660px); margin-top: 28px; }
-.mg-tribal-piece { position: absolute; display: block; background: var(--text); -webkit-mask: var(--tribal-mask) center / contain no-repeat; mask: var(--tribal-mask) center / contain no-repeat; }
+.mg-tribal-canvas { position: absolute !important; inset: 0; opacity: 0; transition: opacity 700ms ease; }
+.mg-tribal-canvas, .mg-tribal-canvas * { pointer-events: none !important; }
+.mg-tribal-field[data-live="true"] .mg-tribal-canvas { opacity: 1; }
+.mg-tribal-field[data-live="true"] .mg-tribal-piece { opacity: 0; }
+.mg-tribal-piece { transition: opacity 700ms ease; position: absolute; display: block; background: var(--text); -webkit-mask: var(--tribal-mask) center / contain no-repeat; mask: var(--tribal-mask) center / contain no-repeat; }
 .mg-tribal-reflejo { --tribal-mask: url(/tribals/luna-reflejo.svg); top: 2%; left: 6%; height: 96%; aspect-ratio: 1.03; }
 .mg-tribal-cruz { --tribal-mask: url(/tribals/sigilo-cruz.svg); top: -6%; right: 3%; height: 124%; aspect-ratio: .93; }
 @media (max-width: 1000px) {

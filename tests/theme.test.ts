@@ -1,3 +1,4 @@
+import { placeTribals } from "../src/components/storefront/tribal-layout";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { runInNewContext } from "node:vm";
@@ -60,4 +61,16 @@ test("nothing shows without a campaign on air, and the preview needs its private
   assert.equal(currentCampaign(after, campaign, false), null);
   assert.equal(currentCampaign(during, null, false), null);
   assert.equal(currentCampaign(during, null, true)?.id, "vista-previa");
+});
+
+test("both 3D tribals stay inside the visible scene and apart, in wide and tall screens", () => {
+  for (const [width, height] of [[8, 3.6], [4.3, 2.14], [1.43, 3.2]]) {
+    const { reflejo, cruz } = placeTribals(width, height);
+    for (const piece of [reflejo, cruz]) {
+      assert.ok(Math.abs(piece.y) + piece.height / 2 <= height / 2 + height * .05, `vertical fit at ${width}x${height}`);
+      assert.ok(Math.abs(piece.x) + piece.height / 2 <= width / 2 + width * .12, `horizontal fit at ${width}x${height}`);
+    }
+    const apart = width >= height ? Math.abs(reflejo.x - cruz.x) : Math.abs(reflejo.y - cruz.y);
+    assert.ok(apart >= Math.max(reflejo.height, cruz.height) * .9, `separation at ${width}x${height}`);
+  }
 });

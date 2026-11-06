@@ -1,6 +1,9 @@
-# ADR: tribales originales y fijos
+# ADR: tribales originales en 3D
 
-**Decisión:** la web usa dos tribales originales de MANGATA, Cruz y Reflejo, como gráficos grandes y fijos. El único movimiento es un sello de 300 ms al sumar a la bolsa.
+**Decisión:** la web muestra dos tribales originales de MANGATA, Cruz y Reflejo, como piezas metálicas en 3D con Three.js y React Three Fiber, sobre puntos que se mueven como agua bajo la luna. Ramiro pidió este cambio el 06/11/2026.
+
+- La librería se descarga solo cuando la sección está por aparecer. No se dibuja nada con la sección fuera de pantalla o la pestaña oculta.
+- Sin WebGL, con movimiento reducido, con ahorro de datos o si falla la carga, quedan los dibujos fijos.
 
 ## Por qué
 
