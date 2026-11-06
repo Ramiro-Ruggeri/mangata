@@ -10,6 +10,7 @@
     "typecheck": "tsc --noEmit",
     "test:database": "node --import tsx --test tests/postgres-orders.test.ts",
     "test": "node --import tsx --test tests/commerce.test.ts tests/consent.test.ts tests/experience.test.ts tests/site-url.test.ts",
+    "test:seo": "node --test tests/seo-http.mjs",
     "images:brand": "node scripts/prepare-brand-campaign.mjs",
     "images:optimize": "node scripts/optimize-product-images.mjs",
     "images:prewarm": "node scripts/prewarm-production-images.mjs",
@@ -19,7 +20,7 @@
     "framer-motion": "^13.0.0",
     "lucide-react": "^1.30.0",
     "matter-js": "0.20.0",
-    "next": "^16.3.0",
+    "next": "^16.4.5",
     "pg": "8.23.0",
     "react": "19.2.4",
     "react-dom": "19.2.4"
@@ -33,8 +34,8 @@
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
-    "eslint-config-next": "^16.3.0",
-    "sharp": "^0.35.4",
+    "eslint-config-next": "^16.4.5",
+    "sharp": "^0.35.5",
     "tailwindcss": "^4",
     "tsx": "^4.20.6",
     "typescript": "^5"

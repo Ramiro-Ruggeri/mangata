@@ -182,6 +182,7 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     <div className="mg-product-grid"><AnimatePresence mode="popLayout">{filtered.slice(0, limit).map((product) => <ProductCard key={product.id} product={product} />)}</AnimatePresence></div>
     {!filtered.length && <div className="mg-empty"><h3>Por acá no quedan piezas.</h3><button className="mg-inline-link" onClick={resetView}>Volver a ver la colección <ArrowRight size={17} /></button></div>}
     {filtered.length > limit && <div className="mg-load-more"><button className="mg-button mg-button-outline" onClick={(event) => { if (event.detail === 0) nextCardRef.current = filtered[limit]?.id ?? null; updateView({ limit: limit + 8 }); }}>Ver más piezas <Plus size={18} /></button><span>Mostrando {Math.min(limit, filtered.length)} de {filtered.length}</span></div>}
+    <nav className="mg-piece-index" aria-labelledby="piece-index-title"><h3 id="piece-index-title">Todas las piezas</h3><ul>{products.map((product) => <li key={product.id}><Link href={`/producto/${product.id}`} prefetch={false} onClick={() => selectProduct(product, "piece_index")}>{product.name}</Link></li>)}</ul></nav>
   </section>;
 }
 

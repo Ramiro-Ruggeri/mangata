@@ -9,25 +9,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     .filter((product) => product.source !== "local-fallback")
     .map((product) => ({
       url: `${siteUrl}/producto/${product.id}`,
-      lastModified: new Date(catalog.syncedAt),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
       images: [product.image.startsWith("http") ? product.image : `${siteUrl}${product.image}`],
     }));
 
+  // No lastModified until pieces record a real edit date: a generation timestamp would be false.
   return [
-    {
-      url: siteUrl,
-      lastModified: new Date(catalog.syncedAt),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${siteUrl}/cambios`,
-      lastModified: new Date(catalog.syncedAt),
-      changeFrequency: "monthly",
-      priority: 0.5,
-    },
+    { url: siteUrl },
+    { url: `${siteUrl}/cambios` },
     ...products,
   ];
 }

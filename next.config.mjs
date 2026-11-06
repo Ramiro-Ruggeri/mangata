@@ -20,6 +20,8 @@ const nextConfig = {
   ...(process.env.MANGATA_STANDALONE === "1" ? { output: "standalone" } : {}),
   poweredByHeader: false,
   reactCompiler: true,
+  // Canonical and description must reach every crawler inside <head>, not streamed into <body>.
+  htmlLimitedBots: /.*/,
   redirects() {
     // Retired preview alias: one storefront and one live inventory, on Hostinger.
     return [{ source: "/:path*", has: [{ type: "host", value: "mangata-store.vercel.app" }],
@@ -43,6 +45,11 @@ const nextConfig = {
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
           { key: "Content-Security-Policy", value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" },
         ],
+      },
+      {
+        // Public photos can be replaced under the same name, so no `immutable`.
+        source: "/:folder(catalog|products|campaign)/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=2592000" }],
       },
     ];
   },

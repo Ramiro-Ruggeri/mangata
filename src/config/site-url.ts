@@ -1,4 +1,4 @@
-export const PRODUCTION_SITE_URL = "https://mangata-store.vercel.app";
+export const PRODUCTION_SITE_URL = "https://mangata.com.ar";
 const PREVIOUS_VERCEL_ALIASES = new Set(["mangata-two.vercel.app", "mangata.vercel.app"]);
 
 /** The previous Vercel alias is no longer this store. Never emit it in metadata. */
