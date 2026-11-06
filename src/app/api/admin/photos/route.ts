@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import sharp from "sharp";
+import type { AdminIdentity } from "@/lib/admin/auth";
 import { adminStore, currentAdmin } from "@/lib/admin/server";
 
 const MAX_BYTES = 12 * 1024 * 1024;
+const MAX_AT_ONCE = 2;
+let working = 0;
 
 /** Re-encoding keeps only pixels: SVG, scripts and the phone's location data never get through. */
 export async function POST(request: Request) {
@@ -11,6 +14,17 @@ export async function POST(request: Request) {
   const admin = await currentAdmin();
   if (!admin) return NextResponse.json({ error: "session" }, { status: 401 });
   if (Number(request.headers.get("content-length") ?? 0) > MAX_BYTES) return NextResponse.json({ error: "size" }, { status: 413 });
+  // Decoding a large photo takes a lot of memory, and the store shares this server.
+  if (working >= MAX_AT_ONCE) return NextResponse.json({ error: "busy" }, { status: 503 });
+  working += 1;
+  try {
+    return await processPhoto(request, admin);
+  } finally {
+    working -= 1;
+  }
+}
+
+async function processPhoto(request: Request, admin: AdminIdentity) {
   const input = Buffer.from(await request.arrayBuffer());
   if (!input.length || input.length > MAX_BYTES) return NextResponse.json({ error: "size" }, { status: 413 });
   try {

@@ -19,6 +19,7 @@ import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { TribalScene } from "./TribalScene";
 import { CampaignBar, CampaignTakeover } from "./CampaignExperience";
 import { HeroSeal } from "./HeroSeal";
+import { subscribeToStock } from "@/lib/commerce/live-stock";
 import type { Campaign } from "@/config/campaign";
 import "./storefront.css";
 
@@ -259,8 +260,10 @@ export default function Storefront({ initialProducts, mode, source: initialSourc
         setSource(catalog.source);
       } catch { /* Checkout always revalidates authoritative stock. */ }
     };
+    // Live changes arrive at once; the slow timer covers a dropped connection.
+    const unsubscribe = subscribeToStock(() => void refresh());
     const interval = window.setInterval(refresh, 60_000);
-    return () => window.clearInterval(interval);
+    return () => { unsubscribe(); window.clearInterval(interval); };
   }, [mode]);
   return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a>{campaign && <CampaignBar campaign={campaign} />}<Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} campaign={campaign} /><CraftStory /><TribalScene /><Help /></main><Footer />{campaign && <CampaignTakeover campaign={campaign} />}</div></MotionConfig>;
 }

@@ -4,6 +4,7 @@ import { BAG_ADDED_EVENT } from "./BagStamp";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { CatalogResult, CommerceMode, StoreProduct } from "@/lib/commerce/types";
 import { refreshLocalCart } from "@/lib/commerce/cart-refresh";
+import { subscribeToStock } from "@/lib/commerce/live-stock";
 import CartDrawer from "@/components/CartDrawer";
 import { useExperience } from "@/components/experience/ExperienceProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
@@ -165,7 +166,8 @@ export function CartProvider({ children, mode, checkoutReady }: { children: Reac
     // Also refresh when the bag opens or the customer returns to this tab.
     refresh();
     window.addEventListener("focus", refresh);
-    return () => { active = false; controller.abort(); window.removeEventListener("focus", refresh); };
+    const unsubscribe = subscribeToStock(refresh);
+    return () => { active = false; controller.abort(); unsubscribe(); window.removeEventListener("focus", refresh); };
   }, [enqueue, mode, open]);
   const runSync = useCallback(async (request: RequestInit & { url?: string }): Promise<SyncPayload> => {
     setSyncState("syncing"); setSyncMessage(undefined);

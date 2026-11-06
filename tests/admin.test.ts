@@ -245,6 +245,28 @@ test("panel on real PostgreSQL", async t => {
       assert.deepEqual(entry.detail.price_cents, { before: 1500000, after: 2000000 });
     });
 
+    await t.test("live stock: open stores hear a sale on commit, not a rolled back one", async () => {
+      const id = await store.createProduct(admin, input());
+      await store.publish(admin, id);
+      const listener = await pool.connect();
+      let heard = 0;
+      listener.on("notification", () => { heard += 1; });
+      await listener.query("LISTEN mangata_stock");
+      try {
+        const piece = (await store.getProduct(id))!;
+        await pool.query("BEGIN; UPDATE inventory SET active=active WHERE sku='" + piece.sku + "'; ROLLBACK;");
+        await new Promise(resolve => setTimeout(resolve, 150));
+        assert.equal(heard, 0);
+        await store.recordManualSale(admin, id, { amountCents: 100, channel: "otro", note: "" });
+        await new Promise(resolve => setTimeout(resolve, 150));
+        assert.ok(heard >= 1);
+      } finally {
+        await listener.query("UNLISTEN mangata_stock");
+        listener.removeAllListeners("notification");
+        listener.release();
+      }
+    });
+
     await t.test("products: a stale screen cannot overwrite a newer change", async () => {
       const id = await store.createProduct(admin, input());
       const { version } = (await store.getProduct(id))!;

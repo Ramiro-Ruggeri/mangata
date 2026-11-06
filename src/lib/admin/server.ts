@@ -27,7 +27,7 @@ export async function pendingToken() {
 
 export async function setSessionCookie(token: string) {
   const jar = await cookies();
-  jar.delete(PENDING);
+  jar.delete({ name: PENDING, secure: true, path: "/" });
   jar.set(SESSION, token, { ...cookieOptions, maxAge: 7 * 24 * 3600 });
 }
 
@@ -35,7 +35,7 @@ export async function endSession() {
   const jar = await cookies();
   const token = jar.get(SESSION)?.value;
   if (token) await adminAuth().logout(token);
-  jar.delete(SESSION);
+  jar.delete({ name: SESSION, secure: true, path: "/" });
 }
 
 export async function currentAdmin() {

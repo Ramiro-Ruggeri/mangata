@@ -89,10 +89,12 @@ export class AdminStore {
   /** `version` rejects a save made from a screen that was opened before someone else's change. */
   async updateProduct(actor: AdminIdentity, id: number, version: string, input: ProductInput) {
     return this.transaction(actor, "edicion", null, async client => {
-      const { rows: [before] } = await client.query(`SELECT c.sku,c.updated_at::text AS version,c.description,c.category,c.measurements,c.images,c.is_new,c.cost_cents::float8 AS cost_cents,i.name,i.price_cents::float8 AS price_cents
+      const { rows: [before] } = await client.query(`SELECT c.sku,i.state,c.updated_at::text AS version,c.description,c.category,c.measurements,c.images,c.is_new,c.cost_cents::float8 AS cost_cents,i.name,i.price_cents::float8 AS price_cents
         FROM catalog_products c JOIN inventory i USING(sku) WHERE c.id=$1 FOR UPDATE OF c,i`, [id]);
       if (!before) throw new AdminError("not_found");
       if (before.version !== version) throw new AdminError("conflict");
+      // The buyer is paying the old price right now; changing it would make checkout fail.
+      if (before.state === "reserved" && before.price_cents !== input.priceCents) throw new AdminError("in_checkout");
       await client.query("UPDATE inventory SET name=$2,price_cents=$3 WHERE sku=$1", [before.sku, input.name, input.priceCents]);
       await client.query(`UPDATE catalog_products SET description=$2,category=$3,measurements=$4,images=$5,is_new=$6,cost_cents=$7,updated_at=now() WHERE id=$1`,
         [id, input.description, input.category, JSON.stringify(input.measurements), JSON.stringify(input.images), input.isNew, input.costCents]);

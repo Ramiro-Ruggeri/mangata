@@ -1,3 +1,4 @@
+import { pesosToCents } from "../src/lib/admin/money";
 import { placeTribals } from "../src/components/storefront/tribal-layout";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -73,4 +74,10 @@ test("both 3D tribals stay inside the visible scene and apart, in wide and tall 
     const apart = width >= height ? Math.abs(reflejo.x - cruz.x) : Math.abs(reflejo.y - cruz.y);
     assert.ok(apart >= Math.max(reflejo.height, cruz.height) * .9, `separation at ${width}x${height}`);
   }
+});
+
+test("a price is read in whole pesos and a decimal is refused, never multiplied", () => {
+  assert.equal(pesosToCents("25.000"), 2_500_000);
+  assert.equal(pesosToCents("$ 25000"), 2_500_000);
+  for (const bad of ["1500,50", "1500.50", "", "abc", "9".repeat(30)]) assert.ok(Number.isNaN(pesosToCents(bad)), bad);
 });

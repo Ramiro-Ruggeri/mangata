@@ -2,6 +2,7 @@
 -- objects, except the stock trigger, which only appends to its own ledger.
 -- Run as the owner role with ON_ERROR_STOP. Rollback: 003-admin.down.sql.
 BEGIN;
+SET LOCAL lock_timeout = '5s';
 
 DO $$
 BEGIN
@@ -95,6 +96,18 @@ CREATE TRIGGER inventory_stock_movement AFTER INSERT OR UPDATE ON inventory
 
 INSERT INTO stock_movements(sku, to_state, to_active, reference, kind)
   SELECT sku, state, active, held_reference, 'inicial' FROM inventory;
+
+-- Tells open stores that something changed, whoever changed it: panel, checkout, webhook or manual SQL.
+-- Delivered only on commit, so nobody sees a change that was rolled back.
+CREATE FUNCTION notify_stock_change() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  PERFORM pg_notify('mangata_stock', '');
+  RETURN NULL;
+END $$;
+CREATE TRIGGER inventory_notify AFTER INSERT OR UPDATE ON inventory
+  FOR EACH STATEMENT EXECUTE FUNCTION notify_stock_change();
+CREATE TRIGGER catalog_products_notify AFTER INSERT OR UPDATE ON catalog_products
+  FOR EACH STATEMENT EXECUTE FUNCTION notify_stock_change();
 
 -- Transfer and WhatsApp sales. Kept apart from `orders`, which only holds provider-confirmed payments.
 CREATE TABLE manual_sales (

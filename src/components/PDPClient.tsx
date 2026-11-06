@@ -1,5 +1,7 @@
 "use client";
 
+import { subscribeToStock } from "@/lib/commerce/live-stock";
+import type { CatalogResult } from "@/lib/commerce/types";
 import Image from "next/image";
 import { BrandSignature } from "@/components/brand/BrandSignature";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
@@ -19,7 +21,16 @@ import "./product/product.css";
 
 const money = (value: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value);
 
-export default function PDPClient({ product, related = [], campaignPercent }: { product: StoreProduct; related?: StoreProduct[]; campaignPercent?: number }) {
+export default function PDPClient({ product: initialProduct, related = [], campaignPercent }: { product: StoreProduct; related?: StoreProduct[]; campaignPercent?: number }) {
+  const [product, setProduct] = useState(initialProduct);
+  useEffect(() => subscribeToStock(() => {
+    fetch("/api/store/catalog", { cache: "no-store" }).then(response => response.ok ? response.json() : null).then((catalog: CatalogResult | null) => {
+      if (!catalog) return;
+      const current = catalog.products.find(item => item.id === initialProduct.id);
+      // A piece that left the catalog can no longer be bought from this open page.
+      setProduct(previous => current ?? { ...previous, inventory: { ...previous.inventory, isInStock: false, availability: "sold" } });
+    }).catch(() => undefined);
+  }), [initialProduct.id]);
   const [current, setCurrent] = useState(0);
   const { activeOverlay, openOverlay, closeOverlay } = useExperience();
   const zoomOpen = activeOverlay === "zoom";

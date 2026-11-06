@@ -4,12 +4,11 @@ import { renderSVG } from "uqr";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { MAX_CENTS, pesosToCents } from "@/lib/admin/money";
 import { AdminError, FULFILLMENT, type ProductInput, type SaleChannel } from "@/lib/admin/store";
 import { adminAuth, adminStore, clientIp, endSession, pendingToken, requireAdmin, setPendingCookie, setSessionCookie } from "@/lib/admin/server";
 
 const text = (form: FormData, key: string) => String(form.get(key) ?? "").trim();
-const pesosToCents = (value: string) => Math.round(Number(value.replace(/[^\d]/g, "")) * 100);
-
 function storeChanged(id?: number) {
   revalidatePath("/");
   if (id) revalidatePath(`/producto/${id}`);
@@ -75,10 +74,10 @@ export async function activate(state: ActivationState, form: FormData): Promise<
 
 const productSchema = z.object({
   name: z.string().min(1).max(120),
-  priceCents: z.number().int().positive().max(100_000_000_00),
+  priceCents: z.number().int().positive().max(MAX_CENTS),
   description: z.string().max(2000),
   category: z.string().min(1).max(40),
-  images: z.array(z.string().regex(/^\/(media\/[0-9a-f-]{36}|(catalog|products)\/[\w./-]+)$/)).max(12),
+  images: z.array(z.string().regex(/^\/(media\/[0-9a-f-]{36}|(catalog|products)\/(?!.*\.\.)[\w./-]+)$/)).max(12),
   costCents: z.number().int().nonnegative().nullable(),
 });
 
@@ -144,7 +143,7 @@ export async function recordSale(id: number, form: FormData) {
   const back = `/admin/productos/${id}`;
   const amountCents = pesosToCents(text(form, "amount"));
   const channel = text(form, "channel") as SaleChannel;
-  if (amountCents <= 0 || !CHANNELS.includes(channel)) redirect(`${back}?error=invalid`);
+  if (!(amountCents > 0) || !CHANNELS.includes(channel)) redirect(`${back}?error=invalid`);
   await guarded(back, async () => { await adminStore().recordManualSale(admin, id, { amountCents, channel, note: text(form, "note").slice(0, 500) }); });
   storeChanged(id);
   redirect(`${back}?ok=vendida`);
