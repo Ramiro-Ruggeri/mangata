@@ -1,7 +1,7 @@
 /* Interface controls only. Product cards, galleries and purchase buttons keep their own design. */
 .cart-header .icon-button {
   border-radius: 50%;
-  border-color: #bcb6ad;
+  border-color: var(--line-strong);
 }
 
 .cart-footer .cart-checkout {
@@ -22,7 +22,7 @@
   height: 32px;
   padding: 6px;
   border-radius: 50%;
-  background: #ffffff12;
+  background: var(--hover);
 }
 
 .cart-footer .cart-checkout:disabled {
@@ -48,28 +48,28 @@
 .privacy-banner .privacy-action,
 .privacy-dialog .privacy-action {
   border-radius: 4px;
-  box-shadow: inset 0 1px 0 #ffffff08;
+  box-shadow: inset 0 1px 0 var(--line);
 }
 
 .privacy-dialog .privacy-close {
-  border: 1px solid #ffffff24;
+  border: 1px solid var(--line);
   border-radius: 50%;
   transition: background var(--motion-feedback), border-color var(--motion-feedback);
 }
 
 .privacy-footer :is(a, button) {
-  text-decoration-color: #777067;
+  text-decoration-color: var(--line-strong);
   transition: color var(--motion-feedback), text-decoration-color var(--motion-feedback);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .cart-footer .cart-checkout:not(:disabled):hover { background: #34303b; border-color: #34303b; transform: none; }
-  .cart-header .icon-button:hover { background: #101010; color: #eeeae2; border-color: #101010; }
-  .cart-footer .cart-clear:hover, .cart-empty .text-link:hover { color: #514374; }
-  .checkout-status-actions > :is(a, button):hover { background: #c5b9ee; border-color: #c5b9ee; color: #101010; }
-  .store-state .store-state-action:hover { background: #d8cef8; }
-  .privacy-dialog .privacy-close:hover { background: #ffffff12; border-color: #b8ada1; }
-  .privacy-footer :is(a, button):hover { color: #eeeae2; text-decoration-color: currentColor; }
+  .cart-footer .cart-checkout:not(:disabled):hover { background: var(--primary-hover); border-color: var(--primary-hover); transform: none; }
+  .cart-header .icon-button:hover { background: var(--primary-bg); color: var(--primary-fg); border-color: var(--primary-bg); }
+  .cart-footer .cart-clear:hover, .cart-empty .text-link:hover { color: var(--focus); }
+  .checkout-status-actions > :is(a, button):hover { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .store-state .store-state-action:hover { background: var(--accent-hover); }
+  .privacy-dialog .privacy-close:hover { background: var(--hover); border-color: var(--line-strong); }
+  .privacy-footer :is(a, button):hover { color: var(--text); text-decoration-color: currentColor; }
 }
 
 .cart-footer .cart-checkout:not(:disabled):active,

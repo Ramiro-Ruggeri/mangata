@@ -16,3 +16,9 @@ export function searchProducts(products: StoreProduct[], query: string) {
     return terms.every(term => text.includes(term));
   });
 }
+
+/** Pieces to offer next: only what can still be bought, closest category first, keeping the store's order. */
+export function relatedPieces(products: StoreProduct[], current: StoreProduct, limit = 4) {
+  const candidates = products.filter(product => product.id !== current.id && product.inventory.isInStock);
+  return [...candidates.filter(product => product.category === current.category), ...candidates.filter(product => product.category !== current.category)].slice(0, limit);
+}

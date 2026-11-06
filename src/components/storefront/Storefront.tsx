@@ -15,6 +15,7 @@ import type { CatalogResult, CatalogSource, CommerceMode, StoreProduct } from "@
 import { PURCHASE_POLICY, SITE, WITHDRAWAL_HREF, whatsappHref } from "@/config/site";
 import { matchesCategory, searchProducts } from "@/lib/catalog-view";
 import { productImageView } from "@/lib/product-images";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { MaterialPlayground } from "./MaterialPlayground";
 import "./storefront.css";
 
@@ -49,6 +50,7 @@ function Header({ onSearch }: { onSearch: () => void }) {
       <nav className="mg-desktop-nav" aria-label="Navegación principal"><a href="#coleccion">La colección</a><a href="#manifiesto">Cómo lo hacemos</a><a href="#ayuda">Hablemos</a></nav>
       <div className="mg-header-actions">
         <button onClick={onSearch} className="mg-icon-button" aria-label="Buscar una pieza"><Search size={20} strokeWidth={1.5} /></button>
+        <ThemeToggle />
         <button onClick={openCart} className="mg-cart-button" aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} /><span className="mg-bag-label">Bolsa</span><span key={count} className="mg-cart-count" data-filled={count > 0}>{count}</span></button>
         <button onClick={() => setMenuOpen(true)} className="mg-icon-button mg-menu-toggle" aria-label="Abrir menú"><Menu size={22} strokeWidth={1.5} /></button>
       </div>
@@ -94,6 +96,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
     </div>
     {featured && <div className="mg-hero-visual">
       <Link className="mg-hero-photo" data-photo-surface={featured.image.startsWith("/catalog/") ? "light" : undefined} href={`/producto/${featured.id}`} aria-label={`Ver ${featured.name}`} onClick={() => selectProduct(featured, "hero")}><Image src={featured.image} alt={featured.name} fill preload sizes="(max-width: 700px) 50vw, (max-width: 1135px) 46vw, 520px" /></Link>
+      <div className="mg-hero-reflection" aria-hidden="true"><span><Image src={featured.image} alt="" fill sizes="(max-width: 700px) 50vw, (max-width: 1135px) 46vw, 520px" /></span></div>
       <span className="mg-hero-ticket"><i aria-hidden="true">M</i><span><strong>Pieza única</strong><small>Sin reposición</small></span></span>
       <Link className="mg-hero-product" href={`/producto/${featured.id}`} onClick={() => selectProduct(featured, "hero_label")}><span><small>La pieza de portada</small><strong>{featured.name}</strong></span><span>{money(featured.price)} <ArrowUpRight size={22} /></span></Link>
     </div>}
@@ -170,7 +173,8 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     const curated = ["Bermuda Tribal", "Bandoo Moñito", "Blazer Cuadrillé", "Bermuda Oscuridad", "Camisa Crop Cuadrillé", "Boxy Black", "Buzo Alitas", "Camisa Jappon"];
     return result.sort((a, b) => {
       const aRank = curated.indexOf(a.name), bRank = curated.indexOf(b.name);
-      return (aRank === -1 ? 999 : aRank) - (bRank === -1 ? 999 : bRank);
+      // A piece someone can still buy always comes before one that is gone.
+      return Number(b.inventory.isInStock) - Number(a.inventory.isInStock) || (aRank === -1 ? 999 : aRank) - (bRank === -1 ? 999 : bRank);
     });
   }, [products, category, onlyAvailable, sort]);
   return <section ref={sectionRef} id="coleccion" className="mg-collection mg-shell" aria-labelledby="collection-title">

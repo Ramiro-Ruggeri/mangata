@@ -1,0 +1,133 @@
+/* Night is the brand's default: the name is the moon's reflection on water. Every store surface reads these tokens. */
+:root {
+  color-scheme: dark;
+  --surface: #0b0d12;
+  --surface-2: #12151c;
+  --surface-3: #1b1f29;
+  --text: #e9eaf0;
+  --text-2: #b4b8c4;
+  --line: #ffffff1f;
+  --line-strong: #ffffff4d;
+  --hover: #ffffff12;
+  --accent: #c9d3ff;
+  --accent-hover: #dde3ff;
+  --accent-ink: #0b0d12;
+  --accent-soft: #c9d3ff17;
+  --primary-bg: #e9eaf0;
+  --primary-fg: #0b0d12;
+  --primary-hover: #ffffff;
+  --plate: #f3f2ee;
+  --plate-filter: brightness(.95);
+  --header-bg: #0b0d12d9;
+  --focus: #c9d3ff;
+  --ok: #7fd6a0;
+  --danger: #ffb4ab;
+  --danger-soft: #ffb4ab17;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --surface: #eeeae2;
+  --surface-2: #e6e1d7;
+  --surface-3: #dcd6ca;
+  --text: #11131a;
+  --text-2: #55534c;
+  --line: #11131a24;
+  --line-strong: #11131a5c;
+  --hover: #11131a0d;
+  --accent: #443a86;
+  --accent-hover: #352c6d;
+  --accent-ink: #ffffff;
+  --accent-soft: #443a8612;
+  --primary-bg: #11131a;
+  --primary-fg: #f4f1ea;
+  --primary-hover: #2b2c38;
+  --plate: #f3f2ee;
+  --plate-filter: none;
+  --header-bg: #eeeae2d9;
+  --focus: #443a86;
+  --ok: #14703a;
+  --danger: #9b2929;
+  --danger-soft: #b1313117;
+}
+
+html, body { background: var(--surface); }
+body { color: var(--text); }
+::selection { background: var(--accent); color: var(--accent-ink); }
+:focus-visible { outline-color: var(--focus); }
+
+/* Bright studio photos soften at night, without touching their color. */
+.mg-product-media, .mg-hero-photo, .product-image-stage, .cart-line-image, .product-thumbnails button { filter: var(--plate-filter); }
+.mg-search-thumb, .cart-line-image { background: var(--plate); }
+
+/* The supplied PNG has opaque black corners, invisible only on pure black. */
+.brand-signature img { border-radius: 50%; }
+
+/* The first paint of a session only. See the script in layout.tsx. */
+:root[data-flash="seen"] .brand-flash { display: none; }
+
+/* Theme change: a disc of the new theme grows from the button, like light crossing the water. */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { animation: theme-reveal 520ms cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes theme-reveal {
+  from { clip-path: circle(0 at var(--theme-x, 100%) var(--theme-y, 0%)); }
+  to { clip-path: circle(var(--theme-r, 150vmax) at var(--theme-x, 100%) var(--theme-y, 0%)); }
+}
+
+.theme-toggle { position: relative; display: inline-grid; flex: 0 0 auto; width: 44px; height: 44px; place-items: center; border: 1px solid transparent; border-radius: 50%; padding: 0; background: transparent; color: inherit; cursor: pointer; transition: background 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.theme-toggle:active { transform: scale(.94); }
+.theme-toggle:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.theme-toggle-icon { display: block; width: 22px; height: 22px; overflow: visible; }
+.theme-toggle-disc { fill: currentColor; }
+.theme-toggle-shadow { transform: translate(0, 0); transition: transform 460ms cubic-bezier(.22, 1, .36, 1); }
+.theme-toggle-rays { stroke: currentColor; stroke-width: 1.5; stroke-linecap: round; opacity: 0; transform: rotate(-40deg) scale(.7); transform-origin: 12px 12px; transition: opacity 240ms ease, transform 460ms cubic-bezier(.22, 1, .36, 1); }
+.theme-toggle-core { transform: scale(1); transform-origin: 12px 12px; transition: transform 460ms cubic-bezier(.22, 1, .36, 1); }
+/* In the light theme the button shows the moon's full disc with its rays. */
+:root[data-theme="light"] .theme-toggle-shadow { transform: translate(14px, -14px); }
+:root[data-theme="light"] .theme-toggle-rays { opacity: 1; transform: none; }
+:root[data-theme="light"] .theme-toggle-core { transform: scale(.62); }
+.theme-toggle-hint { position: absolute; z-index: 5; top: calc(100% + 6px); left: 50%; padding: 6px 9px; border: 1px solid var(--line); background: var(--surface-3); color: var(--text); font-size: 11px; line-height: 1.3; white-space: nowrap; opacity: 0; pointer-events: none; transform: translate(-50%, -3px); transition: opacity 140ms ease, transform 140ms ease; }
+@media (hover: hover) and (pointer: fine) {
+  .theme-toggle:hover { background: var(--hover); border-color: var(--line-strong); }
+  .theme-toggle:hover .theme-toggle-hint { opacity: 1; transform: translate(-50%, 0); transition-delay: 350ms; }
+}
+.theme-toggle:focus-visible .theme-toggle-hint { opacity: 1; transform: translate(-50%, 0); }
+
+/* Related pieces: every product page leads to another available one, and a sold piece never dead-ends. */
+.product-related { width: min(100% - 80px, 1400px); margin-inline: auto; border-top: 1px solid var(--line); padding-block: 44px 72px; }
+.product-related h2 { margin: 0 0 24px; font-family: var(--font-display), Arial, sans-serif; font-size: clamp(24px, 2.2vw, 32px); font-weight: 500; letter-spacing: -.04em; }
+.product-related-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
+.product-related-photo { position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden; background: var(--plate); filter: var(--plate-filter); }
+.product-related-photo img { object-fit: contain; transition: transform var(--motion-editorial, 400ms) var(--motion-ease, ease); }
+@media (hover: hover) and (pointer: fine) { .product-related a:hover img { transform: scale(1.03); } }
+.product-related-name { display: block; margin-top: 12px; font-size: 14px; font-weight: 500; }
+.product-related-price { display: block; margin-top: 3px; color: var(--text-2); font-size: 14px; }
+.product-header .theme-toggle { justify-self: end; }
+.product-header-actions { display: flex; align-items: center; justify-self: end; gap: 6px; }
+@media (max-width: 800px) {
+  .product-related { width: calc(100% - 40px); padding-block: 32px 48px; }
+  .product-related-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
+}
+
+/* Screens outside the storefront, styled in globals.css. */
+.cart-panel { background: var(--surface-2); color: var(--text); }
+.cart-header, .cart-line, .cart-footer { border-color: var(--line); }
+.cart-header sup, .cart-empty, .cart-line-top span, .one-of-one, .cart-sync, .cart-note, .cart-policy, .cart-assurance { color: var(--text-2); }
+.cart-line-top button, .cart-clear, .text-link { color: var(--text-2); }
+.cart-clear { border-bottom-color: var(--line-strong); }
+.cart-policy { border-color: var(--line); }
+.cart-policy summary, .cart-policy a { color: var(--text); }
+.cart-delivery-confirm input { accent-color: var(--accent); }
+.cart-error { background: var(--danger-soft); color: var(--danger); }
+.cart-assurance-check { color: var(--ok); }
+.cart-panel .cart-checkout { background: var(--primary-bg); color: var(--primary-fg); }
+.cart-panel :is(a, button):focus-visible { outline-color: var(--focus); }
+.icon-button { border-color: var(--line-strong); color: var(--text); }
+.store-state { background: var(--surface); color: var(--text); }
+.store-state-content > span, .store-state p { color: var(--text-2); }
+.store-state-action { background: var(--primary-bg); color: var(--primary-fg); }
+.privacy-footer { border-top-color: var(--line); background: var(--surface-2); color: var(--text-2); }
+.checkout-status { background: var(--surface); color: var(--text); }
+.checkout-status-card { border-color: var(--line); background: var(--surface-2); }
+.checkout-status-card p, .checkout-reference, .checkout-status-foot { color: var(--text-2); }
+.checkout-status-actions a, .checkout-status-actions button { border-color: var(--line-strong); color: var(--text); }
+.checkout-status-actions > :first-child { background: var(--primary-bg); color: var(--primary-fg); }

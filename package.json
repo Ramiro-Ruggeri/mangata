@@ -9,7 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:database": "node --import tsx --test tests/postgres-orders.test.ts",
-    "test": "node --import tsx --test tests/commerce.test.ts tests/consent.test.ts tests/experience.test.ts tests/site-url.test.ts",
+    "test": "node --import tsx --test tests/commerce.test.ts tests/consent.test.ts tests/experience.test.ts tests/site-url.test.ts tests/theme.test.ts",
     "test:seo": "node --test tests/seo-http.mjs",
     "images:brand": "node scripts/prepare-brand-campaign.mjs",
     "images:optimize": "node scripts/optimize-product-images.mjs",
