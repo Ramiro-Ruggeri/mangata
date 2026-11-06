@@ -3,7 +3,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import PDPClient from "@/components/PDPClient";
-import { getProduct } from "@/lib/commerce/catalog";
+import { currentCampaign } from "@/config/campaign";
+import { getCatalog, getProduct } from "@/lib/commerce/catalog";
+import { relatedPieces } from "@/lib/catalog-view";
 import { getSiteUrl } from "@/config/site-url";
 
 type Params = { id: string };
@@ -48,6 +50,7 @@ export default async function Page({ params }: Props) {
   const { id } = await params;
   const product = await loadProduct(id);
   if (!product) notFound();
+  const related = relatedPieces((await getCatalog()).products, product);
   const productUrl = new URL(`/producto/${product.id}`, siteUrl).toString();
   const jsonLd = {
     "@context": "https://schema.org",
@@ -82,6 +85,6 @@ export default async function Page({ params }: Props) {
   };
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
-    <PDPClient key={product.id} product={product} />
+    <PDPClient key={product.id} product={product} related={related} campaignPercent={currentCampaign()?.percent} />
   </>;
 }

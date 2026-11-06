@@ -7,6 +7,9 @@ Reviewed 2026-09-14. This is an implementation inventory and release checklist, 
 | Mechanism | Actual purpose | Retention / conditions |
 | --- | --- | --- |
 | `localStorage.mangata_cart_v2` | Operational bag contents; no stock reservation | Until bag/site data is cleared; legacy `mngt_cart_v1` removed on write |
+| `localStorage.mangata_theme` | Visual preference (`dark` or `light`), no personal data | Until site data is cleared | 
+| `localStorage.mangata_campaign_closed_*` | Remembers a dismissed announcement, per campaign; no personal data | Until site data is cleared |
+| `sessionStorage.mangata_intro` | Shows the brand intro once per session | Until the tab closes |
 | `localStorage.mangata_privacy_v1` | Version, analytics choice, decision and expiry timestamps | 180 days; version/expiry/malformed values fail closed |
 | `mangata_evershop_cart` cookie | Operational connected cart | Up to 30 days, HttpOnly, SameSite=Lax, Secure in production; created only in remote cart flow |
 | `mangata_checkout_intent` cookie | Signed operational payment/session match | Up to 48 hours, HttpOnly, SameSite=Lax, Secure; payment flow must be configured |
@@ -20,6 +23,8 @@ Reviewed 2026-09-14. This is an implementation inventory and release checklist, 
 No GTM, Google Analytics, Meta Pixel, Vercel Analytics, marketing SDK, tracking iframe or client analytics fetch was found in this version. Deployment-provider access logs and injected scripts are not verifiable from source alone: inspect the deployed environment before release.
 
 ## Consent contract
+
+The first-layer banner is off (`ASK_FOR_CONSENT` in `ConsentProvider.tsx`) since 2026-11-06: no collector is connected and optional measurement stays off without an explicit choice, available from the footer. It must come back, or be replaced, before connecting any measurement service. This is an engineering decision, not legal advice: confirm it in the pending legal review.
 
 - No choice, false, invalid JSON, expired timestamp, future timestamp, changed version, or a duration extended beyond the configured interval means no optional measurement.
 - SSR emits no permission. `useSyncExternalStore` uses a hydration sentinel so a returning decision does not flash a consent banner.

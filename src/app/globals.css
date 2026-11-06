@@ -36,9 +36,10 @@ section[id] { scroll-margin-top: 5rem; }
 
 /* Authentic raster mark, shared across the buying journey; never distorted or redrawn. */
 .brand-signature { display: inline-flex; align-items: center; gap: 9px; vertical-align: middle; white-space: nowrap; }
-.brand-signature img { display: block; width: 40px; height: 40px; flex: 0 0 40px; object-fit: contain; }
+.mangata-mark { display: block; background: currentColor; -webkit-mask: url(/brand/mangata-mark.svg) center / contain no-repeat; mask: url(/brand/mangata-mark.svg) center / contain no-repeat; }
+.brand-signature .mangata-mark { width: 40px; height: 40px; flex: 0 0 40px; }
 .brand-signature > span { font-family: var(--font-display), Arial, sans-serif; font-size: 25px; font-weight: 700; line-height: 1; letter-spacing: -.065em; }
-.brand-signature-symbol img { width: 36px; height: 36px; flex-basis: 36px; }
+.brand-signature-symbol .mangata-mark { width: 36px; height: 36px; flex-basis: 36px; }
 .privacy-footer { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 28px; border-top: 1px solid #34322e; background: #101010; color: #bcb8b0; padding: 12px 20px calc(18px + var(--mobile-purchase-height, 0px)); }
 .privacy-footer a, .privacy-footer button { display: inline-flex; align-items: center; min-height: 44px; border: 0; background: transparent; padding: 6px 0; color: inherit; font: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; }
 .privacy-footer :is(a, button):hover { color: #eeeae2; }
@@ -46,11 +47,11 @@ section[id] { scroll-margin-top: 5rem; }
 .cart-body { min-height: 0; overscroll-behavior: contain; }
 .cart-header > div { display: flex; align-items: center; gap: 10px; }
 .cart-header .brand-signature { flex-shrink: 0; }
-.cart-header .brand-signature img { border-radius: 50%; }
+.cart-header .brand-signature .mangata-mark { border-radius: 50%; }
 .cart-header h2 { margin: 0 !important; }
 @media (max-width: 700px) {
   .brand-signature { gap: 6px; }
-  .brand-signature img { width: 32px; height: 32px; flex-basis: 32px; }
+  .brand-signature .mangata-mark { width: 32px; height: 32px; flex-basis: 32px; }
   .brand-signature > span { font-size: 22px; }
 }
 @media (max-height: 740px) {

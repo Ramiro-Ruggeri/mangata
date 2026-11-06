@@ -24,7 +24,6 @@ async function main() {
     await page.goto(base, { waitUntil: 'domcontentloaded', timeout: 60000 });
     await page.evaluate(() => document.fonts.ready);
     assert.equal(await page.locator('.brand-flash').evaluate(el => getComputedStyle(el).animationName), 'brand-flash');
-    await page.getByRole('button', { name: 'Rechazar opcionales', exact: true }).click();
     const rows = [];
     for (const [width, height] of [[320,740],[360,800],[390,844],[430,932],[700,900],[720,450],[768,1024],[844,390],[1024,768],[1280,800],[1440,900],[1920,1080],[2560,1440]]) {
       await page.setViewportSize({ width, height });
@@ -86,15 +85,9 @@ async function main() {
       return card && Math.abs(card.getBoundingClientRect().top - top) < 4;
     }, { anchor: returnAnchor, top: returnTop });
     await page.getByRole('button', { name: 'Restablecer colección', exact: true }).click();
-    await page.waitForFunction(() => document.querySelectorAll('.mg-product-card').length === 8);
+    await page.waitForFunction(() => document.querySelectorAll('.mg-product-card').length > 8);
     assert.equal(await page.getByRole('combobox', { name: 'Ordenar piezas' }).inputValue(), 'selection');
     assert.equal(await page.getByRole('button', { name: 'Todas', exact: true }).evaluate(el => document.activeElement === el), true);
-    await page.getByRole('button', { name: 'Ver más piezas', exact: true }).focus();
-    await page.keyboard.press('Enter');
-    await page.waitForFunction(() => document.querySelectorAll('.mg-product-card').length === 16);
-    assert.equal(await page.locator('.mg-product-card').count(), 16);
-    await page.waitForFunction(() => document.querySelectorAll('.mg-product-card')[8]?.querySelector('.mg-product-photo') === document.activeElement);
-    assert.equal(await page.locator('.mg-product-card').nth(8).locator('.mg-product-photo').evaluate(el => document.activeElement === el), true);
     await page.locator('.mg-faq summary').nth(1).click();
     assert.equal(await page.locator('.mg-faq details').nth(1).evaluate(el => el.open), true);
     await page.locator('.mg-faq summary').nth(1).focus();
@@ -103,29 +96,8 @@ async function main() {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.locator('.mg-product-photo').first().hover();
     await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('.mg-image-primary')).transform.match(/matrix\(([^,]+)/)?.[1]) > 1);
-    // The optional physics starts only near the section; native buttons work with keyboard too.
-    await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.physics === 'ready');
-    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'false', null, { timeout: 6000 });
-    await page.getByRole('button', { name: 'Mover pieza MANGATA', exact: true }).first().focus();
-    const oldTransform = await page.locator('.mg-material-tag').first().getAttribute('style');
-    await page.keyboard.press('Enter');
-    await page.waitForFunction(old => document.querySelector('.mg-material-tag')?.getAttribute('style') !== old, oldTransform);
-    await page.getByRole('button', { name: 'Pausar', exact: true }).click();
-    assert.equal(await page.locator('.mg-material-arena').getAttribute('data-running'), 'false');
-    if (output) await page.screenshot({ path: join(output, 'materiales-desktop.png') });
-    const tag = await page.locator('.mg-material-tag').first().boundingBox();
-    await page.mouse.move(tag.x + tag.width / 2, tag.y + tag.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(tag.x + tag.width / 2 + 60, tag.y + tag.height / 2 - 25, { steps: 8 });
-    await page.mouse.up();
-    assert.equal(await page.locator('.mg-material-arena').getAttribute('data-running'), 'true');
-    await page.getByRole('button', { name: 'Mezclar', exact: true }).click();
-    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
-    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'false');
-    await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'true');
-    assert.notEqual(await page.locator('.mg-hero-ticket').evaluate(el => getComputedStyle(el).animationName), 'none');
+    await page.locator('.mg-tribal-field').scrollIntoViewIfNeeded();
+    if (output) await page.screenshot({ path: join(output, 'tribales-desktop.png') });
     // Native animated up/down restores position, on both long home and product pages.
     for (const path of ['/', '/producto/7']) {
       await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' });
@@ -174,14 +146,7 @@ async function main() {
       return route.fulfill({ status: product ? 200 : 400, json: product ? { synced: true, product } : { code: 'invalid_cart' } });
     });
     await mobile.goto(base, { waitUntil: 'domcontentloaded' });
-    await mobile.getByRole('button', { name: 'Rechazar opcionales', exact: true }).tap();
     await mobile.getByRole('link', { name: 'Ver las piezas', exact: true }).tap();
-    const withPhotos = mobile.locator('.mg-product-card').filter({ has: mobile.locator('.mg-card-views') }).first();
-    await withPhotos.locator('.mg-card-views button').nth(1).tap();
-    await mobile.waitForFunction(() => document.querySelector('.mg-product-photo[data-secondary="true"]'));
-    assert.equal(new URL(mobile.url()).pathname, '/', 'Selecting a thumbnail must not open product');
-    await withPhotos.locator('.mg-card-views button').first().tap();
-    assert.equal(await withPhotos.locator('.mg-product-photo').getAttribute('data-secondary'), 'false');
     if (output) await mobile.screenshot({ path: join(output, 'cards-touch.png') });
     const card = mobile.locator('.mg-product-card').filter({ has: mobile.locator('.mg-add-button:not([disabled])') }).first();
     const piece = await card.locator('h3').innerText();

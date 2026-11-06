@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { BrandSignature } from "@/components/brand/BrandSignature";
+import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { useExperience } from "@/components/experience/ExperienceProvider";
 import { useNativeDialog } from "@/components/ui/useNativeDialog";
 import Link from "next/link";
@@ -9,6 +10,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, LockKeyhole, MessageCircle, Plus, ShoppingBag, X, ZoomIn } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
+import { BagStamp } from "@/components/commerce/BagStamp";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { StoreProduct } from "@/lib/commerce/types";
 import { PURCHASE_POLICY, whatsappHref } from "@/config/site";
@@ -17,7 +19,7 @@ import "./product/product.css";
 
 const money = (value: number) => new Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS", maximumFractionDigits: 0 }).format(value);
 
-export default function PDPClient({ product }: { product: StoreProduct }) {
+export default function PDPClient({ product, related = [], campaignPercent }: { product: StoreProduct; related?: StoreProduct[]; campaignPercent?: number }) {
   const [current, setCurrent] = useState(0);
   const { activeOverlay, openOverlay, closeOverlay } = useExperience();
   const zoomOpen = activeOverlay === "zoom";
@@ -90,7 +92,7 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
       <header className="product-header">
         <Link href="/#coleccion" className="product-header-back" aria-label="Volver a la colección"><ArrowLeft size={19} strokeWidth={1.5} aria-hidden="true" /><span>Colección</span></Link>
         <Link href="/" className="product-wordmark" aria-label="MANGATA, inicio"><BrandSignature /></Link>
-        <button className="product-header-bag" onClick={openCart} aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} aria-hidden="true" /><span>Bolsa</span><span className="product-bag-count">{count}</span></button>
+        <div className="product-header-actions"><ThemeToggle /><button className="product-header-bag" onClick={openCart} aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} aria-hidden="true" /><span>Bolsa</span><span className="product-bag-count">{count}</span><BagStamp /></button></div>
       </header>
 
       <nav className="product-breadcrumb" aria-label="Ruta de navegación">
@@ -101,7 +103,7 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
         <div className="product-heading">
           <div className="product-heading-top"><span>{product.category}</span><span className="product-sku">{product.sku}</span></div>
           <h1>{product.name}</h1>
-          <div className="product-price-row"><strong>{money(product.price)}</strong>{product.compareAtPrice != null && product.compareAtPrice > product.price && <del>{money(product.compareAtPrice)}</del>}</div>
+          <div className="product-price-row"><strong>{money(product.price)}</strong>{product.compareAtPrice != null && product.compareAtPrice > product.price && <del>{money(product.compareAtPrice)}</del>}{campaignPercent != null && available && <span className="mg-sale-chip mg-sale-chip-inline">{campaignPercent}% OFF · ya aplicado</span>}</div>
           {product.transferPrice != null && product.transferPrice < product.price && <p className="product-transfer"><span>{money(product.transferPrice)}</span> por transferencia</p>}
         </div>
 
@@ -147,6 +149,11 @@ export default function PDPClient({ product }: { product: StoreProduct }) {
           <Link className="product-continue" href="/#coleccion"><span>{available ? "Seguir viendo la colección" : "Ver otras piezas de la colección"}</span><ArrowRight size={20} strokeWidth={1.4} aria-hidden="true" /></Link>
         </div>
       </div>
+
+      {related.length > 0 && <section className="product-related" aria-labelledby="product-related-title">
+        <h2 id="product-related-title">{available ? "Otras piezas disponibles" : "Piezas disponibles"}</h2>
+        <div className="product-related-grid">{related.map((piece) => <Link key={piece.id} href={`/producto/${piece.id}`} onClick={() => trackCommerceEvent("select_item", { currency: "ARS", value: piece.price, item_id: piece.sku, item_name: piece.name, item_category: piece.category, source: "product_related" })}><span className="product-related-photo"><Image src={piece.image} alt={piece.name} fill loading="lazy" sizes="(max-width: 800px) 50vw, 25vw" /></span><span className="product-related-name">{piece.name}</span><span className="product-related-price">{money(piece.price)}</span></Link>)}</div>
+      </section>}
 
       <footer className="product-footer"><Link href="/">MANGATA</Link><span>Upcycling desde Córdoba.</span><a href="https://www.instagram.com/mangata.upcy" target="_blank" rel="noopener noreferrer">Instagram <ArrowUpRight size={14} aria-hidden="true" /></a></footer>
 

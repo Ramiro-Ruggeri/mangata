@@ -1,6 +1,7 @@
 // src/app/layout.tsx
 import "./globals.css";
 import "@/components/ui/interface-actions.css";
+import "@/components/theme/theme.css";
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Plus_Jakarta_Sans } from "next/font/google";
 import { CartProvider } from "@/components/commerce/CartProvider";
@@ -12,6 +13,7 @@ import { PrivacyFooter } from "@/components/PrivacyFooter";
 import { getCommerceMode } from "@/lib/commerce/catalog";
 import { getCheckoutReady } from "@/lib/commerce/readiness";
 import { getSiteUrl } from "@/config/site-url";
+import { THEME_BOOT_SCRIPT, THEME_COLORS } from "@/components/theme/theme";
 
 /* =========================
  * Fuentes (next/font) — swap para evitar FOIT
@@ -34,8 +36,8 @@ const body = Plus_Jakarta_Sans({
  * Viewport / PWA hints
  * ========================= */
 export const viewport: Viewport = {
-  themeColor: "#090909",
-  colorScheme: "dark",
+  themeColor: THEME_COLORS.dark,
+  colorScheme: "dark light",
   width: "device-width",
   initialScale: 1,
 };
@@ -98,7 +100,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: "/icon.png",
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }, { url: "/icon.png", type: "image/png" }],
     shortcut: "/icon.png",
     apple: "/apple-icon.png",
   },
@@ -120,11 +122,14 @@ export default function RootLayout({
   return (
     <html
       lang="es"
+      data-theme="dark"
+      suppressHydrationWarning
       dir="ltr"
       data-scroll-behavior="smooth"
       className={`${display.variable} ${body.variable}`}
     >
       <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT_SCRIPT }} />
         {/* JSON-LD Organization */}
         <script
           type="application/ld+json"

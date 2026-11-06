@@ -57,12 +57,18 @@ function PreferencesDialog({ analytics, onSave, onClose }: { analytics: boolean;
   );
 }
 
+/**
+ * No measurement service is connected, so nothing optional leaves the browser and there is nothing to ask yet.
+ * Measurement stays off without an explicit choice, available from the footer. Turn this on with the first real collector.
+ */
+const ASK_FOR_CONSENT: boolean = false;
+
 export function ConsentProvider({ children }: { children: React.ReactNode }) {
   const { activeOverlay, openOverlay, closeOverlay } = useExperience();
   const raw = useSyncExternalStore(subscribeConsent, getConsentSnapshot, getServerConsentSnapshot);
   const consent = parseConsent(raw);
   const ready = raw !== "";
-  const showBanner = ready && !consent && !activeOverlay;
+  const showBanner = ASK_FOR_CONSENT && ready && !consent && !activeOverlay;
   const [message, setMessage] = useState("");
   const [memoryOnly, setMemoryOnly] = useState(false);
   const bannerRef = useRef<HTMLElement>(null);
