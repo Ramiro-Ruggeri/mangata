@@ -86,10 +86,11 @@
 }
 @media (prefers-reduced-motion: reduce) { .privacy-dialog[open] { animation: none; } .privacy-action, .privacy-toggle input, .privacy-toggle input::before { transition: none; } .privacy-dialog::backdrop { backdrop-filter: none; } }
 
-/* One sentence and one button along the bottom edge. It never covers the buying controls. */
-.privacy-banner { inset: auto 0 var(--mobile-purchase-height, 0px) 0; width: auto; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: none; align-items: center; gap: 14px; padding: 6px max(14px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left)); border: 0; border-top: 1px solid var(--line); background: var(--header-bg); box-shadow: none; }
-.privacy-banner p { grid-column: 1; min-width: 0; max-width: none; color: var(--text); font-size: 12px; line-height: 1.35; }
-.privacy-banner b { font-weight: 600; }
-.privacy-banner-options { border: 0; padding: 0; background: none; color: var(--text-2); font: inherit; text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
-.privacy-banner-accept { grid-column: 2; min-height: 36px; border: 1px solid var(--accent); padding: 0 14px; background: none; color: var(--accent); font: 500 13px/1 var(--font-body), sans-serif; cursor: pointer; }
-@media (min-width: 701px) { .privacy-banner { padding-inline: var(--mg-gutter, 28px); } .privacy-banner p { font-size: 13px; } }
+/* One sentence and one button on a white bar, the same in both themes. It never covers the buying controls. */
+.privacy-banner { inset: auto 0 var(--mobile-purchase-height, 0px) 0; width: auto; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px max(16px, env(safe-area-inset-right)) calc(10px + env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left)); border: 0; border-top: 1px solid #d8d8dc; background: #fff; box-shadow: none; color: #11131a; }
+.privacy-banner p { flex: 1 1 0; min-width: 0; max-width: none; margin: 0; color: #11131a; font: 400 13px/1.35 var(--font-body), sans-serif; }
+.privacy-banner b { font-weight: 700; }
+.privacy-banner-accept { flex: none; min-height: 44px; border: 1px solid #443a86; border-radius: 0; padding: 0 16px; background: none; color: #443a86; font: 500 14px/1 var(--font-body), sans-serif; cursor: pointer; }
+.privacy-banner-accept:hover { background: #443a86; color: #fff; }
+.privacy-banner-accept:focus-visible { outline: 2px solid #443a86; outline-offset: 2px; }
+@media (min-width: 701px) { .privacy-banner { padding-inline: var(--mg-gutter, 28px); } .privacy-banner p { font-size: 14px; } }
