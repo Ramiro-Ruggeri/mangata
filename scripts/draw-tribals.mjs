@@ -44,7 +44,6 @@ function stroke(x, y, angle, length, curl, w, { ease = 1.5, shape = "root" } = {
 const branch = (parent, t, turn, length, curl, w, options) => { const p = parent.at(t); return stroke(p.x, p.y, p.angle + turn, length, curl, w, options); };
 const disc = (cx, cy, r) => ({ points: Array.from({ length: 160 }, (_, i) => [cx + Math.cos(i / 160 * Math.PI * 2) * r, cy + Math.sin(i / 160 * Math.PI * 2) * r]) });
 const flipX = s => ({ points: s.points.map(([x, y]) => [-x, y]) });
-const flipY = s => ({ points: s.points.map(([x, y]) => [x, -y]) });
 const both = list => [...list, ...list.map(flipX)];
 
 // Each piece returns what to paint and what to cut away. All coordinates are in a 1000-unit box centered on zero.
@@ -131,7 +130,7 @@ mkdirSync(outDir, { recursive: true });
 const proofTiles = [];
 const TILE = 340;
 let row = 0;
-for (const [family, shapes] of Object.entries(FAMILIES)) {
+for (const shapes of Object.values(FAMILIES)) {
   let column = 0;
   for (const [name, draw] of Object.entries(shapes)) {
     const piece = draw();

@@ -260,5 +260,5 @@ export default function Storefront({ initialProducts, mode, source: initialSourc
     const interval = window.setInterval(refresh, 60_000);
     return () => window.clearInterval(interval);
   }, [mode]);
-  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><TribalScene products={products} /><Help /></main><Footer />{campaign && <CampaignNotice campaign={campaign} />}</div></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><TribalScene /><Help /></main><Footer />{campaign && <CampaignNotice campaign={campaign} />}</div></MotionConfig>;
 }

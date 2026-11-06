@@ -494,23 +494,23 @@
   .mg-category-tabs button { flex: 1 1 auto; padding: 9px 12px; font-size: 13px; }
 }
 
-/* The appliques, still and oversized, cut by the edge of the page like the garment cuts them. Denim is real. */
+/* MANGATA's own tribals, still and oversized, cut by the edge of the page. */
 .mg-tribal { padding-block: 72px 0; overflow: hidden; border-bottom: 1px solid var(--mg-line); }
 .mg-storefront .mg-tribal h2 { margin: 17px 0 0; font-family: var(--font-display), sans-serif; font-size: clamp(44px, 6vw, 92px); font-weight: 500; line-height: .98; letter-spacing: -.055em; }
 .mg-tribal-field { position: relative; height: clamp(380px, 44vw, 660px); margin-top: 28px; }
-.mg-tribal-piece { position: absolute; display: block; aspect-ratio: var(--tribal-ratio); background: url(/tribals/denim.webp) center / 620px; -webkit-mask: var(--tribal-mask) center / 100% 100% no-repeat; mask: var(--tribal-mask) center / 100% 100% no-repeat; transition: filter var(--motion-feedback, 160ms) ease; }
-.mg-tribal-piece[data-tribal="bermuda-llama"] { top: -6%; left: 3%; height: 112%; rotate: -7deg; }
-.mg-tribal-piece[data-tribal="bermuda-estrella"] { top: 6%; left: 37%; height: 118%; rotate: 9deg; }
-.mg-tribal-piece[data-tribal="bermuda-garra"] { top: -14%; right: -5%; height: 104%; rotate: -11deg; }
-.mg-tribal-piece:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
-@media (hover: hover) and (pointer: fine) { .mg-tribal-piece:hover { filter: brightness(1.16); } }
+.mg-tribal-piece { position: absolute; display: block; background: var(--text); -webkit-mask: var(--tribal-mask) center / contain no-repeat; mask: var(--tribal-mask) center / contain no-repeat; }
+.mg-tribal-reflejo { --tribal-mask: url(/tribals/luna-reflejo.svg); top: 2%; left: 6%; height: 96%; aspect-ratio: 1.03; }
+.mg-tribal-cruz { --tribal-mask: url(/tribals/sigilo-cruz.svg); top: -6%; right: 3%; height: 124%; aspect-ratio: .93; }
+@media (max-width: 1000px) {
+  .mg-tribal-reflejo { top: 10%; left: 3%; height: 70%; }
+  .mg-tribal-cruz { top: 0; right: 1%; height: 100%; }
+}
 @media (max-width: 700px) {
   .mg-tribal { padding-top: 52px; }
   .mg-storefront .mg-tribal h2 { font-size: clamp(40px, 11vw, 56px); }
-  .mg-tribal-field { height: 86vw; margin-top: 20px; }
-  .mg-tribal-piece[data-tribal="bermuda-llama"] { left: -5%; height: 100%; }
-  .mg-tribal-piece[data-tribal="bermuda-estrella"] { top: 16%; left: 30%; height: 104%; }
-  .mg-tribal-piece[data-tribal="bermuda-garra"] { top: -12%; right: -18%; height: 84%; }
+  .mg-tribal-field { height: 150vw; margin-top: 24px; }
+  .mg-tribal-reflejo { top: 0; left: 6%; height: 44%; }
+  .mg-tribal-cruz { top: auto; right: -6%; bottom: -8%; height: 66%; }
 }
 
 .mg-hero-trust { color: var(--text); }
@@ -520,7 +520,7 @@
 
 /* Campaign notice. Bottom left on desktop; a bar on phones that leaves room for the scroll button. */
 .campaign-notice { position: fixed; z-index: 70; bottom: calc(20px + var(--consent-banner-height, 0px)); left: 20px; display: grid; grid-template-columns: 56px minmax(0, 1fr) 44px; align-items: start; gap: 12px; width: min(380px, calc(100vw - 40px)); border: 1px solid var(--line-strong); padding: 12px 6px 12px 12px; background: var(--surface-2); color: var(--text); box-shadow: 0 12px 34px #0004; animation: campaign-in 320ms var(--motion-ease, ease) both; }
-.campaign-notice-mark { width: 56px; height: 72px; background: url(/tribals/denim.webp) center / 180px; -webkit-mask: url(/tribals/bermuda-garra.svg) center / contain no-repeat; mask: url(/tribals/bermuda-garra.svg) center / contain no-repeat; }
+.campaign-notice-mark { width: 56px; height: 72px; background: var(--text); -webkit-mask: url(/tribals/sigilo-cruz.svg) center / contain no-repeat; mask: url(/tribals/sigilo-cruz.svg) center / contain no-repeat; }
 .campaign-notice strong { display: block; font-family: var(--font-display), sans-serif; font-size: 18px; font-weight: 600; letter-spacing: -.03em; line-height: 1.2; }
 .campaign-notice p { margin: 3px 0 2px; color: var(--text-2); font-size: 13px; line-height: 1.45; }
 .campaign-notice a { display: inline-flex; min-height: 44px; align-items: center; font-size: 13px; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }

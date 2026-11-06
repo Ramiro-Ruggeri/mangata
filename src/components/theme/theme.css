@@ -133,6 +133,6 @@ body { color: var(--text); }
 .checkout-status-actions > :first-child { background: var(--primary-bg); color: var(--primary-fg); }
 
 .product-header-bag { position: relative; }
-.bag-stamp { position: absolute; top: 50%; left: 50%; width: 44px; height: 58px; margin: -29px 0 0 -22px; pointer-events: none; background: var(--accent); -webkit-mask: url(/tribals/bermuda-estrella.svg) center / contain no-repeat; mask: url(/tribals/bermuda-estrella.svg) center / contain no-repeat; opacity: 0; animation: bag-stamp 300ms cubic-bezier(.22, 1, .36, 1) both; }
+.bag-stamp { position: absolute; top: 50%; left: 50%; width: 44px; height: 58px; margin: -29px 0 0 -22px; pointer-events: none; background: var(--accent); -webkit-mask: url(/tribals/sigilo-cruz.svg) center / contain no-repeat; mask: url(/tribals/sigilo-cruz.svg) center / contain no-repeat; opacity: 0; animation: bag-stamp 300ms cubic-bezier(.22, 1, .36, 1) both; }
 @keyframes bag-stamp { 0% { opacity: 0; transform: scale(1.7) rotate(-12deg); } 45% { opacity: .9; transform: scale(1) rotate(0); } 100% { opacity: 0; transform: scale(.92) rotate(0); } }
 @media (prefers-reduced-motion: reduce) { .bag-stamp { display: none; } }

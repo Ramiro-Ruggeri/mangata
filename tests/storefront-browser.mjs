@@ -96,10 +96,8 @@ async function main() {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.locator('.mg-product-photo').first().hover();
     await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('.mg-image-primary')).transform.match(/matrix\(([^,]+)/)?.[1]) > 1);
-    // The appliques are real links to their garment.
     await page.locator('.mg-tribal-field').scrollIntoViewIfNeeded();
     if (output) await page.screenshot({ path: join(output, 'tribales-desktop.png') });
-    assert.ok(await page.locator('.mg-tribal-piece').count() > 0);
     // Native animated up/down restores position, on both long home and product pages.
     for (const path of ['/', '/producto/7']) {
       await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' });

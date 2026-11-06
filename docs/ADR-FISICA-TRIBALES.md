@@ -1,29 +1,25 @@
-# ADR: tribales sin física
+# ADR: tribales originales y fijos
 
-**Decisión:** los tribales son gráficos grandes y fijos, sin motor de física. El único movimiento es un sello de 300 ms al sumar a la bolsa.
+**Decisión:** la web usa dos tribales originales de MANGATA, Cruz y Reflejo, como gráficos grandes y fijos. El único movimiento es un sello de 300 ms al sumar a la bolsa.
 
-## Por qué cambió
+## Por qué
 
-El prompt pedía Matter.js y se construyó la escena, con 60 fps medidos y piezas que se apilaban. Ramiro la probó y dijo que se sentía rara, aunque le encantaron las formas. Esa impresión pesa más que las mediciones de fluidez.
+- **Sin física:** Ramiro probó una escena con Matter.js y dijo que se sentía rara. En las homes de marcas de moda que se pudieron inspeccionar el 06/11/2026 no apareció Matter.js. Eso muestra su código, no el efecto en ventas. Matter.js salió de las dependencias.
+- **Sin las siluetas de la Bermuda Tribal:** eran trazos de apliques reales, pero a Ramiro no le cerraron. Quedan en el historial, en el commit 629f1e2.
+- **Sin calcar:** Ramiro pidió basarlos en referencias de Pinterest. Se usaron solo rasgos generales de estilo: simetría, puntas afiladas y contraste de grosores. Pinterest no otorga derechos sobre lo que muestra.
 
-La investigación de marcas de moda (06/11/2026, solo el código de sus páginas de inicio, no resultados de venta) no encontró Matter.js en ninguna. Fear of God, Our Legacy, Stüssy, Aimé Leon Dore, Bode y Rick Owens usan fundidos, transiciones de vista o carruseles. KidSuper es el extremo lúdico, con canvas y 4,8 MB transferidos.
+## Origen
 
-No hay un test público serio que aísle el efecto del movimiento en las ventas. La evidencia medida es sobre velocidad, y esto quita peso de la página.
-
-## Efecto
-
-- Matter.js sale de las dependencias. La escena con física queda en el historial, en el commit 04ea4ab.
-- Sin bucle de animación ni gesto especial en celular: el scroll queda libre.
-- Con movimiento reducido, el sello no aparece.
-
-## Tribales
-
-Solo 3 siluetas cumplen la exigencia de provenir de apliques reales: las de la Bermuda Tribal, trazadas con `scripts/trace-tribals.mjs`. La cruz bordada de la Campera Rituales y los motivos de la Bermuda Oscuridad se probaron y se descartaron porque el trazo no era fiel.
+`scripts/draw-tribals.mjs` los dibuja desde cero con trazos afilados. Reflejo sale del significado de "mangata", la luna reflejada en el agua. Cruz toma como inspiración la cruz bordada de la Campera Rituales. La hoja completa incluía 7 candidatos; Ramiro aprobó aplicar estos dos.
 
 potrace tiene licencia GPL. Se usa como herramienta externa, fuera de las dependencias del proyecto.
 
+## Límites
+
+- No enlazan a productos, porque ninguna prenda los lleva.
+- No se compararon legalmente contra otros diseños existentes.
+
 ## Pendiente
 
-- Aprobación de las siluetas por parte de Emilia.
-- Administrar los tribales desde el panel.
-- Comparar la conversión cuando haya métricas y tráfico suficiente.
+- Aprobación de Emilia antes de publicar.
+- Administrarlos desde el panel.

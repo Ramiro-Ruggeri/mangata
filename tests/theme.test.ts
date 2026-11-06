@@ -3,8 +3,6 @@ import assert from "node:assert/strict";
 import { runInNewContext } from "node:vm";
 import { relatedPieces } from "../src/lib/catalog-view";
 import { THEME_BOOT_SCRIPT, THEME_COLORS, THEME_KEY } from "../src/components/theme/theme";
-import { resolveScenePieces } from "../src/components/storefront/tribal-scene";
-import tribals from "../src/components/storefront/tribals.json";
 import { currentCampaign, isOnAir, type Campaign } from "../src/config/campaign";
 import type { StoreProduct } from "../src/lib/commerce/types";
 
@@ -45,13 +43,6 @@ test("related pieces only offer what can be bought, same category first", () => 
   const result = relatedPieces([current, piece("2", "Prendas"), piece("3", "Denim", false), piece("4", "Denim"), piece("5", "Accesorios")], current);
   assert.deepEqual(result.map(p => p.id), ["4", "2", "5"]);
   assert.equal(relatedPieces(Array.from({ length: 9 }, (_, i) => piece(String(i + 2), "Denim")), current).length, 4);
-});
-
-test("every tribal leads to a garment in the store, and a missing garment takes its shapes out", () => {
-  const bermuda = piece("11", "Denim"), campera = piece("7", "Prendas");
-  assert.ok(resolveScenePieces(tribals, [bermuda, campera]).every(p => ["11", "7"].includes(p.product.id)));
-  assert.ok(resolveScenePieces(tribals, [campera]).every(p => p.product.id === "7"));
-  assert.deepEqual(resolveScenePieces(tribals, []), []);
 });
 
 const campaign: Campaign = { id: "x", title: "T", message: "M", linkLabel: "L", href: "/", startsAt: "2026-11-27T00:00:00-03:00", endsAt: "2026-11-30T00:00:00-03:00" };
