@@ -10,6 +10,7 @@ services:
     volumes:
       - data:/var/lib/postgresql/data
       - ./commerce-schema.sql:/docker-entrypoint-initdb.d/10-schema.sql:ro
+      - ./migrations/002-catalog.up.sql:/docker-entrypoint-initdb.d/11-catalog.sql:ro
       - ./commerce-role.sql:/docker-entrypoint-initdb.d/20-role.sql:ro
     networks:
       private:

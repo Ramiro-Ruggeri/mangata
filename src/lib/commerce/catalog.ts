@@ -1,7 +1,7 @@
 import { products as legacyProducts } from "@/lib/products";
 import { fetchEverShopCatalog, fetchEverShopProduct } from "./evershop";
 import type { CatalogResult, CommerceMode, StoreProduct } from "./types";
-import { ordersDatabase, usesPostgresOrders } from "./postgres-orders";
+import { ordersDatabase, usesPostgresOrders, type CatalogRow } from "./postgres-orders";
 
 export function getCommerceMode(): CommerceMode {
   return process.env.MANGATA_COMMERCE_MODE === "evershop"
@@ -110,12 +110,52 @@ export async function getProduct(id: string): Promise<StoreProduct | null> {
   return (await getAvailableLocalCatalog()).find((product) => product.id === id) ?? null;
 }
 
+/** `source` stays "local": it means first-party, and the bag only accepts first-party pieces. */
+export function productFromRow(row: CatalogRow): StoreProduct {
+  return {
+    id: String(row.id),
+    sku: row.sku,
+    name: row.name,
+    slug: slugify(row.name),
+    description: row.description,
+    measurements: row.measurements.length ? row.measurements : undefined,
+    price: Number(row.price_cents) / 100,
+    image: row.images[0],
+    images: row.images,
+    category: row.category,
+    isNew: row.is_new,
+    inventory: { isInStock: row.state === "available", manageStock: true, availability: row.state },
+    source: "local",
+  };
+}
+
+/** Archived pieces stay in the database for order history but leave the store. */
+export const visibleProducts = (rows: CatalogRow[]) => rows.filter((row) => row.active).map(productFromRow);
+
+// Survives a database outage, so a piece archived in the panel does not reappear from the code seed.
+let lastKnownCatalog: StoreProduct[] | undefined;
+
+/** null means the catalog was not imported yet: products.ts is still the source. */
+async function databaseCatalog() {
+  const rows = await ordersDatabase().catalogRows();
+  return rows.length ? visibleProducts(rows) : null;
+}
+
 export async function getAvailableLocalCatalog(): Promise<StoreProduct[]> {
-  const products = getLocalCatalog();
-  if (!usesPostgresOrders()) return products;
-  try { return await ordersDatabase().availability(products); }
-  catch {
+  if (!usesPostgresOrders()) return getLocalCatalog();
+  try {
+    const products = await databaseCatalog();
+    if (!products) return await ordersDatabase().availability(getLocalCatalog());
+    lastKnownCatalog = products;
+    return products;
+  } catch {
     console.error("[commerce] inventory_unavailable");
-    return products.map(product => ({ ...product, inventory: { ...product.inventory, isInStock: false, availability: "unconfirmed" } }));
+    return (lastKnownCatalog ?? getLocalCatalog()).map(product => ({ ...product, inventory: { ...product.inventory, isInStock: false, availability: "unconfirmed" } }));
   }
+}
+
+/** Identity and price for checkout. reserve() decides stock, so a buyer retrying a piece they hold still resolves. */
+export async function getCheckoutCatalog(): Promise<StoreProduct[]> {
+  const products = usesPostgresOrders() ? await databaseCatalog() : null;
+  return (products ?? getLocalCatalog()).map(product => ({ ...product, inventory: { ...product.inventory, isInStock: true } }));
 }

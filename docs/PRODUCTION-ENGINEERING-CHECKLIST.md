@@ -53,7 +53,7 @@ El servicio de conciliación devuelve fallo operativo si hay revisiones o atraso
 
 - `/opt/mangata/current` enlaza la versión desplegada; backups y secretos viven fuera del release.
 - Base: `deploy/compose.database.yaml`. No ejecutar `down -v` ni restaurar un dump sobre producción durante una comprobación.
-- Operaciones privadas: ejecutar `deploy/commerce-ops.mjs` dentro del contenedor web (`seed`, `status`, `reconcile`). La ruta pública debe permanecer bloqueada por Nginx además de requerir un token secreto.
+- Operaciones privadas: ejecutar `deploy/commerce-ops.mjs` dentro del contenedor web (`import-catalog`, `status`, `reconcile`). `import-catalog` solo inserta lo que falta: nunca pisa ediciones, precios ni stock. La ruta pública debe permanecer bloqueada por Nginx además de requerir un token secreto.
 - Backup: `deploy/commerce-backup.sh`, archivo privado PostgreSQL formato custom. Timer diario; sin borrado automático.
 - Una copia en el mismo VPS no protege ante pérdida del VPS. El destino externo y su retención quedan pendientes de definir; no afirmar que hay backup externo.
 - Rollback web: volver a la imagen previa **sólo si comprende el stock persistente**; nunca volver al catálogo sin base después del primer cobro.

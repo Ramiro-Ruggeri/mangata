@@ -13,7 +13,7 @@ export async function POST(request: Request) {
   if (!usesPostgresOrders()) return reply({ error: "not_configured" }, 503);
   try {
     const action = new URL(request.url).searchParams.get("action");
-    if (action === "seed") return reply({ products: await ordersDatabase().seed(getLocalCatalog()) });
+    if (action === "import-catalog") return reply(await ordersDatabase().importCatalog(getLocalCatalog()));
     if (action === "status") return reply(await ordersDatabase().status());
     if (action === "reconcile") return reply(await reconcileOutstandingPayments());
     return reply({ error: "invalid_action" }, 400);

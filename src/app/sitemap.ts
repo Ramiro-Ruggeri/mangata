@@ -2,6 +2,9 @@ import type { MetadataRoute } from "next";
 import { getCatalog } from "@/lib/commerce/catalog";
 import { getSiteUrl } from "@/config/site-url";
 
+// Cached at build by default: a piece added or archived in the panel must appear without a deploy.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl = getSiteUrl();
   const catalog = await getCatalog();

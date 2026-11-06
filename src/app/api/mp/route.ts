@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
-import { getCommerceMode, getLocalCatalog } from "@/lib/commerce/catalog";
+import { getCheckoutCatalog, getCommerceMode } from "@/lib/commerce/catalog";
 import { CHECKOUT_COOKIE, checkoutIntentMatches, readCheckoutIntent, signCheckoutIntent, type CheckoutIntent } from "@/lib/commerce/checkout-session";
 import { assertCheckoutConfigured, reserveCheckoutIntent } from "@/lib/commerce/order-service";
 import { assertStoreRequest, CommerceError, publicCommerceError, resolveOneOfOneItems } from "@/lib/commerce/one-of-one";
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     assertStoreRequest(request);
     if (getCommerceMode() !== "local") throw new CommerceError("checkout_unavailable", 409);
     const body = await readStoreJson(request);
-    const products = resolveOneOfOneItems(body?.items, getLocalCatalog());
+    const products = resolveOneOfOneItems(body?.items, await getCheckoutCatalog());
     const amount = products.reduce((sum, product) => sum + product.price, 0);
     const skus = products.map((product) => product.sku);
     assertCheckoutConfigured();

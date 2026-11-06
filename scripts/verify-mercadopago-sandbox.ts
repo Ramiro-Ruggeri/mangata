@@ -1,7 +1,7 @@
 // Explicit opt-in integration check. TEST credentials and an isolated test DB only.
 // Never accepts real cards, production tokens, customer details or production stock.
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { randomInt, randomUUID } from "node:crypto";
 import { Pool } from "pg";
 import { PostgresOrders } from "../src/lib/commerce/postgres-orders";
 import type { ProviderPayment } from "../src/lib/commerce/checkout-session";
@@ -61,10 +61,10 @@ async function main() {
     for (const [holder, expected] of [["APRO", "approved"], ["OTHE", "rejected"], ["CONT", "pending"]]) {
       const reference = `MNGT-${randomUUID()}`;
       const sku = `SANDBOX-${randomUUID()}`;
-      const product: StoreProduct = { id: sku, sku, name: "MANGATA sandbox validation", price: 100,
+      const product: StoreProduct = { id: String(randomInt(1_000_000, 2_000_000_000)), sku, name: "MANGATA sandbox validation", price: 100,
         slug: sku, category: "Prendas", description: "Synthetic test only", image: "/test.webp", images: ["/test.webp"],
         isNew: false, inventory: { isInStock: true, manageStock: true }, source: "local" };
-      await db.seed([product]);
+      await db.importCatalog([product]);
       await db.reserve({ reference, amount: 100, currency: "ARS", skus: [sku], expiresAt: Date.now() + 3600000 }, [product], Date.now() + 1800000);
       // Official Mercado Pago test card. Never replace with a real card.
       const card = await api("/v1/card_tokens", {

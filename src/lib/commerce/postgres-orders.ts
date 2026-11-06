@@ -3,6 +3,20 @@ import type { CheckoutIntent, ProviderPayment } from "./checkout-session";
 import type { StoreProduct } from "./types";
 import { CommerceError } from "./one-of-one";
 
+export type CatalogRow = {
+  id: number;
+  sku: string;
+  description: string;
+  category: string;
+  measurements: Array<{ label: string; value: string }>;
+  images: string[];
+  is_new: boolean;
+  name: string;
+  price_cents: string;
+  state: "available" | "reserved" | "sold" | "review";
+  active: boolean;
+};
+
 let pool: Pool | undefined;
 export const usesPostgresOrders = () => process.env.MANGATA_ORDER_STORAGE === "postgres";
 
@@ -48,17 +62,34 @@ export class PostgresOrders {
     } finally { client.release(); }
   }
 
-  async seed(products: StoreProduct[]) {
+  /**
+   * Insert-only: once a piece exists the database owns it. Re-running never overwrites an edit,
+   * a price or a stock state, and never archives what the code does not list.
+   */
+  async importCatalog(products: StoreProduct[]) {
     return this.transaction(async (client) => {
+      const position = new Map(products.map((p, index) => [p.sku, index + 1]));
+      let inventoryCreated = 0, catalogCreated = 0;
       for (const p of [...products].sort((a, b) => a.sku.localeCompare(b.sku))) {
-        await client.query(`INSERT INTO inventory(sku,name,price_cents,active) VALUES($1,$2,$3,$4)
-          ON CONFLICT(sku) DO UPDATE SET name=EXCLUDED.name, active=EXCLUDED.active,
-          price_cents=CASE WHEN inventory.state='available' THEN EXCLUDED.price_cents ELSE inventory.price_cents END`,
-        [p.sku, p.name, cents(p.price), p.inventory.isInStock]);
+        inventoryCreated += (await client.query(`INSERT INTO inventory(sku,name,price_cents,active) VALUES($1,$2,$3,$4)
+          ON CONFLICT(sku) DO NOTHING`, [p.sku, p.name, cents(p.price), p.inventory.isInStock])).rowCount ?? 0;
+        catalogCreated += (await client.query(`INSERT INTO catalog_products(id,sku,description,category,measurements,images,is_new,position)
+          VALUES($1,$2,$3,$4,$5,$6,$7,$8) ON CONFLICT DO NOTHING`, [Number(p.id), p.sku, p.description, p.category,
+          JSON.stringify(p.measurements ?? []), JSON.stringify(p.images), p.isNew, position.get(p.sku)])).rowCount ?? 0;
       }
-      await client.query("UPDATE inventory SET active=false WHERE NOT(sku=ANY($1::text[]))", [products.map(p => p.sku)]);
-      return products.length;
+      const { rows } = await client.query("SELECT sku,name,price_cents FROM inventory WHERE sku=ANY($1::text[])", [products.map(p => p.sku)]);
+      const drift = rows.filter(row => {
+        const p = products.find(item => item.sku === row.sku)!;
+        return row.name !== p.name || Number(row.price_cents) !== cents(p.price);
+      }).map(row => row.sku as string).sort();
+      return { products: products.length, inventoryCreated, catalogCreated, drift };
     });
+  }
+
+  async catalogRows() {
+    const { rows } = await this.db.query(`SELECT c.id,c.sku,c.description,c.category,c.measurements,c.images,c.is_new,
+      i.name,i.price_cents,i.state,i.active FROM catalog_products c JOIN inventory i USING(sku) ORDER BY c.position,c.id`);
+    return rows as CatalogRow[];
   }
 
   async availability(products: StoreProduct[]) {

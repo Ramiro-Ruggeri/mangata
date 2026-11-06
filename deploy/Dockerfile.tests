@@ -6,4 +6,5 @@ COPY tsconfig.json ./
 COPY src ./src
 COPY tests ./tests
 COPY deploy/commerce-schema.sql ./deploy/commerce-schema.sql
+COPY deploy/migrations ./deploy/migrations
 CMD ["npm", "run", "test:database"]
