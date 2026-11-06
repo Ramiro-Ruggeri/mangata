@@ -119,6 +119,16 @@ ALTER TABLE catalog_products
   ADD COLUMN cost_cents bigint CHECK (cost_cents IS NULL OR cost_cents >= 0),
   ADD COLUMN is_draft boolean NOT NULL DEFAULT false;
 
+-- Photos uploaded from the panel. In the database so that the nightly dump backs them up.
+CREATE TABLE catalog_images (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  bytes bytea NOT NULL,
+  width integer NOT NULL,
+  height integer NOT NULL,
+  created_by integer NOT NULL REFERENCES admin_users(id),
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+
 -- Above every id ever published, including the retired ones: a public URL is never recycled.
 CREATE SEQUENCE catalog_product_id_seq START WITH 1000 MINVALUE 1000;
 
@@ -127,7 +137,8 @@ DO $$
 BEGIN
   IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'mangata_app') THEN
     GRANT SELECT, INSERT, UPDATE ON admin_users, admin_sessions, admin_login_throttle, manual_sales TO mangata_app;
-    REVOKE ALL ON audit_log, stock_movements FROM mangata_app;
+    REVOKE ALL ON audit_log, stock_movements, catalog_images FROM mangata_app;
+    GRANT SELECT, INSERT ON catalog_images TO mangata_app;
     GRANT SELECT, INSERT ON audit_log, stock_movements TO mangata_app;
     GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO mangata_app;
   END IF;

@@ -477,7 +477,7 @@
 }
 
 /* MANGATA's own tribals, still and oversized, cut by the edge of the page. */
-.mg-tribal { padding-block: 72px 0; overflow: hidden; border-bottom: 1px solid var(--mg-line); background: var(--bg); }
+.mg-tribal { padding-block: 72px 0; overflow: hidden; border-bottom: 1px solid var(--mg-line); background: var(--surface); }
 .mg-storefront .mg-tribal h2 { margin: 17px 0 0; font-family: var(--font-display), sans-serif; font-size: clamp(44px, 6vw, 92px); font-weight: 500; line-height: .98; letter-spacing: -.055em; }
 .mg-tribal-field { position: relative; height: clamp(380px, 44vw, 660px); margin-top: 28px; }
 .mg-tribal-canvas { position: absolute !important; inset: 0; opacity: 0; transition: opacity 700ms ease; }
@@ -511,7 +511,7 @@
 .mg-cart-button { position: relative; }
 
 /* The story is one continuous reading that flows into the tribals. */
-.mg-story { display: block; padding-inline: 0; background: var(--bg); }
+.mg-story { display: block; padding-inline: 0; background: var(--surface); }
 .mg-story-copy { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); align-items: start; gap: 18px clamp(32px, 6vw, 96px); padding: clamp(64px, 8vw, 120px) var(--mg-gutter) 0; }
 .mg-story-copy > .mg-eyebrow { grid-column: 1 / -1; }
 .mg-story-copy > h2 { position: sticky; top: 104px; margin: 0; }

@@ -205,8 +205,9 @@ test("panel on real PostgreSQL", async t => {
       await ending(async () => {
         const { token } = await auth.invite(email);
         await auth.beginActivation(token, PASSWORD);
-        await auth.confirmActivation(token, await codeFor(email));
-        await pool.query("UPDATE admin_users SET pending_totp_enc=NULL WHERE email=$1", [email]);
+        const { rows: [{ pending_totp_enc: pending }] } = await pool.query("SELECT pending_totp_enc FROM admin_users WHERE email=$1", [email]);
+        const step = Math.floor(Date.now() / 30000);
+        await auth.confirmActivation(token, totpAt(openSecret(pending, ROOT), step));
       });
       await ending(() => auth.disable(email));
       assert.equal(await auth.login(email, PASSWORD, randomUUID()), null);
@@ -272,7 +273,7 @@ test("panel on real PostgreSQL", async t => {
     });
 
     const published = async () => { const id = await store.createProduct(admin, input()); await store.publish(admin, id); return { id, sku: (await store.getProduct(id))!.sku }; };
-    const checkoutIntent = (sku: string, amount = 15000) => ({ reference: `MNGT-${randomUUID()}`, amount, currency: "ARS", skus: [sku], expiresAt: Date.now() + 1_800_000 });
+    const checkoutIntent = (sku: string, amount = 15000) => ({ reference: `MNGT-${randomUUID()}`, amount, currency: "ARS" as const, skus: [sku], expiresAt: Date.now() + 1_800_000 });
     const asProduct = async (id: number) => visibleProducts(await orders.catalogRows()).find(p => p.id === String(id))!;
 
     await t.test("stock: a manual sale takes the piece off sale, and voiding it needs a reason and leaves a trail", async () => {

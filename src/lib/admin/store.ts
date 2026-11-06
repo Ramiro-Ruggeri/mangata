@@ -29,7 +29,7 @@ export type Fulfillment = (typeof FULFILLMENT)[number];
 // Statuses after which money may still arrive or is held. A piece in any of them cannot go back on sale.
 const LIVE_PAYMENTS = ["approved", "pending", "in_process", "authorized", "in_mediation"];
 
-const PRODUCT_SELECT = `SELECT c.id,c.sku,c.description,c.category,c.measurements,c.images,c.is_new,c.cost_cents,c.is_draft,c.updated_at::text AS version,
+const PRODUCT_SELECT = `SELECT c.id,c.sku,c.description,c.category,c.measurements,c.images,c.is_new,c.cost_cents::float8 AS cost_cents,c.is_draft,c.updated_at::text AS version,
   i.name,i.price_cents::float8 AS price_cents,i.state,i.active,i.held_reference,ci.expires_at,
   (ms.reference IS NOT NULL AND ms.voided_at IS NULL) AS manual_sale
   FROM catalog_products c JOIN inventory i USING(sku)
@@ -89,7 +89,7 @@ export class AdminStore {
   /** `version` rejects a save made from a screen that was opened before someone else's change. */
   async updateProduct(actor: AdminIdentity, id: number, version: string, input: ProductInput) {
     return this.transaction(actor, "edicion", null, async client => {
-      const { rows: [before] } = await client.query(`SELECT c.sku,c.updated_at::text AS version,c.description,c.category,c.measurements,c.images,c.is_new,c.cost_cents,i.name,i.price_cents::float8 AS price_cents
+      const { rows: [before] } = await client.query(`SELECT c.sku,c.updated_at::text AS version,c.description,c.category,c.measurements,c.images,c.is_new,c.cost_cents::float8 AS cost_cents,i.name,i.price_cents::float8 AS price_cents
         FROM catalog_products c JOIN inventory i USING(sku) WHERE c.id=$1 FOR UPDATE OF c,i`, [id]);
       if (!before) throw new AdminError("not_found");
       if (before.version !== version) throw new AdminError("conflict");
@@ -112,7 +112,7 @@ export class AdminStore {
   }
 
   private async lockedPiece(client: PoolClient, id: number) {
-    const { rows: [piece] } = await client.query(`SELECT c.sku,c.is_draft,i.name,i.price_cents,i.state,i.active,i.held_reference FROM catalog_products c JOIN inventory i USING(sku)
+    const { rows: [piece] } = await client.query(`SELECT c.sku,c.is_draft,c.images,i.name,i.price_cents,i.state,i.active,i.held_reference FROM catalog_products c JOIN inventory i USING(sku)
       WHERE c.id=$1 FOR UPDATE OF c,i`, [id]);
     if (!piece) throw new AdminError("not_found");
     return piece;
@@ -121,6 +121,7 @@ export class AdminStore {
   async publish(actor: AdminIdentity, id: number) {
     return this.transaction(actor, "publicacion", null, async client => {
       const piece = await this.lockedPiece(client, id);
+      if (!piece.images.length) throw new AdminError("no_photo");
       await client.query("UPDATE inventory SET active=true WHERE sku=$1", [piece.sku]);
       await client.query("UPDATE catalog_products SET is_draft=false,updated_at=now() WHERE id=$1", [id]);
       await this.audit(client, actor, "publicar_producto", "product", String(id));
@@ -170,6 +171,13 @@ export class AdminStore {
       await client.query("UPDATE inventory SET state='available',held_reference=NULL WHERE sku=$1", [piece.sku]);
       await this.audit(client, actor, "volver_a_vender", "product", String(id), { reason, reference: piece.held_reference });
     });
+  }
+
+  /** Photos live in the database, so the existing backup already covers them. */
+  async savePhoto(actor: AdminIdentity, photo: { bytes: Buffer; width: number; height: number }) {
+    const { rows: [row] } = await this.db.query("INSERT INTO catalog_images(bytes,width,height,created_by) VALUES($1,$2,$3,$4) RETURNING id", [photo.bytes, photo.width, photo.height, actor.id]);
+    await this.db.query("INSERT INTO audit_log(actor_id,actor_email,action,entity,entity_id) VALUES($1,$2,'subir_foto','photo',$3)", [actor.id, actor.email, row.id]);
+    return row.id as string;
   }
 
   async movements(limit = 100, sku?: string) {
