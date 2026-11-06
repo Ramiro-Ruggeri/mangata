@@ -17,7 +17,11 @@ export type CommerceEventName =
   | "drop_inquiry"
   | "stock_error"
   | "checkout_error"
-  | "theme_change";
+  | "theme_change"
+  | "tribal_interaction"
+  | "announcement_view"
+  | "announcement_click"
+  | "announcement_close";
 
 export type CommerceEventPayload = {
   currency?: "ARS";

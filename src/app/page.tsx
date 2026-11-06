@@ -1,5 +1,6 @@
 import Storefront from "@/components/storefront/Storefront";
 import { getCatalog } from "@/lib/commerce/catalog";
+import { currentCampaign } from "@/config/campaign";
 
 export default async function HomePage() {
   const catalog = await getCatalog();
@@ -8,6 +9,7 @@ export default async function HomePage() {
       initialProducts={catalog.products}
       mode={catalog.mode}
       source={catalog.source}
+      campaign={currentCampaign()}
     />
   );
 }

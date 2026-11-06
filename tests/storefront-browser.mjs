@@ -97,29 +97,17 @@ async function main() {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.locator('.mg-product-photo').first().hover();
     await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('.mg-image-primary')).transform.match(/matrix\(([^,]+)/)?.[1]) > 1);
-    // The optional physics starts only near the section; native buttons work with keyboard too.
-    await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.physics === 'ready');
-    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'false', null, { timeout: 6000 });
-    await page.getByRole('button', { name: 'Mover pieza MANGATA', exact: true }).first().focus();
-    const oldTransform = await page.locator('.mg-material-tag').first().getAttribute('style');
-    await page.keyboard.press('Enter');
-    await page.waitForFunction(old => document.querySelector('.mg-material-tag')?.getAttribute('style') !== old, oldTransform);
-    await page.getByRole('button', { name: 'Pausar', exact: true }).click();
-    assert.equal(await page.locator('.mg-material-arena').getAttribute('data-running'), 'false');
-    if (output) await page.screenshot({ path: join(output, 'materiales-desktop.png') });
-    const tag = await page.locator('.mg-material-tag').first().boundingBox();
-    await page.mouse.move(tag.x + tag.width / 2, tag.y + tag.height / 2);
+    // The physics loads near the section, moves real pieces and always leaves a keyboard route to the garments.
+    await page.locator('.mg-tribal-arena').scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => document.querySelector('.mg-tribal-arena')?.dataset.physics === 'ready');
+    if (output) await page.screenshot({ path: join(output, 'tribales-desktop.png') });
+    const piece = await page.locator('.mg-tribal-piece').first().boundingBox();
+    await page.mouse.move(piece.x + piece.width / 2, piece.y + piece.height / 2);
     await page.mouse.down();
-    await page.mouse.move(tag.x + tag.width / 2 + 60, tag.y + tag.height / 2 - 25, { steps: 8 });
+    await page.mouse.move(piece.x + piece.width / 2 + 60, piece.y + piece.height / 2 - 25, { steps: 8 });
     await page.mouse.up();
-    assert.equal(await page.locator('.mg-material-arena').getAttribute('data-running'), 'true');
-    await page.getByRole('button', { name: 'Mezclar', exact: true }).click();
-    await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
-    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'false');
-    await page.locator('.mg-material-arena').scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => document.querySelector('.mg-material-arena')?.dataset.running === 'true');
-    assert.notEqual(await page.locator('.mg-hero-ticket').evaluate(el => getComputedStyle(el).animationName), 'none');
+    assert.equal(new URL(page.url()).pathname, '/', 'Dragging a tribal must not open the product');
+    assert.ok(await page.locator('.mg-tribal-list a').count() > 0);
     // Native animated up/down restores position, on both long home and product pages.
     for (const path of ['/', '/producto/7']) {
       await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' });

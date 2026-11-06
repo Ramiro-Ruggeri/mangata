@@ -15,7 +15,9 @@ import type { CatalogResult, CatalogSource, CommerceMode, StoreProduct } from "@
 import { PURCHASE_POLICY, SITE, WITHDRAWAL_HREF, whatsappHref } from "@/config/site";
 import { matchesCategory, searchProducts } from "@/lib/catalog-view";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
-import { MaterialPlayground } from "./MaterialPlayground";
+import { TribalScene } from "./TribalScene";
+import { CampaignNotice } from "./CampaignNotice";
+import type { Campaign } from "@/config/campaign";
 import "./storefront.css";
 
 const INSTAGRAM = SITE.instagram;
@@ -84,6 +86,7 @@ function SearchDialog({ products, open, onClose }: { products: StoreProduct[]; o
 }
 
 function Hero({ products }: { products: StoreProduct[] }) {
+  const { checkoutReady, mode } = useCart();
   const featured = products.find((product) => product.name === "Bermuda Tribal" && product.inventory.isInStock) ?? products.find((product) => product.inventory.isInStock) ?? products[0];
   return <section className="mg-hero" id="inicio" aria-labelledby="hero-title">
     <div className="mg-hero-copy">
@@ -91,6 +94,7 @@ function Hero({ products }: { products: StoreProduct[] }) {
       <h1 id="hero-title">Diseñado<br />para <em>vos.</em></h1>
       <p>Piezas únicas de diseño y upcycling,<br /> hechas a mano.</p>
       <a href="#coleccion" className="mg-button mg-button-light">Ver las piezas <ArrowDown size={18} /></a>
+      {checkoutReady && mode === "local" && <span className="mg-hero-footnote mg-hero-trust"><LockKeyhole size={13} strokeWidth={2} aria-hidden="true" /> Pago protegido con Mercado Pago.</span>}
       <span className="mg-hero-footnote"><CircleCheck size={13} strokeWidth={2} aria-hidden="true" /> Fotos reales. Hecho a mano en Córdoba.</span>
     </div>
     {featured && <div className="mg-hero-visual">
@@ -169,7 +173,7 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
     });
   }, [products, category, onlyAvailable, sort]);
   return <section ref={sectionRef} id="coleccion" className="mg-collection mg-shell" aria-labelledby="collection-title">
-    <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow"><b>01</b> La colección</span><h2 id="collection-title">Prendas con<br /><em>huella.</em></h2></div><div className="mg-collection-context"><p>Prendas y accesorios exclusivos,<br /> diseñados e intervenidos a mano.</p>{source === "local" && <aside className="mg-opening-note" aria-label="Precios de apertura"><span className="mg-opening-dot" aria-hidden="true" /><span><strong>Precios de apertura</strong><small>Ya están aplicados.</small></span></aside>}</div></div>
+    <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>huella.</em></h2></div><div className="mg-collection-context"><p>Prendas y accesorios exclusivos,<br /> diseñados e intervenidos a mano.</p>{source === "local" && <aside className="mg-opening-note" aria-label="Precios de apertura"><span className="mg-opening-dot" aria-hidden="true" /><span><strong>Precios de apertura</strong><small>Ya están aplicados.</small></span></aside>}</div></div>
     {source === "local-fallback" && <p className="mg-catalog-notice" role="status">Estamos revisando la disponibilidad de las piezas. Podés verlas y consultarnos por WhatsApp.</p>}
     <div className="mg-catalog-controls"><div className="mg-category-tabs" role="group" aria-label="Filtrar colección">{["Todas", "Denim", "Prendas", "Accesorios"].map((name) => <button key={name} aria-pressed={category === name} className={category === name ? "is-active" : ""} onClick={() => updateView({ category: name })}>{name}</button>)}</div><label className="mg-sort"><SlidersHorizontal size={15} /><select aria-label="Ordenar piezas" value={sort} onChange={(event) => updateView({ sort: event.target.value })}><option value="selection">Nuestra selección</option><option value="new">Recién intervenidas</option><option value="price-low">Menor precio</option><option value="price-high">Mayor precio</option></select><ChevronDown size={13} /></label></div>
     <div className="mg-catalog-summary"><p role="status" aria-atomic="true">{filtered.length} {filtered.length === 1 ? "pieza" : "piezas"}{category !== "Todas" ? ` · ${category}` : ""}</p><label><input type="checkbox" checked={onlyAvailable} onChange={(event) => updateView({ onlyAvailable: event.target.checked })} /> Sólo disponibles</label></div>
@@ -182,13 +186,13 @@ function Catalog({ products, source }: { products: StoreProduct[]; source: Catal
 function CraftStory() {
   return <section id="manifiesto" className="mg-story" aria-labelledby="story-title">
     <div className="mg-story-image"><Image src="/campaign/rework-still-life-v2.webp" alt="Composición conceptual de denim recuperado, bordes deshilachados y metal" fill quality={85} sizes="(max-width: 700px) 100vw, (max-width: 1400px) 52vw, 720px" /><span>Estudio de materiales · campaña conceptual</span></div>
-    <div className="mg-story-copy" data-reveal><span className="mg-eyebrow"><b>02</b> Hecho de lo que ya existe</span><h2 id="story-title">MANGATA nace de una forma distinta de mirar lo que ya existe.</h2><p>El nombre viene del reflejo de la luna sobre el agua: una huella de luz que aparece y muta con el movimiento.</p><p>Esa idea atraviesa nuestra forma de diseñar. Recuperamos prendas y materiales que ya existen y los transformamos en algo nuevo: mezclamos texturas, intervenimos, desarmamos, reconstruimos y probamos otras formas de vestir.</p><p>MANGATA es una marca autogestiva de diseño y upcycling, trabajada 100% a mano. Cada pieza se desarrolla de manera individual y no repetimos diseños ni molderías.</p><p>Creemos en una moda más consciente, donde le damos valor a lo que quedó en desuso.</p><p>No buscamos que todas las prendas sean iguales. Buscamos que cada una encuentre su propia forma de brillar y que vos brilles con ella.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div>
+    <div className="mg-story-copy" data-reveal><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">MANGATA nace de una forma distinta de mirar lo que ya existe.</h2><p>El nombre viene del reflejo de la luna sobre el agua: una huella de luz que aparece y muta con el movimiento.</p><p>Esa idea atraviesa nuestra forma de diseñar. Recuperamos prendas y materiales que ya existen y los transformamos en algo nuevo: mezclamos texturas, intervenimos, desarmamos, reconstruimos y probamos otras formas de vestir.</p><p>MANGATA es una marca autogestiva de diseño y upcycling, trabajada 100% a mano. Cada pieza se desarrolla de manera individual y no repetimos diseños ni molderías.</p><p>Creemos en una moda más consciente, donde le damos valor a lo que quedó en desuso.</p><p>No buscamos que todas las prendas sean iguales. Buscamos que cada una encuentre su propia forma de brillar y que vos brilles con ella.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div>
   </section>;
 }
 
 function Help() {
   const { checkoutReady, mode } = useCart();
-  return <section id="ayuda" className="mg-help mg-shell" aria-labelledby="help-title"><div className="mg-help-intro"><span className="mg-eyebrow"><b>04</b> Antes de elegir</span><h2 id="help-title">Que te guste.<br /><em>Que sea para vos.</em></h2><p>Si tenés dudas sobre una pieza, te ayudamos a resolverlas antes de comprar.</p><a className="mg-button mg-button-dark" href={WHATSAPP} target="_blank" rel="noreferrer">Hablemos por WhatsApp <MessageCircle size={19} /></a>
+  return <section id="ayuda" className="mg-help mg-shell" aria-labelledby="help-title"><div className="mg-help-intro"><span className="mg-eyebrow">Antes de elegir</span><h2 id="help-title">Que te guste.<br /><em>Que sea para vos.</em></h2><p>Si tenés dudas sobre una pieza, te ayudamos a resolverlas antes de comprar.</p><a className="mg-button mg-button-dark" href={WHATSAPP} target="_blank" rel="noreferrer">Hablemos por WhatsApp <MessageCircle size={19} /></a>
       <div className="mg-buying-guide" id="compra-entrega" tabIndex={-1}><h3>Pago y entrega</h3>{checkoutReady && mode === "local" && <p><LockKeyhole size={17} aria-hidden="true" /><span>Pagás las piezas en el checkout de Mercado Pago. Los precios están en pesos argentinos.</span></p>}<p><PackageCheck size={18} aria-hidden="true" /><span>El envío no está incluido en el precio. Coordiná el costo y la entrega o el retiro antes de pagar.</span></p><a className="mg-inline-link" href={whatsappHref("Hola MANGATA, quiero consultar el costo de envío o coordinar un retiro antes de comprar.")} target="_blank" rel="noopener noreferrer">Consultar entrega <ArrowUpRight size={16} /></a></div>
     </div><div className="mg-faq"><details><summary>¿Cómo sé si me va a quedar?<Plus size={18} /></summary><p>Las piezas con medidas confirmadas las muestran en su ficha. Si una todavía no las tiene, podés pedirlas por WhatsApp desde esa misma página.</p></details><details><summary>¿Qué pieza voy a recibir?<Plus size={18} /></summary><p>Cada publicación corresponde a una pieza única. La prenda que ves disponible es la que vas a recibir.</p></details><details><summary>¿Cómo coordino el envío o retiro?<Plus size={18} /></summary><p>Escribinos con la pieza y tu localidad para consultar las opciones de entrega o coordinar un retiro en Córdoba.</p></details><details id="cambios"><summary>¿Cómo funcionan los cambios?<Plus size={18} /></summary><p>{PURCHASE_POLICY.uniquePieces} {PURCHASE_POLICY.exchanges} <Link href="/cambios">Ver condiciones y derecho de arrepentimiento.</Link></p></details><details><summary>¿Querés ver más detalles de una pieza?<Plus size={18} /></summary><p>Si necesitás fotos, medidas o querés consultar algún detalle antes de comprar, escribime.</p></details></div></section>;
 }
@@ -234,7 +238,7 @@ function Footer() {
   </footer>;
 }
 
-export default function Storefront({ initialProducts, mode, source: initialSource }: { initialProducts: StoreProduct[]; mode: CommerceMode; source: CatalogSource }) {
+export default function Storefront({ initialProducts, mode, source: initialSource, campaign }: { initialProducts: StoreProduct[]; mode: CommerceMode; source: CatalogSource; campaign: Campaign | null }) {
   const storefrontRef = useRef<HTMLDivElement>(null);
   useRevealOnView(storefrontRef);
   const [products, setProducts] = useState(initialProducts);
@@ -255,5 +259,5 @@ export default function Storefront({ initialProducts, mode, source: initialSourc
     const interval = window.setInterval(refresh, 60_000);
     return () => window.clearInterval(interval);
   }, [mode]);
-  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><MaterialPlayground /><Help /></main><Footer /></div></MotionConfig>;
+  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a><Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} /><CraftStory /><TribalScene products={products} /><Help /></main><Footer />{campaign && <CampaignNotice campaign={campaign} />}</div></MotionConfig>;
 }
