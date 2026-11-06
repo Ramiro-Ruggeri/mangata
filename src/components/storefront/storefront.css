@@ -494,29 +494,23 @@
   .mg-category-tabs button { flex: 1 1 auto; padding: 9px 12px; font-size: 13px; }
 }
 
-/* Del retazo a la pieza. The denim is real, cut by the silhouette of a real applique. */
-.mg-tribal { display: grid; grid-template-columns: minmax(0, .8fr) minmax(0, 1.5fr); gap: 16px clamp(28px, 4vw, 64px); align-items: end; padding-block: 72px; border-bottom: 1px solid var(--mg-line); }
-.mg-storefront .mg-tribal h2 { margin: 17px 0 22px; font-family: var(--font-display), sans-serif; font-size: clamp(36px, 3.7vw, 56px); font-weight: 500; line-height: 1.02; letter-spacing: -.05em; }
-.mg-tribal-copy > p { max-width: 38ch; color: var(--text-2); font-size: 15px; line-height: 1.7; }
-.mg-tribal-list { display: flex; flex-wrap: wrap; gap: 2px 18px; margin: 16px 0 0; padding: 0; list-style: none; }
-.mg-tribal-list a { display: inline-flex; min-height: 44px; align-items: center; font-size: 14px; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: var(--line-strong); }
-.mg-storefront .mg-tribal-replay { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; margin-top: 6px; border: 1px solid var(--line-strong); border-radius: 2px; padding: 8px 14px; background: transparent; color: var(--text); font-size: 13px; }
-@media (hover: hover) and (pointer: fine) { .mg-storefront .mg-tribal-replay:hover { background: var(--hover); } }
-.mg-tribal-arena { position: relative; height: clamp(340px, 30vw, 430px); overflow: hidden; border-bottom: 1px solid var(--line-strong); contain: layout paint; container-type: size; }
-/* At rest, before or without physics: a composition resting on the same floor. */
-.mg-tribal-piece { position: absolute; bottom: 0; left: var(--tribal-x); height: var(--tribal-h); aspect-ratio: var(--tribal-ratio); background: url(/tribals/denim.webp) center / 360px; -webkit-mask: var(--tribal-mask) center / 100% 100% no-repeat; mask: var(--tribal-mask) center / 100% 100% no-repeat; rotate: var(--tribal-r); transform-origin: center; cursor: pointer; user-select: none; -webkit-user-select: none; touch-action: pan-y; -webkit-touch-callout: none; }
-.mg-tribal-arena[data-physics="ready"] .mg-tribal-piece { top: 0; bottom: auto; left: 0; rotate: none; will-change: transform; cursor: grab; }
-.mg-tribal-arena .mg-tribal-piece[data-held="true"] { cursor: grabbing; filter: brightness(1.14); }
-.mg-tribal-hint { display: none; grid-column: 1 / -1; color: var(--text-2); font-size: 12px; }
-@media (hover: none) { .mg-tribal-hint { display: block; } }
-@media (max-width: 900px) {
-  .mg-tribal { grid-template-columns: 1fr; padding-block: 52px; }
-  .mg-tribal-arena { height: 340px; }
-}
+/* The appliques, still and oversized, cut by the edge of the page like the garment cuts them. Denim is real. */
+.mg-tribal { padding-block: 72px 0; overflow: hidden; border-bottom: 1px solid var(--mg-line); }
+.mg-storefront .mg-tribal h2 { margin: 17px 0 0; font-family: var(--font-display), sans-serif; font-size: clamp(44px, 6vw, 92px); font-weight: 500; line-height: .98; letter-spacing: -.055em; }
+.mg-tribal-field { position: relative; height: clamp(380px, 44vw, 660px); margin-top: 28px; }
+.mg-tribal-piece { position: absolute; display: block; aspect-ratio: var(--tribal-ratio); background: url(/tribals/denim.webp) center / 620px; -webkit-mask: var(--tribal-mask) center / 100% 100% no-repeat; mask: var(--tribal-mask) center / 100% 100% no-repeat; transition: filter var(--motion-feedback, 160ms) ease; }
+.mg-tribal-piece[data-tribal="bermuda-llama"] { top: -6%; left: 3%; height: 112%; rotate: -7deg; }
+.mg-tribal-piece[data-tribal="bermuda-estrella"] { top: 6%; left: 37%; height: 118%; rotate: 9deg; }
+.mg-tribal-piece[data-tribal="bermuda-garra"] { top: -14%; right: -5%; height: 104%; rotate: -11deg; }
+.mg-tribal-piece:focus-visible { outline: 2px solid var(--focus); outline-offset: 4px; }
+@media (hover: hover) and (pointer: fine) { .mg-tribal-piece:hover { filter: brightness(1.16); } }
 @media (max-width: 700px) {
-  /* Fewer, larger pieces on a phone. */
-  .mg-tribal-piece:nth-child(n + 5) { display: none; }
-  .mg-tribal-piece { left: calc(var(--tribal-x) * 1.08); }
+  .mg-tribal { padding-top: 52px; }
+  .mg-storefront .mg-tribal h2 { font-size: clamp(40px, 11vw, 56px); }
+  .mg-tribal-field { height: 86vw; margin-top: 20px; }
+  .mg-tribal-piece[data-tribal="bermuda-llama"] { left: -5%; height: 100%; }
+  .mg-tribal-piece[data-tribal="bermuda-estrella"] { top: 16%; left: 30%; height: 104%; }
+  .mg-tribal-piece[data-tribal="bermuda-garra"] { top: -12%; right: -18%; height: 84%; }
 }
 
 .mg-hero-trust { color: var(--text); }
@@ -541,3 +535,4 @@
   .campaign-notice a { min-height: 36px; }
 }
 @media (prefers-reduced-motion: reduce) { .campaign-notice { animation: none; } }
+.mg-cart-button { position: relative; }

@@ -10,6 +10,7 @@ import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight, Check, ChevronDown, CircleCheck, CreditCard, LockKeyhole, Menu, MessageCircle, PackageCheck, Plus, Search, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
+import { BagStamp } from "@/components/commerce/BagStamp";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { CatalogResult, CatalogSource, CommerceMode, StoreProduct } from "@/lib/commerce/types";
 import { PURCHASE_POLICY, SITE, WITHDRAWAL_HREF, whatsappHref } from "@/config/site";
@@ -52,7 +53,7 @@ function Header({ onSearch }: { onSearch: () => void }) {
       <div className="mg-header-actions">
         <button onClick={onSearch} className="mg-icon-button" aria-label="Buscar una pieza"><Search size={20} strokeWidth={1.5} /></button>
         <ThemeToggle />
-        <button onClick={openCart} className="mg-cart-button" aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} /><span className="mg-bag-label">Bolsa</span><span key={count} className="mg-cart-count" data-filled={count > 0}>{count}</span></button>
+        <button onClick={openCart} className="mg-cart-button" aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} /><span className="mg-bag-label">Bolsa</span><span key={count} className="mg-cart-count" data-filled={count > 0}>{count}</span><BagStamp /></button>
         <button onClick={() => setMenuOpen(true)} className="mg-icon-button mg-menu-toggle" aria-label="Abrir menú"><Menu size={22} strokeWidth={1.5} /></button>
       </div>
     </header>

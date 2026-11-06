@@ -1,5 +1,6 @@
 "use client";
 
+import { BAG_ADDED_EVENT } from "./BagStamp";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { CatalogResult, CommerceMode, StoreProduct } from "@/lib/commerce/types";
 import { refreshLocalCart } from "@/lib/commerce/cart-refresh";
@@ -211,6 +212,7 @@ export function CartProvider({ children, mode, checkoutReady }: { children: Reac
           id: current.id, sku: current.sku, name: current.name, price: current.price,
           image: current.image, qty: 1, remoteItemId: payload.itemId,
         }]);
+        window.dispatchEvent(new Event(BAG_ADDED_EVENT));
         trackCommerceEvent("add_to_cart", {
           currency: "ARS", value: current.price, item_id: current.sku, item_name: current.name, item_category: current.category,
         });

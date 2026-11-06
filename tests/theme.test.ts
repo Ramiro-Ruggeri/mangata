@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { runInNewContext } from "node:vm";
 import { relatedPieces } from "../src/lib/catalog-view";
 import { THEME_BOOT_SCRIPT, THEME_COLORS, THEME_KEY } from "../src/components/theme/theme";
-import { resolveScenePieces, shouldAnimateScene } from "../src/components/storefront/tribal-scene";
+import { resolveScenePieces } from "../src/components/storefront/tribal-scene";
 import tribals from "../src/components/storefront/tribals.json";
 import { currentCampaign, isOnAir, type Campaign } from "../src/config/campaign";
 import type { StoreProduct } from "../src/lib/commerce/types";
@@ -52,23 +52,6 @@ test("every tribal leads to a garment in the store, and a missing garment takes 
   assert.ok(resolveScenePieces(tribals, [bermuda, campera]).every(p => ["11", "7"].includes(p.product.id)));
   assert.ok(resolveScenePieces(tribals, [campera]).every(p => p.product.id === "7"));
   assert.deepEqual(resolveScenePieces(tribals, []), []);
-});
-
-test("collision bodies stay simple and inside their shape", () => {
-  for (const asset of tribals) {
-    assert.ok(asset.circles.length > 0 && asset.circles.length <= 16, asset.id);
-    for (const c of asset.circles) assert.ok(c.x >= 0 && c.x <= 1 && c.y >= 0 && c.y <= 1 && c.r > 0, asset.id);
-  }
-});
-
-test("reduced motion, data saving and weak devices get the static composition", () => {
-  const scope = (reduced: boolean, navigator: object) => ({ matchMedia: () => ({ matches: reduced }), navigator });
-  assert.equal(shouldAnimateScene(scope(false, { deviceMemory: 8, hardwareConcurrency: 8 })), true);
-  assert.equal(shouldAnimateScene(scope(false, {})), true);
-  assert.equal(shouldAnimateScene(scope(true, {})), false);
-  assert.equal(shouldAnimateScene(scope(false, { connection: { saveData: true } })), false);
-  assert.equal(shouldAnimateScene(scope(false, { deviceMemory: 1 })), false);
-  assert.equal(shouldAnimateScene(scope(false, { hardwareConcurrency: 1 })), false);
 });
 
 const campaign: Campaign = { id: "x", title: "T", message: "M", linkLabel: "L", href: "/", startsAt: "2026-11-27T00:00:00-03:00", endsAt: "2026-11-30T00:00:00-03:00" };

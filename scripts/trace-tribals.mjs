@@ -1,4 +1,4 @@
-// Traces tribal appliques from MANGATA's own product photos into SVG, with simple collision circles.
+// Traces tribal appliques from MANGATA's own product photos into SVG.
 // potrace (GPL) and svgo run as offline tools and are not project dependencies:
 //   TRACER_DIR=<folder with potrace and svgo installed> node scripts/trace-tribals.mjs
 import { createRequire } from "node:module";
@@ -67,60 +67,6 @@ const fillSmallHoles = (mask, w, h, limit) => {
   return out;
 };
 
-const distanceField = (mask, w, h) => {
-  const d = new Float32Array(w * h).map((_, i) => (mask[i] ? 1e6 : 0));
-  const relax = (i, j, cost) => { if (d[j] + cost < d[i]) d[i] = d[j] + cost; };
-  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
-    const i = y * w + x;
-    if (x) relax(i, i - 1, 1);
-    if (y) relax(i, i - w, 1);
-    if (x && y) relax(i, i - w - 1, 1.414);
-    if (y && x < w - 1) relax(i, i - w + 1, 1.414);
-  }
-  for (let y = h - 1; y >= 0; y--) for (let x = w - 1; x >= 0; x--) {
-    const i = y * w + x;
-    if (x < w - 1) relax(i, i + 1, 1);
-    if (y < h - 1) relax(i, i + w, 1);
-    if (x < w - 1 && y < h - 1) relax(i, i + w + 1, 1.414);
-    if (y < h - 1 && x) relax(i, i + w - 1, 1.414);
-  }
-  return d;
-};
-
-/** Greedy largest inscribed circles: a light compound body, without using the SVG outline. */
-const collisionCircles = (mask, w, h, limit = 9) => {
-  const field = distanceField(mask, w, h);
-  const circles = [];
-  for (let n = 0; n < limit; n++) {
-    let best = -1, r = 0;
-    for (let i = 0; i < field.length; i++) if (field[i] > r) { r = field[i]; best = i; }
-    if (best < 0 || (circles.length && r < circles[0].r * .16)) break;
-    const cx = best % w, cy = Math.floor(best / w);
-    circles.push({ x: cx, y: cy, r });
-    for (let y = Math.max(0, Math.floor(cy - r * 1.25)); y <= Math.min(h - 1, cy + r * 1.25); y++) {
-      for (let x = Math.max(0, Math.floor(cx - r * 1.25)); x <= Math.min(w - 1, cx + r * 1.25); x++) {
-        if ((x - cx) ** 2 + (y - cy) ** 2 <= (r * 1.25) ** 2) field[y * w + x] = 0;
-      }
-    }
-  }
-  // The arms have to collide too, or the pieces sink into the floor: cover the point farthest from every circle so far.
-  const inside = distanceField(mask, w, h);
-  const minimum = Math.max(w, h) * .018;
-  while (circles.length < 16) {
-    let best = -1, far = 0;
-    for (let i = 0; i < mask.length; i += 7) {
-      if (!mask[i]) continue;
-      const x = i % w, y = Math.floor(i / w);
-      let gap = Infinity;
-      for (const c of circles) gap = Math.min(gap, Math.hypot(x - c.x, y - c.y) - c.r);
-      if (gap > far) { far = gap; best = i; }
-    }
-    if (best < 0 || far < Math.max(w, h) * .05) break;
-    circles.push({ x: best % w, y: Math.floor(best / w), r: Math.max(inside[best], minimum) });
-  }
-  return circles;
-};
-
 mkdirSync(OUT, { recursive: true });
 const manifest = [];
 for (const source of SOURCES) {
@@ -153,9 +99,8 @@ for (const source of SOURCES) {
   const small = optimize(svg, { multipass: true, floatPrecision: 1, plugins: ["preset-default", { name: "removeAttrs", params: { attrs: ["stroke", "fill-rule"] } }] }).data;
   writeFileSync(join(OUT, `${source.id}.svg`), small);
 
-  const circles = collisionCircles(cropped, bw, bh).map(c => ({ x: +(c.x / bw).toFixed(3), y: +(c.y / bh).toFixed(3), r: +(c.r / bw).toFixed(3) }));
-  manifest.push({ id: source.id, productId: source.productId, photo: source.photo, ratio: +(bw / bh).toFixed(3), circles });
-  console.log(source.id, `${bw}x${bh}`, `fill ${(area / (bw * bh)).toFixed(2)}`, `${(small.length / 1024).toFixed(1)}KB`, `${circles.length} circles`);
+  manifest.push({ id: source.id, productId: source.productId, photo: source.photo, ratio: +(bw / bh).toFixed(3) });
+  console.log(source.id, `${bw}x${bh}`, `fill ${(area / (bw * bh)).toFixed(2)}`, `${(small.length / 1024).toFixed(1)}KB`);
 }
 writeFileSync("src/components/storefront/tribals.json", JSON.stringify(manifest, null, 1) + "\n");
 

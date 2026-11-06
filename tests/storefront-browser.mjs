@@ -97,17 +97,10 @@ async function main() {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.locator('.mg-product-photo').first().hover();
     await page.waitForFunction(() => Number(getComputedStyle(document.querySelector('.mg-image-primary')).transform.match(/matrix\(([^,]+)/)?.[1]) > 1);
-    // The physics loads near the section, moves real pieces and always leaves a keyboard route to the garments.
-    await page.locator('.mg-tribal-arena').scrollIntoViewIfNeeded();
-    await page.waitForFunction(() => document.querySelector('.mg-tribal-arena')?.dataset.physics === 'ready');
+    // The appliques are real links to their garment.
+    await page.locator('.mg-tribal-field').scrollIntoViewIfNeeded();
     if (output) await page.screenshot({ path: join(output, 'tribales-desktop.png') });
-    const piece = await page.locator('.mg-tribal-piece').first().boundingBox();
-    await page.mouse.move(piece.x + piece.width / 2, piece.y + piece.height / 2);
-    await page.mouse.down();
-    await page.mouse.move(piece.x + piece.width / 2 + 60, piece.y + piece.height / 2 - 25, { steps: 8 });
-    await page.mouse.up();
-    assert.equal(new URL(page.url()).pathname, '/', 'Dragging a tribal must not open the product');
-    assert.ok(await page.locator('.mg-tribal-list a').count() > 0);
+    assert.ok(await page.locator('.mg-tribal-piece').count() > 0);
     // Native animated up/down restores position, on both long home and product pages.
     for (const path of ['/', '/producto/7']) {
       await page.goto(`${base}${path}`, { waitUntil: 'domcontentloaded' });

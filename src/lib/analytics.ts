@@ -18,7 +18,6 @@ export type CommerceEventName =
   | "stock_error"
   | "checkout_error"
   | "theme_change"
-  | "tribal_interaction"
   | "announcement_view"
   | "announcement_click"
   | "announcement_close";

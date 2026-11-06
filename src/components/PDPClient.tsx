@@ -10,6 +10,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Check, ChevronLeft, ChevronRight, LockKeyhole, MessageCircle, Plus, ShoppingBag, X, ZoomIn } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
+import { BagStamp } from "@/components/commerce/BagStamp";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { StoreProduct } from "@/lib/commerce/types";
 import { PURCHASE_POLICY, whatsappHref } from "@/config/site";
@@ -91,7 +92,7 @@ export default function PDPClient({ product, related = [] }: { product: StorePro
       <header className="product-header">
         <Link href="/#coleccion" className="product-header-back" aria-label="Volver a la colección"><ArrowLeft size={19} strokeWidth={1.5} aria-hidden="true" /><span>Colección</span></Link>
         <Link href="/" className="product-wordmark" aria-label="MANGATA, inicio"><BrandSignature /></Link>
-        <div className="product-header-actions"><ThemeToggle /><button className="product-header-bag" onClick={openCart} aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} aria-hidden="true" /><span>Bolsa</span><span className="product-bag-count">{count}</span></button></div>
+        <div className="product-header-actions"><ThemeToggle /><button className="product-header-bag" onClick={openCart} aria-label={`Abrir bolsa, ${count} ${count === 1 ? "pieza" : "piezas"}`}><ShoppingBag size={19} strokeWidth={1.5} aria-hidden="true" /><span>Bolsa</span><span className="product-bag-count">{count}</span><BagStamp /></button></div>
       </header>
 
       <nav className="product-breadcrumb" aria-label="Ruta de navegación">
