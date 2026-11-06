@@ -29,14 +29,18 @@ export function assertDatabaseConfigured() {
   }
 }
 
-export function ordersDatabase() {
+export function databasePool() {
   assertDatabaseConfigured();
   if (!pool) {
     pool = new Pool({ connectionString: process.env.MANGATA_DATABASE_URL, max: 5, connectionTimeoutMillis: 3000,
       idleTimeoutMillis: 10_000, statement_timeout: 5000, query_timeout: 8000, application_name: "mangata" });
     pool.on("error", () => console.error("[commerce] database_connection_error"));
   }
-  return new PostgresOrders(pool);
+  return pool;
+}
+
+export function ordersDatabase() {
+  return new PostgresOrders(databasePool());
 }
 
 function cents(value: number) {
@@ -251,12 +255,18 @@ export class PostgresOrders {
     await this.db.query("UPDATE checkout_intents SET checked_at=now() WHERE reference=$1", [reference]);
   }
 
+  /** Shown in the panel: a stalled timer must be visible, not assumed healthy. */
+  async markReconciled() {
+    await this.db.query(`INSERT INTO commerce_meta(key,value) VALUES('last_reconcile_at',now()::text)
+      ON CONFLICT(key) DO UPDATE SET value=EXCLUDED.value`);
+  }
+
   async status() {
     const { rows: [row] } = await this.db.query(`SELECT
       (SELECT count(*)::int FROM inventory WHERE active) AS products,
       (SELECT count(*)::int FROM orders) AS orders,
       (SELECT count(*)::int FROM checkout_intents WHERE status='manual_review') AS reviews,
-      (SELECT count(*)::int FROM checkout_intents WHERE status NOT IN ('approved','cancelled') AND checked_at<now()-interval '15 minutes') AS overdue`);
+      (SELECT count(*)::int FROM checkout_intents WHERE status NOT IN ('approved','cancelled','manual_sale') AND checked_at<now()-interval '15 minutes') AS overdue`);
     return row;
   }
 }

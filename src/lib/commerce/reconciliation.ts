@@ -38,5 +38,6 @@ export async function reconcileOutstandingPayments() {
     await db.checked(intent.reference);
     checked++;
   }
+  await db.markReconciled();
   return { checked, ...await db.status() };
 }

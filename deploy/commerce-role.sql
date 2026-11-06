@@ -6,3 +6,6 @@ REVOKE CREATE ON SCHEMA public FROM PUBLIC;
 GRANT USAGE ON SCHEMA public TO mangata_app;
 GRANT SELECT, INSERT, UPDATE ON ALL TABLES IN SCHEMA public TO mangata_app;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE ON TABLES TO mangata_app;
+-- Append-only ledgers, and the sequences behind panel inserts.
+REVOKE UPDATE ON audit_log, stock_movements FROM mangata_app;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO mangata_app;
