@@ -18,7 +18,7 @@
   --primary-hover: #ffffff;
   --plate: #f3f2ee;
   --plate-filter: brightness(.95);
-  --header-bg: #0b0d12d9;
+  --header-bg: #0b0d12;
   --focus: #c9d3ff;
   --ok: #7fd6a0;
   --danger: #ffb4ab;
@@ -43,7 +43,7 @@
   --primary-hover: #2b2c38;
   --plate: #f3f2ee;
   --plate-filter: none;
-  --header-bg: #eeeae2d9;
+  --header-bg: #eeeae2;
   --focus: #443a86;
   --ok: #14703a;
   --danger: #9b2929;

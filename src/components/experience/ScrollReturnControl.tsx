@@ -63,6 +63,7 @@ function ScrollReturnSession({ route }: { route: string }) {
   const [keyboardOpen, setKeyboardOpen] = useState(false);
   const [travelling, setTravelling] = useState(false);
   const [status, setStatus] = useState("");
+  const [readingDown, setReadingDown] = useState(false);
   const pointRef = useRef<ScrollReturnPoint | null>(null);
   const manualNavigation = useRef(false);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -74,8 +75,13 @@ function ScrollReturnSession({ route }: { route: string }) {
 
   useEffect(() => {
     let frame = 0;
+    let lastY = window.scrollY;
     const readPosition = () => {
       frame = 0;
+      if (Math.abs(window.scrollY - lastY) > 4) {
+        setReadingDown(window.scrollY > lastY && document.activeElement !== buttonRef.current);
+        lastY = window.scrollY;
+      }
       setBeyondViewport(isPastScrollThreshold(window.scrollY, window.innerHeight));
       if (pointRef.current && shouldDiscardReturn(window.scrollY, manualNavigation.current)) {
         pointRef.current = null;
@@ -189,7 +195,7 @@ function ScrollReturnSession({ route }: { route: string }) {
     travelTo(0, topTarget, "Estás al inicio. Podés volver al lugar anterior con el botón de flecha hacia abajo.");
   }
 
-  const visible = (beyondViewport || returnPoint !== null || travelling) && !keyboardOpen && activeOverlay === null;
+  const visible = ((beyondViewport && !readingDown) || returnPoint !== null || travelling) && !keyboardOpen && activeOverlay === null;
   const label = returnPoint ? "Volver a donde estaba" : "Subir al inicio";
 
   return (
