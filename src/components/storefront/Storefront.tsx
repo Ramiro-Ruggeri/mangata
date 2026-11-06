@@ -6,7 +6,6 @@ import { useExperience } from "@/components/experience/ExperienceProvider";
 import { useRevealOnView } from "@/components/experience/useRevealOnView";
 import { useNativeDialog } from "@/components/ui/useNativeDialog";
 import Link from "next/link";
-import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight, Check, ChevronDown, CircleCheck, CreditCard, LockKeyhole, Menu, MessageCircle, PackageCheck, Plus, Search, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useCart } from "@/components/commerce/CartProvider";
@@ -128,7 +127,7 @@ function ProductCard({ product, percent }: { product: StoreProduct; percent?: nu
   const inBag = items.some((item) => item.sku === product.sku);
   const secondary = product.images[1];
   const add = async () => { setPending(true); try { await addItem(product); } finally { setPending(false); } };
-  return <motion.article data-scroll-anchor={`product-${product.id}`} layout="position" initial={false} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .22 }} className="mg-product-card">
+  return <article data-scroll-anchor={`product-${product.id}`} className="mg-product-card">
     <div className="mg-product-media" data-photo-surface={product.image.startsWith("/catalog/") ? "light" : undefined}>
       <Link href={`/producto/${product.id}`} className="mg-product-photo" aria-label={`Ver ${product.name}`} onPointerEnter={(event) => { if (event.pointerType === "mouse" && secondary) setSecondaryRequested(true); }} onClick={() => selectProduct(product, "collection")}>
         <Image src={product.image} alt={product.name} fill loading="lazy" sizes="(max-width: 700px) calc((100vw - 52px) / 2), (max-width: 1024px) 31vw, (max-width: 1440px) 23vw, 315px" className="mg-image-primary" />
@@ -143,7 +142,7 @@ function ProductCard({ product, percent }: { product: StoreProduct; percent?: nu
       <Link href={`/producto/${product.id}`} onClick={() => selectProduct(product, "collection_name")}><h3>{product.name}</h3></Link><div className="mg-product-prices"><strong>{money(product.price)}</strong>{product.compareAtPrice && <del>{money(product.compareAtPrice)}</del>}</div>{product.transferPrice && <p className="mg-transfer-price">{money(product.transferPrice)} por transferencia</p>}
     </div>
     <button className={`mg-add-button ${inBag ? "is-added" : ""}`} onClick={add} disabled={!product.inventory.isInStock || pending || syncState === "syncing"} aria-label={`${inBag ? "Ver" : "Sumar"} ${product.name} ${inBag ? "en" : "a"} la bolsa`}><span>{pending ? "Sumando…" : inBag ? "En tu bolsa" : "Sumar a la bolsa"}</span>{inBag ? <Check size={16} /> : <Plus size={16} />}</button>
-  </motion.article>;
+  </article>;
 }
 
 function Catalog({ products, source, campaign }: { products: StoreProduct[]; source: CatalogSource; campaign: Campaign | null }) {
@@ -183,7 +182,7 @@ function Catalog({ products, source, campaign }: { products: StoreProduct[]; sou
     <div className="mg-catalog-controls"><div className="mg-category-tabs" role="group" aria-label="Filtrar colección">{["Todas", "Denim", "Prendas", "Accesorios"].map((name) => <button key={name} aria-pressed={category === name} className={category === name ? "is-active" : ""} onClick={() => updateView({ category: name })}>{name}</button>)}</div><label className="mg-sort"><SlidersHorizontal size={15} /><select aria-label="Ordenar piezas" value={sort} onChange={(event) => updateView({ sort: event.target.value })}><option value="selection">Nuestra selección</option><option value="new">Recién intervenidas</option><option value="price-low">Menor precio</option><option value="price-high">Mayor precio</option></select><ChevronDown size={13} /></label></div>
     <div className="mg-catalog-summary"><p role="status" aria-atomic="true">{filtered.length} {filtered.length === 1 ? "pieza" : "piezas"}{category !== "Todas" ? ` · ${category}` : ""}</p><label><input type="checkbox" checked={onlyAvailable} onChange={(event) => updateView({ onlyAvailable: event.target.checked })} /> Sólo disponibles</label></div>
     {(category !== "Todas" || onlyAvailable || sort !== "selection") && <div className="mg-active-filters" role="group" aria-label="Selección actual"><span>Estás viendo</span>{category !== "Todas" && <button onClick={() => { updateView({ category: "Todas" }); restoreControl(".mg-category-tabs button"); }} aria-label={`Quitar filtro ${category}`}>{category}<X size={14} /></button>}{onlyAvailable && <button onClick={() => { updateView({ onlyAvailable: false }); restoreControl(".mg-catalog-summary input"); }} aria-label="Quitar filtro Sólo disponibles">Sólo disponibles<X size={14} /></button>}{sort !== "selection" && <button onClick={() => { updateView({ sort: "selection" }); restoreControl(".mg-sort select"); }} aria-label="Quitar orden elegido">{sort === "price-low" ? "Menor precio" : sort === "price-high" ? "Mayor precio" : "Recién intervenidas"}<X size={14} /></button>}<button className="mg-reset-filters" onClick={resetView}>Restablecer colección<ArrowRight size={14} /></button></div>}
-    <div className="mg-product-grid"><AnimatePresence mode="popLayout">{filtered.map((product) => <ProductCard key={product.id} product={product} percent={campaign?.percent} />)}</AnimatePresence></div>
+    <div className="mg-product-grid">{filtered.map((product) => <ProductCard key={product.id} product={product} percent={campaign?.percent} />)}</div>
     {!filtered.length && <div className="mg-empty"><h3>Por acá no quedan piezas.</h3><button className="mg-inline-link" onClick={resetView}>Volver a ver la colección <ArrowRight size={17} /></button></div>}
   </section>;
 }
@@ -265,5 +264,5 @@ export default function Storefront({ initialProducts, mode, source: initialSourc
     const interval = window.setInterval(refresh, 60_000);
     return () => { unsubscribe(); window.clearInterval(interval); };
   }, [mode]);
-  return <MotionConfig reducedMotion="user"><div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a>{campaign && <CampaignBar campaign={campaign} />}<Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} campaign={campaign} /><CraftStory /><TribalScene /><Help /></main><Footer />{campaign && <CampaignTakeover campaign={campaign} />}</div></MotionConfig>;
+  return <div ref={storefrontRef} className="mg-storefront"><a className="skip-link" href="#coleccion">Saltar a la colección</a>{campaign && <CampaignBar campaign={campaign} />}<Header onSearch={() => setSearchOpen(true)} /><SearchDialog products={products} open={searchOpen} onClose={() => setSearchOpen(false)} /><main><Hero products={products} /><PurchaseNotes /><Catalog products={products} source={source} campaign={campaign} /><CraftStory /><TribalScene /><Help /></main><Footer />{campaign && <CampaignTakeover campaign={campaign} />}</div>;
 }

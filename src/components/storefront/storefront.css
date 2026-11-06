@@ -586,3 +586,8 @@
   .mg-catalog-summary label { display: inline-flex; min-height: 44px; align-items: center; gap: 8px; }
   .mg-catalog-summary input { width: 20px; height: 20px; }
 }
+
+/* A card that appears after filtering fades in; no animation library for this. */
+.mg-product-card { animation: mg-card-in 220ms ease both; }
+@keyframes mg-card-in { from { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .mg-product-card { animation: none; } }

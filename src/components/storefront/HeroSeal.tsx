@@ -18,13 +18,15 @@ export function HeroSeal() {
   const [live, setLive] = useState(false);
   const onReady = useCallback(() => setLive(true), []);
 
-  // It waits until the page has finished and settled, so it never delays the photo or a purchase.
+  // three.js is heavy: someone who only glances at the page never downloads it, and sees the still stamp.
   useEffect(() => {
-    let timer = 0;
-    const schedule = () => { timer = window.setTimeout(() => { if (canDraw3D()) setLoad(true); }, 1500); };
-    if (document.readyState === "complete") schedule();
-    else window.addEventListener("load", schedule, { once: true });
-    return () => { window.clearTimeout(timer); window.removeEventListener("load", schedule); };
+    const events = ["pointermove", "pointerdown", "scroll", "keydown"] as const;
+    const start = () => {
+      events.forEach(name => window.removeEventListener(name, start));
+      if (canDraw3D()) setLoad(true);
+    };
+    events.forEach(name => window.addEventListener(name, start, { passive: true }));
+    return () => events.forEach(name => window.removeEventListener(name, start));
   }, []);
 
   return <span className="mg-hero-seal" data-live={live}>

@@ -5,7 +5,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import type { CatalogResult, CommerceMode, StoreProduct } from "@/lib/commerce/types";
 import { refreshLocalCart } from "@/lib/commerce/cart-refresh";
 import { subscribeToStock } from "@/lib/commerce/live-stock";
-import CartDrawer from "@/components/CartDrawer";
+import dynamic from "next/dynamic";
 import { useExperience } from "@/components/experience/ExperienceProvider";
 import { trackCommerceEvent } from "@/lib/analytics";
 import type { CommerceError } from "@/lib/commerce/one-of-one";
@@ -105,6 +105,9 @@ class CartRequestError extends Error {
 }
 const CartContext = createContext<CartContextValue | null>(null);
 
+const loadCartDrawer = () => import("@/components/CartDrawer");
+const CartDrawer = dynamic(loadCartDrawer, { ssr: false });
+
 export function CartProvider({ children, mode, checkoutReady }: { children: React.ReactNode; mode: CommerceMode; checkoutReady: boolean }) {
   const items = useSyncExternalStore(subscribeCart, () => cartSnapshot, () => EMPTY_CART);
   const { activeOverlay, openOverlay, closeOverlay } = useExperience();
@@ -113,6 +116,16 @@ export function CartProvider({ children, mode, checkoutReady }: { children: Reac
   const [syncMessage, setSyncMessage] = useState<string>();
   const operations = useRef<Promise<unknown>>(Promise.resolve());
   const cartTrigger = useRef<HTMLElement | null>(null);
+  // The bag's code waits for the first sign of use, and is ready before the first tap ends.
+  const [drawerRequested, setDrawerRequested] = useState(false);
+  const drawerWanted = open || drawerRequested;
+  useEffect(() => {
+    const events = ["pointerdown", "keydown"] as const;
+    const request = () => { void loadCartDrawer(); setDrawerRequested(true); events.forEach(name => window.removeEventListener(name, request)); };
+    events.forEach(name => window.addEventListener(name, request, { passive: true }));
+    return () => events.forEach(name => window.removeEventListener(name, request));
+  }, []);
+
   const openCart = useCallback(() => {
     // Capture the trigger before inert removes focus from the page content.
     if (document.documentElement.dataset.activeOverlay !== "cart") cartTrigger.current = document.activeElement as HTMLElement | null;
@@ -273,7 +286,7 @@ export function CartProvider({ children, mode, checkoutReady }: { children: Reac
     items, count: items.length, subtotal: items.reduce((sum, item) => sum + item.price, 0),
     open, mode, syncState, syncMessage, checkoutReady, addItem, removeItem, clear, clearPurchased, checkout, openCart, closeCart, restoreCartFocus,
   }), [items, open, mode, syncState, syncMessage, checkoutReady, addItem, removeItem, clear, clearPurchased, checkout, openCart, closeCart, restoreCartFocus]);
-  return <CartContext.Provider value={value}><div inert={open}>{children}</div><CartDrawer /></CartContext.Provider>;
+  return <CartContext.Provider value={value}><div inert={open}>{children}</div>{drawerWanted && <CartDrawer />}</CartContext.Provider>;
 }
 
 export function useCart() {
