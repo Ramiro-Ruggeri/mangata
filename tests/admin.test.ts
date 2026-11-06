@@ -7,6 +7,7 @@ import { getLocalCatalog, visibleProducts } from "../src/lib/commerce/catalog";
 import { PostgresOrders } from "../src/lib/commerce/postgres-orders";
 import { AdminAuth, MAX_ACCOUNT_FAILURES, MAX_IP_ATTEMPTS } from "../src/lib/admin/auth";
 import { AdminError, AdminStore, type ProductInput } from "../src/lib/admin/store";
+import { countEvent, metricsReport, trafficSource } from "../src/lib/admin/metrics";
 import { base32Encode, matchTotp, openSecret, totpAt } from "../src/lib/admin/crypto";
 
 const sql = (file: string) => readFileSync(new URL(`../deploy/${file}`, import.meta.url), "utf8");
@@ -392,6 +393,29 @@ test("panel on real PostgreSQL", async t => {
       assert.equal((await store.overview()).manual_today_count, 0, "02:00 UTC belongs to yesterday in Argentina");
       await orders.markReconciled();
       assert.ok((await store.overview()).last_reconcile_at);
+    });
+
+    await t.test("metrics: counters hold no identity, ignore forged pieces and separate sales", async () => {
+      await pool.query(sql("migrations/004-metrics.up.sql"));
+      const id = await store.createProduct(admin, input());
+      await store.publish(admin, id);
+      const { sku } = (await store.getProduct(id))!;
+      await countEvent(pool, "product_view", sku);
+      await countEvent(pool, "product_view", sku);
+      await countEvent(pool, "product_view", "MNGT-inventada");
+      await countEvent(pool, "page_view", trafficSource("www.instagram.com", "mangata.com.ar"));
+      await store.recordManualSale(admin, id, { amountCents: 500_000, channel: "whatsapp", note: "" });
+      const report = await metricsReport(pool, 30);
+      assert.equal(report.funnel.product_view, 2);
+      assert.equal(report.sources.find(item => item.dimension === "instagram")!.total, 1);
+      assert.equal(report.current.manual_cents >= 500_000, true);
+      assert.equal(report.pieces.find(piece => piece.sku === sku)!.sold, 1);
+      const { rows } = await pool.query("SELECT column_name FROM information_schema.columns WHERE table_name='metrics_daily' ORDER BY 1");
+      assert.deepEqual(rows.map(row => row.column_name), ["count", "day", "dimension", "metric"]);
+      assert.equal(trafficSource("", "mangata.com.ar"), "directo");
+      assert.equal(trafficSource("mangata.com.ar", "mangata.com.ar"), "interna");
+      assert.equal(trafficSource("chatgpt.com", "mangata.com.ar"), "ia");
+      await pool.query(sql("migrations/004-metrics.down.sql"));
     });
 
     await t.test("reconciliation: manual sales never look like overdue or abandoned payments", async () => {

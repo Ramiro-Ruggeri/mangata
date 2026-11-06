@@ -1,4 +1,5 @@
 // src/app/layout.tsx
+import { PageCounter } from "@/components/PageCounter";
 import "./globals.css";
 import "@/components/ui/interface-actions.css";
 import "@/components/theme/theme.css";
@@ -149,6 +150,7 @@ export default function RootLayout({
       <body>
         <ExperienceProvider>
           <BrandFlash />
+          <PageCounter />
           <ConsentProvider>
             <CartProvider mode={commerceMode} checkoutReady={getCheckoutReady(commerceMode)}>
               {children}

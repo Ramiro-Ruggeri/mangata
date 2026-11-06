@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Boxes, Home, LogOut, ReceiptText, Wallet } from "lucide-react";
+import { BarChart3, Boxes, Home, LogOut, ReceiptText, Wallet } from "lucide-react";
 import { logout } from "./actions";
 import { requireAdmin } from "@/lib/admin/server";
 
@@ -32,6 +32,7 @@ const NAV = [
   { href: "/admin/productos", label: "Piezas", Icon: Boxes },
   { href: "/admin/pedidos", label: "Pedidos", Icon: ReceiptText },
   { href: "/admin/pagos", label: "Pagos", Icon: Wallet },
+  { href: "/admin/metricas", label: "Métricas", Icon: BarChart3 },
 ];
 
 /** Authorises first: no page body renders for someone without a session. */

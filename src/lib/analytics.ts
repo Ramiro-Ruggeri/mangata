@@ -42,11 +42,35 @@ declare global {
   }
 }
 
+/**
+ * Anonymous daily counters: no cookie, storage or identifier.
+ * Until Ramiro decides otherwise they follow the same rule as all measurement: nothing leaves without consent.
+ */
+const COUNT_WITHOUT_CONSENT: boolean = false;
+
+export function countMetric(event: string, detail: { sku?: string; referrer?: string } = {}) {
+  if (typeof window === "undefined") return;
+  if (!COUNT_WITHOUT_CONSENT && !hasAnalyticsConsent()) return;
+  try {
+    const body = JSON.stringify({ event, ...detail });
+    if (!navigator.sendBeacon?.("/api/store/metric", new Blob([body], { type: "application/json" }))) {
+      void fetch("/api/store/metric", { method: "POST", body, keepalive: true }).catch(() => undefined);
+    }
+  } catch { /* Counting never gets in the way of shopping. */ }
+}
+
+const COUNTED_EVENTS: Partial<Record<CommerceEventName, string>> = {
+  view_item: "product_view", add_to_cart: "add_to_cart", begin_checkout: "begin_checkout",
+  measurement_inquiry: "whatsapp_click", checkout_inquiry: "whatsapp_click", drop_inquiry: "whatsapp_click", announcement_click: "announcement_click",
+};
+
 export function trackCommerceEvent(
   event: CommerceEventName,
   payload: CommerceEventPayload = {},
 ) {
   if (typeof window === "undefined") return false;
+  const counted = COUNTED_EVENTS[event];
+  if (counted) countMetric(counted, { sku: payload.item_id });
   if (!hasAnalyticsConsent()) { clearCommerceAnalytics(); return false; }
   const detail: Record<string, unknown> = { event, event_source: "mangata" };
   const keys: Array<keyof CommerceEventPayload> = [

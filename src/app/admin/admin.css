@@ -14,7 +14,7 @@ body:has(.adm) .brand-flash, body:has(.adm) footer, body:has(.adm) .experience-s
 .adm-icon { display: grid; width: 44px; height: 44px; place-items: center; border: 0; background: none; color: inherit; cursor: pointer; }
 .adm-main { width: min(720px, 100%); margin: 0 auto; padding: 20px 16px 104px; }
 .adm-title { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 18px; }
-.adm-nav { position: fixed; z-index: 5; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(4, 1fr); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--line); background: var(--header-bg); }
+.adm-nav { position: fixed; z-index: 5; right: 0; bottom: 0; left: 0; display: grid; grid-template-columns: repeat(5, 1fr); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid var(--line); background: var(--header-bg); }
 .adm-nav a { display: grid; min-height: 60px; place-items: center; align-content: center; gap: 3px; font-size: 12px; text-decoration: none; }
 
 .adm-primary, .adm-secondary { display: inline-flex; min-height: 48px; align-items: center; justify-content: center; border: 1px solid var(--text); padding: 0 18px; font: inherit; font-weight: 600; text-decoration: none; cursor: pointer; }
@@ -96,3 +96,11 @@ body:has(.adm) .brand-flash, body:has(.adm) footer, body:has(.adm) .experience-s
   .adm-top { order: -2; }
   .adm-main { padding-bottom: 48px; }
 }
+
+.adm-static li { display: flex; min-height: 48px; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--line); }
+.adm-table { overflow-x: auto; }
+.adm-table table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.adm-table th, .adm-table td { padding: 10px 6px; border-bottom: 1px solid var(--line); text-align: right; font-weight: 400; }
+.adm-table th { color: var(--text-2); font-size: 12px; }
+.adm-table th:first-child, .adm-table td:first-child { text-align: left; }
+.adm-table small { display: block; color: var(--text-2); font-size: 12px; }
