@@ -29,9 +29,10 @@ export function CampaignBar({ campaign }: { campaign: Campaign }) {
 export function CampaignTakeover({ campaign }: { campaign: Campaign }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
+  const [touched, setTouched] = useState(false);
 
   useEffect(() => {
-    try { if (window.localStorage.getItem(closedKey(campaign.id))) return; } catch { /* It may show again next visit. */ }
+    try { if (window.sessionStorage.getItem(closedKey(campaign.id))) return; } catch { /* Then it may show again on the next page. */ }
     const timer = window.setTimeout(() => {
       if (document.documentElement.dataset.activeOverlay || !dialog.current || dialog.current.open) return;
       dialog.current.showModal();
@@ -41,7 +42,7 @@ export function CampaignTakeover({ campaign }: { campaign: Campaign }) {
   }, [campaign.id]);
 
   const remember = () => {
-    try { window.localStorage.setItem(closedKey(campaign.id), "1"); } catch { /* It stays closed for this page view. */ }
+    try { window.sessionStorage.setItem(closedKey(campaign.id), "1"); } catch { /* It stays closed for this page view. */ }
   };
   const close = () => {
     dialog.current?.close();
@@ -58,6 +59,8 @@ export function CampaignTakeover({ campaign }: { campaign: Campaign }) {
     className="mg-takeover"
     aria-label={`${campaign.title}: ${campaign.percent}% OFF`}
     onClose={remember}
+    data-touched={touched || undefined}
+    onPointerDown={() => setTouched(true)}
     onPointerMove={(event) => setTilt({ x: event.clientX / window.innerWidth * 2 - 1, y: event.clientY / window.innerHeight * 2 - 1 })}
     style={{ "--tilt-x": tilt.x, "--tilt-y": tilt.y } as CSSProperties}
   >

@@ -11,5 +11,6 @@ await client.connect();
 await client.query(`INSERT INTO admin_users(email,invite_hash,invite_expires_at) VALUES($1,$2,now()+interval '24 hours')
   ON CONFLICT(email) DO UPDATE SET invite_hash=EXCLUDED.invite_hash,invite_expires_at=EXCLUDED.invite_expires_at,pending_password_hash=NULL,pending_totp_enc=NULL,active=true`,
 [email, createHash("sha256").update(token).digest("hex")]);
+await client.query("INSERT INTO audit_log(actor_email,action,entity,entity_id) VALUES('servidor','invitar','admin_user',$1)", [email]);
 await client.end();
 console.log(`${process.env.NEXT_PUBLIC_SITE_URL}/admin/activar?t=${token}`);

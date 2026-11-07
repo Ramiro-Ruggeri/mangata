@@ -1,6 +1,6 @@
 "use client";
 
-import { Component, useCallback, useEffect, useState, type ReactNode } from "react";
+import { Component, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
 import { canDraw3D } from "./TribalScene";
 
@@ -17,6 +17,7 @@ export function HeroSeal({ adorn }: { adorn: string }) {
   const [load, setLoad] = useState(false);
   const [live, setLive] = useState(false);
   const onReady = useCallback(() => setLive(true), []);
+  const tappedAt = useRef(-1e9);
 
   // three.js is heavy: someone who only glances at the page never downloads it, and sees the still stamp.
   useEffect(() => {
@@ -29,13 +30,13 @@ export function HeroSeal({ adorn }: { adorn: string }) {
     return () => events.forEach(name => window.removeEventListener(name, start));
   }, []);
 
-  return <span className="mg-hero-seal" data-live={live}>
+  return <span className="mg-hero-seal" data-live={live} onPointerDown={() => { tappedAt.current = performance.now(); }}>
     <span className="sr-only">Pieza única. Sin reposición.</span>
     <svg className="mg-hero-seal-ring" viewBox="0 0 120 120" aria-hidden="true">
       <defs><path id="mg-seal-ring" d="M60 60m-47 0a47 47 0 1 1 94 0a47 47 0 1 1-94 0" /></defs>
       <text><textPath href="#mg-seal-ring" textLength="292">PIEZA ÚNICA · SIN REPOSICIÓN ·</textPath></text>
     </svg>
     <span className="mg-hero-seal-static" aria-hidden="true" style={{ WebkitMaskImage: `url(${adorn})`, maskImage: `url(${adorn})` }} />
-    {load && <Boundary><AdornCanvas src={adorn} onReady={onReady} /></Boundary>}
+    {load && <Boundary><AdornCanvas src={adorn} onReady={onReady} tappedAt={tappedAt} /></Boundary>}
   </span>;
 }

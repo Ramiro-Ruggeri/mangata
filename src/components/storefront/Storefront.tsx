@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { BrandSignature } from "@/components/brand/BrandSignature";
 import { useExperience } from "@/components/experience/ExperienceProvider";
-import { useRevealOnView } from "@/components/experience/useRevealOnView";
 import { useNativeDialog } from "@/components/ui/useNativeDialog";
 import Link from "next/link";
 import { ArrowDown, ArrowRight, ArrowUp, ArrowUpRight, Check, ChevronDown, CircleCheck, CreditCard, LockKeyhole, Menu, MessageCircle, PackageCheck, Plus, Search, ShoppingBag, SlidersHorizontal, X } from "lucide-react";
@@ -176,7 +175,7 @@ function Catalog({ products, source, campaign }: { products: StoreProduct[]; sou
     });
   }, [products, category, onlyAvailable, sort]);
   return <section ref={sectionRef} id="coleccion" className="mg-collection mg-shell" aria-labelledby="collection-title">
-    <div className="mg-collection-heading" data-reveal><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>huella.</em></h2></div><div className="mg-collection-context"><p>Prendas y accesorios exclusivos,<br /> diseñados e intervenidos a mano.</p></div></div>
+    <div className="mg-collection-heading"><div><span className="mg-eyebrow">La colección</span><h2 id="collection-title">Prendas con<br /><em>huella.</em></h2></div><div className="mg-collection-context"><p>Prendas y accesorios exclusivos,<br /> diseñados e intervenidos a mano.</p></div></div>
     {source === "local-fallback" && <p className="mg-catalog-notice" role="status">Estamos revisando la disponibilidad de las piezas. Podés verlas y consultarnos por WhatsApp.</p>}
     {campaign && <p className="mg-campaign-strip"><strong>{campaign.title}</strong><span>{campaign.percent}% OFF</span><small>{campaign.message}</small></p>}
     <div className="mg-catalog-controls"><div className="mg-category-tabs" role="group" aria-label="Filtrar colección">{["Todas", "Denim", "Prendas", "Accesorios"].map((name) => <button key={name} aria-pressed={category === name} className={category === name ? "is-active" : ""} onClick={() => updateView({ category: name })}>{name}</button>)}</div><label className="mg-sort"><SlidersHorizontal size={15} /><select aria-label="Ordenar piezas" value={sort} onChange={(event) => updateView({ sort: event.target.value })}><option value="selection">Nuestra selección</option><option value="new">Recién intervenidas</option><option value="price-low">Menor precio</option><option value="price-high">Mayor precio</option></select><ChevronDown size={13} /></label></div>
@@ -189,7 +188,7 @@ function Catalog({ products, source, campaign }: { products: StoreProduct[]; sou
 
 function CraftStory() {
   return <section id="manifiesto" className="mg-story" aria-labelledby="story-title">
-        <div className="mg-story-copy" data-reveal><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">MANGATA nace de una forma distinta de mirar lo que ya existe.</h2><div className="mg-story-body"><p>El nombre viene del reflejo de la luna sobre el agua: una huella de luz que aparece y muta con el movimiento.</p><p>Esa idea atraviesa nuestra forma de diseñar. Recuperamos prendas y materiales que ya existen y los transformamos en algo nuevo: mezclamos texturas, intervenimos, desarmamos, reconstruimos y probamos otras formas de vestir.</p><p>MANGATA es una marca autogestiva de diseño y upcycling, trabajada 100% a mano. Cada pieza se desarrolla de manera individual y no repetimos diseños ni molderías.</p><p>Creemos en una moda más consciente, donde le damos valor a lo que quedó en desuso.</p><p>No buscamos que todas las prendas sean iguales. Buscamos que cada una encuentre su propia forma de brillar y que vos brilles con ella.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div></div>
+        <div className="mg-story-copy"><span className="mg-eyebrow">Hecho de lo que ya existe</span><h2 id="story-title">MANGATA nace de una forma distinta de mirar lo que ya existe.</h2><div className="mg-story-body"><p>El nombre viene del reflejo de la luna sobre el agua: una huella de luz que aparece y muta con el movimiento.</p><p>Esa idea atraviesa nuestra forma de diseñar. Recuperamos prendas y materiales que ya existen y los transformamos en algo nuevo: mezclamos texturas, intervenimos, desarmamos, reconstruimos y probamos otras formas de vestir.</p><p>MANGATA es una marca autogestiva de diseño y upcycling, trabajada 100% a mano. Cada pieza se desarrolla de manera individual y no repetimos diseños ni molderías.</p><p>Creemos en una moda más consciente, donde le damos valor a lo que quedó en desuso.</p><p>No buscamos que todas las prendas sean iguales. Buscamos que cada una encuentre su propia forma de brillar y que vos brilles con ella.</p><a href={INSTAGRAM} target="_blank" rel="noreferrer" className="mg-inline-link">Mirá el proceso en Instagram <ArrowUpRight size={18} /></a><div className="mg-craft-signature"><span>MANGATA</span><small>Recuperada e intervenida en Córdoba.</small></div></div></div>
   </section>;
 }
 
@@ -203,13 +202,13 @@ function Help() {
 function Footer() {
   return <footer className="mg-footer" aria-label="MANGATA: colección y contacto">
     <div className="mg-footer-top mg-shell">
-      <div className="mg-footer-intro" data-reveal>
+      <div className="mg-footer-intro">
         <span className="mg-eyebrow">Seguimos por acá</span>
         <h2>¿Te quedó algo<br /><em>en la cabeza?</em></h2>
         <p>Volvé a mirarlo. Si dudás con el calce, lo vemos con vos antes de que elijas.</p>
         <a href="#coleccion" className="mg-button mg-button-lilac mg-footer-collection" onClick={() => trackCommerceEvent("footer_navigation", { source: "footer_collection" })}>Volver a la colección <ArrowUp size={18} aria-hidden="true" /></a>
       </div>
-      <div className="mg-footer-support" data-reveal>
+      <div className="mg-footer-support">
         <a href={WHATSAPP_MEASURES} target="_blank" rel="noopener noreferrer" className="mg-footer-assist" aria-label="Consultar medidas por WhatsApp (se abre en otra pestaña)" onClick={() => trackCommerceEvent("measurement_inquiry", { source: "footer" })}>
           <span className="mg-footer-assist-icon"><MessageCircle size={20} strokeWidth={1.5} aria-hidden="true" /></span>
           <span><strong>¿Cómo te va a quedar?</strong><small>Pedinos las medidas por WhatsApp.</small></span>
@@ -243,7 +242,6 @@ function Footer() {
 
 export default function Storefront({ initialProducts, mode, source: initialSource, campaign }: { initialProducts: StoreProduct[]; mode: CommerceMode; source: CatalogSource; campaign: Campaign | null }) {
   const storefrontRef = useRef<HTMLDivElement>(null);
-  useRevealOnView(storefrontRef);
   const [products, setProducts] = useState(initialProducts);
   const [source, setSource] = useState(initialSource);
   const { activeOverlay, openOverlay, closeOverlay } = useExperience();

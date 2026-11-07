@@ -12,7 +12,7 @@ export function placeTribals(width: number, height: number): TribalLayout {
       moonPaths: [-width * .24, width * .24],
     };
   }
-  const size = Math.min(height * .42, width * .8);
+  const size = Math.min(height * .46, width * .9);
   return {
     reflejo: { x: -width * .06, y: height * .25, height: size * .92 },
     cruz: { x: width * .06, y: -height * .2, height: size },

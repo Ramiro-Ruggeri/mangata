@@ -7,6 +7,10 @@ import {
 export const MAX_ACCOUNT_FAILURES = 5;
 export const ACCOUNT_LOCK_MINUTES = 15;
 export const MAX_IP_ATTEMPTS = 20;
+/** Wrong passwords for one account from one address; then only that address waits. */
+export const MAX_PASSWORD_FAILURES_PER_ADDRESS = 5;
+/** Wrong passwords for one account from everywhere together; only then the account itself waits. */
+export const MAX_PASSWORD_FAILURES_PER_ACCOUNT = 30;
 export const IP_WINDOW_MINUTES = 15;
 const SESSION_DAYS = 7;
 const IDLE_HOURS = 12;
@@ -90,6 +94,19 @@ export class AdminAuth {
     return row.attempts <= MAX_IP_ATTEMPTS;
   }
 
+  /** Failures inside the current window for a key, optionally counting one more. */
+  private async failures(key: string, add: boolean) {
+    const { rows: [row] } = await this.db.query(add
+      ? `INSERT INTO admin_login_throttle(ip_hash,attempts) VALUES($1,1)
+        ON CONFLICT(ip_hash) DO UPDATE SET
+          attempts=CASE WHEN admin_login_throttle.window_started_at<now()-make_interval(mins=>$2) THEN 1 ELSE admin_login_throttle.attempts+1 END,
+          window_started_at=CASE WHEN admin_login_throttle.window_started_at<now()-make_interval(mins=>$2) THEN now() ELSE admin_login_throttle.window_started_at END
+        RETURNING attempts`
+      : "SELECT CASE WHEN window_started_at<now()-make_interval(mins=>$2) THEN 0 ELSE attempts END AS attempts FROM admin_login_throttle WHERE ip_hash=$1",
+    [sha256(key), ACCOUNT_LOCK_MINUTES]);
+    return (row?.attempts ?? 0) as number;
+  }
+
   private async failure(userId: number) {
     await this.db.query(`UPDATE admin_users SET
       locked_until=CASE WHEN failed_attempts+1>=$2 THEN now()+make_interval(mins=>$3) ELSE locked_until END,
@@ -100,10 +117,19 @@ export class AdminAuth {
   /** Every failure returns the same result, so it cannot be used to discover accounts or locks. */
   async login(rawEmail: string, password: string, ip: string) {
     if (password.length > 200 || !await this.ipAllowed(ip)) return null;
+    const email = rawEmail.trim().toLowerCase();
+    const pairKey = `password|${ip}|${email}`, accountKey = `password|${email}`;
+    if (await this.failures(pairKey, false) >= MAX_PASSWORD_FAILURES_PER_ADDRESS) { await burnPasswordCheck(password); return null; }
     const { rows: [user] } = await this.db.query(`SELECT id,password_hash,totp_secret_enc,locked_until>now() AS locked FROM admin_users
       WHERE email=$1 AND active`, [rawEmail.trim().toLowerCase()]);
     if (!user?.password_hash || !user.totp_secret_enc || user.locked) { await burnPasswordCheck(password); return null; }
-    if (!await verifyPassword(password, user.password_hash)) { await this.failure(user.id); return null; }
+    if (!await verifyPassword(password, user.password_hash)) {
+      await this.failures(pairKey, true);
+      if (await this.failures(accountKey, true) >= MAX_PASSWORD_FAILURES_PER_ACCOUNT) {
+        await this.db.query("UPDATE admin_users SET locked_until=now()+make_interval(mins=>$2) WHERE id=$1", [user.id, ACCOUNT_LOCK_MINUTES]);
+      }
+      return null;
+    }
     const token = newToken();
     await this.db.query(`INSERT INTO admin_sessions(token_hash,user_id,expires_at) VALUES($1,$2,now()+make_interval(mins=>$3))`,
       [sha256(token), user.id, PENDING_MINUTES]);
@@ -121,6 +147,12 @@ export class AdminAuth {
     const { rows: [row] } = await this.db.query(`SELECT s.token_hash,u.id,u.email,u.totp_secret_enc,u.locked_until>now() AS locked FROM admin_sessions s JOIN admin_users u ON u.id=s.user_id
       WHERE s.token_hash=$1 AND NOT s.mfa_passed AND s.revoked_at IS NULL AND s.expires_at>now() AND u.active`, [sha256(pendingToken)]);
     if (!row || row.locked) return null;
+    const { rowCount: slot } = await this.db.query(`UPDATE admin_users SET failed_attempts=failed_attempts+1
+      WHERE id=$1 AND failed_attempts<$2 AND (locked_until IS NULL OR locked_until<=now())`, [row.id, MAX_ACCOUNT_FAILURES]);
+    if (!slot) {
+      await this.db.query("UPDATE admin_sessions SET revoked_at=now() WHERE token_hash=$1", [row.token_hash]);
+      return null;
+    }
     const code = rawCode.trim();
     let ok = false, usedRecovery = false;
     if (/^\d{6}$/.test(code)) {
@@ -131,7 +163,8 @@ export class AdminAuth {
       ok = usedRecovery = await this.consumeRecoveryCode(row.id, code);
     }
     if (!ok) {
-      await this.failure(row.id);
+      await this.db.query(`UPDATE admin_users SET locked_until=now()+make_interval(mins=>$3),failed_attempts=0
+        WHERE id=$1 AND failed_attempts>=$2`, [row.id, MAX_ACCOUNT_FAILURES, ACCOUNT_LOCK_MINUTES]);
       const { rows: [state] } = await this.db.query("SELECT locked_until>now() AS locked FROM admin_users WHERE id=$1", [row.id]);
       if (state.locked) await this.db.query("UPDATE admin_sessions SET revoked_at=now() WHERE token_hash=$1", [row.token_hash]);
       return null;

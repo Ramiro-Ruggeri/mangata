@@ -103,15 +103,17 @@ function useReflections() {
   return texture;
 }
 
-function Piece({ geometry, reflections, place, phase, spin, color, motion, scroll }: { geometry: BufferGeometry; reflections: Texture; place: TribalPlacement; phase: number; spin: number; color: string; motion: RefObject<Motion>; scroll: RefObject<number> }) {
+function Piece({ geometry, reflections, place, phase, color, motion }: { geometry: BufferGeometry; reflections: Texture; place: TribalPlacement; phase: number; color: string; motion: RefObject<Motion> }) {
   const group = useRef<Group>(null);
+  // Without a mouse the pieces stay nearly face on, so they never look thin on a phone.
+  const sway = useMemo(() => window.matchMedia("(pointer: coarse)").matches ? .08 : .26, []);
   useFrame((state, rawDelta) => {
     if (!group.current) return;
     const delta = Math.min(rawDelta, .05);
     const time = state.clock.elapsedTime;
     const { rotation, position } = group.current;
-    rotation.y = MathUtils.damp(rotation.y, MathUtils.clamp(Math.sin(time * .32 + phase) * .26 + motion.current.pointerX * .34 + scroll.current * spin, -.62, .62), 3, delta);
-    rotation.x = MathUtils.damp(rotation.x, -motion.current.pointerY * .2 + Math.cos(time * .26 + phase) * .06, 3, delta);
+    rotation.y = MathUtils.damp(rotation.y, MathUtils.clamp(Math.sin(time * .32 + phase) * sway + motion.current.pointerX * .34, -.62, .62), 3, delta);
+    rotation.x = MathUtils.damp(rotation.x, -motion.current.pointerY * .2 + Math.cos(time * .26 + phase) * sway * .25, 3, delta);
     position.y = place.y + Math.sin(time * .55 + phase) * place.height * .025;
   });
   return <group ref={group} position={[place.x, place.y, 0]} scale={place.height}>
@@ -166,25 +168,39 @@ function Scene({ geometries, field, onReady }: { geometries: { reflejo: BufferGe
   const layout = placeTribals(width, height);
   const motion = useRef<Motion>({ pointerX: 0, pointerY: 0 });
   const target = useRef({ x: 0, y: 0 });
-  const scroll = useRef(0);
   const light = useRef<PointLight>(null);
   const frames = useRef(0);
 
   useEffect(() => {
+    const onTouch = (event: TouchEvent) => {
+      const touch = event.touches[0];
+      const rect = field.current?.getBoundingClientRect();
+      if (!touch || !rect || touch.clientY < rect.top || touch.clientY > rect.bottom) return;
+      target.current = { x: (touch.clientX - rect.left) / rect.width * 2 - 1, y: (touch.clientY - rect.top) / rect.height * 2 - 1 };
+    };
+    const release = () => { target.current = { x: 0, y: 0 }; };
+    window.addEventListener("touchstart", onTouch, { passive: true });
+    window.addEventListener("touchmove", onTouch, { passive: true });
+    window.addEventListener("touchend", release, { passive: true });
+    window.addEventListener("touchcancel", release, { passive: true });
     const onPointer = (event: PointerEvent) => {
       if (event.pointerType === "touch") return;
       target.current = { x: event.clientX / window.innerWidth * 2 - 1, y: event.clientY / window.innerHeight * 2 - 1 };
     };
     window.addEventListener("pointermove", onPointer, { passive: true });
-    return () => window.removeEventListener("pointermove", onPointer);
-  }, []);
+    return () => {
+      window.removeEventListener("pointermove", onPointer);
+      window.removeEventListener("touchstart", onTouch);
+      window.removeEventListener("touchmove", onTouch);
+      window.removeEventListener("touchend", release);
+      window.removeEventListener("touchcancel", release);
+    };
+  }, [field]);
 
   useFrame((_, rawDelta) => {
     const delta = Math.min(rawDelta, .05);
     motion.current.pointerX = MathUtils.damp(motion.current.pointerX, target.current.x, 4, delta);
     motion.current.pointerY = MathUtils.damp(motion.current.pointerY, target.current.y, 4, delta);
-    const rect = field.current?.getBoundingClientRect();
-    if (rect) scroll.current = MathUtils.clamp((rect.top + rect.height / 2 - window.innerHeight / 2) / window.innerHeight, -1, 1);
     if (light.current) light.current.position.set(motion.current.pointerX * width * .55, -motion.current.pointerY * height * .55, 2.4);
     frames.current += 1;
     if (frames.current === 2) onReady();
@@ -193,8 +209,8 @@ function Scene({ geometries, field, onReady }: { geometries: { reflejo: BufferGe
   return <>
     <directionalLight position={[-2, 5, 4]} intensity={1.3} />
     <pointLight ref={light} color={palette.light} intensity={26} distance={9} />
-    <Piece geometry={geometries.reflejo} reflections={reflections} place={layout.reflejo} phase={0} spin={.4} color={palette.metal} motion={motion} scroll={scroll} />
-    <Piece geometry={geometries.cruz} reflections={reflections} place={layout.cruz} phase={2.1} spin={-.4} color={palette.metal} motion={motion} scroll={scroll} />
+    <Piece geometry={geometries.reflejo} reflections={reflections} place={layout.reflejo} phase={0} color={palette.metal} motion={motion} />
+    <Piece geometry={geometries.cruz} reflections={reflections} place={layout.cruz} phase={2.1} color={palette.metal} motion={motion} />
     <Water y={layout.waterY} paths={layout.moonPaths} color={palette.water} strength={palette.waterStrength} compact={width < height} />
   </>;
 }
@@ -251,13 +267,15 @@ export default function TribalCanvas({ field, onReady, onFail }: { field: RefObj
   </Canvas>;
 }
 
-function Adorn({ geometry, onReady }: { geometry: BufferGeometry; onReady: () => void }) {
+function Adorn({ geometry, onReady, tappedAt }: { geometry: BufferGeometry; onReady: () => void; tappedAt: RefObject<number> }) {
   const group = useRef<Group>(null);
   const reflections = useReflections();
   const frames = useRef(0);
   useFrame((state, delta) => {
     if (group.current) {
-      group.current.rotation.y += Math.min(delta, .05) * .7;
+      // A tap gives a fast turn that fades over about a second.
+      const extra = 9 * Math.exp(-(performance.now() - tappedAt.current) / 600);
+      group.current.rotation.y += Math.min(delta, .05) * (.7 + extra);
       group.current.rotation.x = Math.sin(state.clock.elapsedTime * .6) * .14;
     }
     frames.current += 1;
@@ -272,7 +290,7 @@ function Adorn({ geometry, onReady }: { geometry: BufferGeometry; onReady: () =>
 }
 
 /** A small adorn turning, for the stamp on the cover. */
-export function AdornCanvas({ src, onReady }: { src: string; onReady: () => void }) {
+export function AdornCanvas({ src, onReady, tappedAt }: { src: string; onReady: () => void; tappedAt: RefObject<number> }) {
   const [geometry, setGeometry] = useState<BufferGeometry | null>(null);
   useEffect(() => {
     let built: BufferGeometry | null = null;
@@ -286,6 +304,6 @@ export function AdornCanvas({ src, onReady }: { src: string; onReady: () => void
   }, [src]);
   if (!geometry) return null;
   return <Canvas className="mg-hero-seal-canvas" dpr={[1, 2]} camera={{ position: [0, 0, 8], fov: 30 }} gl={{ alpha: true, antialias: true }}>
-    <Adorn geometry={geometry} onReady={onReady} />
+    <Adorn geometry={geometry} onReady={onReady} tappedAt={tappedAt} />
   </Canvas>;
 }

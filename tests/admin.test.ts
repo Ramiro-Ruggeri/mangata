@@ -5,7 +5,7 @@ import { readFileSync } from "node:fs";
 import { Pool } from "pg";
 import { getLocalCatalog, visibleProducts } from "../src/lib/commerce/catalog";
 import { PostgresOrders } from "../src/lib/commerce/postgres-orders";
-import { AdminAuth, MAX_ACCOUNT_FAILURES, MAX_IP_ATTEMPTS } from "../src/lib/admin/auth";
+import { AdminAuth, MAX_ACCOUNT_FAILURES, MAX_IP_ATTEMPTS, MAX_PASSWORD_FAILURES_PER_ADDRESS, MAX_PASSWORD_FAILURES_PER_ACCOUNT } from "../src/lib/admin/auth";
 import { AdminError, AdminStore, type ProductInput } from "../src/lib/admin/store";
 import { countEvent, metricsReport, trafficSource } from "../src/lib/admin/metrics";
 import { base32Encode, matchTotp, openSecret, totpAt } from "../src/lib/admin/crypto";
@@ -156,9 +156,17 @@ test("panel on real PostgreSQL", async t => {
       assert.equal(await auth.verifySecondFactor(third!, code), null);
     });
 
-    await t.test("lockout: account locks on repeated failures, then even the right password fails", async () => {
+    await t.test("lockout: one address guessing cannot lock the owner out from elsewhere", async () => {
       const { email } = await freshAccount();
-      for (let i = 0; i < MAX_ACCOUNT_FAILURES; i++) assert.equal(await auth.login(email, "incorrecta-numero-" + i, randomUUID()), null);
+      const attacker = randomUUID();
+      for (let i = 0; i < MAX_PASSWORD_FAILURES_PER_ADDRESS; i++) assert.equal(await auth.login(email, "incorrecta-numero-" + i, attacker), null);
+      assert.equal(await auth.login(email, PASSWORD, attacker), null, "that address waits, even with the right password");
+      assert.ok(await auth.login(email, PASSWORD, randomUUID()), "the owner still gets in from her phone");
+    });
+
+    await t.test("lockout: guessing from many addresses locks the account, then even the right password fails", async () => {
+      const { email } = await freshAccount();
+      for (let i = 0; i < MAX_PASSWORD_FAILURES_PER_ACCOUNT; i++) assert.equal(await auth.login(email, "incorrecta-numero-" + i, randomUUID()), null);
       assert.equal(await auth.login(email, PASSWORD, randomUUID()), null);
       await pool.query("UPDATE admin_users SET locked_until=now()-interval '1 second' WHERE email=$1", [email]);
       assert.ok(await auth.login(email, PASSWORD, randomUUID()));
@@ -169,7 +177,18 @@ test("panel on real PostgreSQL", async t => {
       const pending = await auth.login(email, PASSWORD, randomUUID());
       for (let i = 0; i < MAX_ACCOUNT_FAILURES; i++) assert.equal(await auth.verifySecondFactor(pending!, "000000"), null);
       assert.equal(await auth.pendingSessionValid(pending!), false);
+      const again = await auth.login(email, PASSWORD, randomUUID());
+      assert.equal(again, null, "a locked account gets no new pending session");
       assert.equal(await auth.verifySecondFactor(pending!, await codeFor(email)), null);
+    });
+
+    await t.test("lockout: parallel code guesses cannot exceed the limit", async () => {
+      const { email } = await freshAccount();
+      const pending = await auth.login(email, PASSWORD, randomUUID());
+      const results = await Promise.all(Array.from({ length: MAX_ACCOUNT_FAILURES * 3 }, () => auth.verifySecondFactor(pending!, "000000")));
+      assert.ok(results.every(result => result === null));
+      const { rows: [row] } = await pool.query("SELECT locked_until>now() AS locked FROM admin_users WHERE email=$1", [email]);
+      assert.equal(row.locked, true);
     });
 
     await t.test("throttle: one address cannot keep trying, and it does not block another", async () => {

@@ -34,7 +34,11 @@ export async function setSessionCookie(token: string) {
 export async function endSession() {
   const jar = await cookies();
   const token = jar.get(SESSION)?.value;
-  if (token) await adminAuth().logout(token);
+  if (token) {
+    const admin = await adminAuth().identify(token);
+    await adminAuth().logout(token);
+    if (admin) await databasePool().query("INSERT INTO audit_log(actor_id,actor_email,action,entity,entity_id) VALUES($1,$2,'salir','admin_user',$3)", [admin.id, admin.email, String(admin.id)]);
+  }
   jar.delete({ name: SESSION, secure: true, path: "/" });
 }
 

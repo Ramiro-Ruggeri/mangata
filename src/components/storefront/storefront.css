@@ -591,3 +591,16 @@
 .mg-product-card { animation: mg-card-in 220ms ease both; }
 @keyframes mg-card-in { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .mg-product-card { animation: none; } }
+
+/* The stamp answers a tap with a faster turn; the photo link stays under the rest of the picture. */
+.mg-hero-seal { pointer-events: auto; touch-action: manipulation; cursor: pointer; }
+/* The opening follows a finger, and drifts by itself on touch screens until it is touched. */
+.mg-takeover { touch-action: none; }
+@media (pointer: coarse) {
+  .mg-takeover:not([data-touched]) .mg-takeover-reflejo { animation: mg-drift 7s ease-in-out infinite alternate; }
+  .mg-takeover:not([data-touched]) .mg-takeover-cruz { animation: mg-drift 8s ease-in-out infinite alternate-reverse; }
+  .mg-takeover:not([data-touched]) .mg-takeover-glow { animation: mg-glow 6s ease-in-out infinite alternate; }
+}
+@keyframes mg-drift { to { translate: 18px -14px; rotate: 4deg; } }
+@keyframes mg-glow { to { translate: 12% 8%; } }
+@media (prefers-reduced-motion: reduce) { .mg-takeover * { animation: none !important; } }

@@ -8,7 +8,7 @@ Reviewed 2026-09-14. This is an implementation inventory and release checklist, 
 | --- | --- | --- |
 | `localStorage.mangata_cart_v2` | Operational bag contents; no stock reservation | Until bag/site data is cleared; legacy `mngt_cart_v1` removed on write |
 | `localStorage.mangata_theme` | Visual preference (`dark` or `light`), no personal data | Until site data is cleared | 
-| `localStorage.mangata_campaign_closed_*` | Remembers a dismissed announcement, per campaign; no personal data | Until site data is cleared |
+| `sessionStorage.mangata_campaign_closed_*` | Remembers a dismissed announcement during one visit, per campaign; no personal data | Until the tab closes; former value was localStorage and is ignored |ite data is cleared |
 | `sessionStorage.mangata_intro` | Shows the brand intro once per session | Until the tab closes |
 | `localStorage.mangata_privacy_v1` | Version, analytics choice, decision and expiry timestamps | 180 days; version/expiry/malformed values fail closed |
 | `mangata_evershop_cart` cookie | Operational connected cart | Up to 30 days, HttpOnly, SameSite=Lax, Secure in production; created only in remote cart flow |
