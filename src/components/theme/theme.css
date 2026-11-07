@@ -139,3 +139,6 @@ body { color: var(--text); }
 
 /* Nothing may widen the page: on phones the whole site must never slide sideways. */
 html, body { overflow-x: clip; }
+
+/* Safari would invent a bolder face for weights it lacks; every weight used is loaded instead. */
+html { font-synthesis: none; }

@@ -604,3 +604,13 @@
 @keyframes mg-drift { to { translate: 18px -14px; rotate: 4deg; } }
 @keyframes mg-glow { to { translate: 12% 8%; } }
 @media (prefers-reduced-motion: reduce) { .mg-takeover * { animation: none !important; } }
+
+/* The smallest phones: the whole header fits, with every control still 40 px or more. */
+@media (max-width: 340px) {
+  .mg-header { gap: 4px; padding-inline: 8px; }
+  .mg-header .mangata-mark { width: 26px; height: 26px; flex-basis: 26px; }
+  .mg-header .brand-signature > span { font-size: 17px; }
+  .mg-storefront .mg-header .mg-icon-button { width: 40px; height: 40px; }
+  .mg-storefront .mg-cart-button { padding-inline: 4px; }
+  .mg-hero .mg-button { white-space: nowrap; font-size: 13px; }
+}
