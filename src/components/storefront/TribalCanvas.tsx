@@ -106,7 +106,7 @@ function useReflections() {
 function Piece({ geometry, reflections, place, phase, color, motion }: { geometry: BufferGeometry; reflections: Texture; place: TribalPlacement; phase: number; color: string; motion: RefObject<Motion> }) {
   const group = useRef<Group>(null);
   // Without a mouse the pieces stay nearly face on, so they never look thin on a phone.
-  const sway = useMemo(() => window.matchMedia("(pointer: coarse)").matches ? .08 : .26, []);
+  const sway = useMemo(() => window.matchMedia("(pointer: coarse)").matches ? .16 : .26, []);
   useFrame((state, rawDelta) => {
     if (!group.current) return;
     const delta = Math.min(rawDelta, .05);
@@ -169,6 +169,8 @@ function Scene({ geometries, field, onReady }: { geometries: { reflejo: BufferGe
   const motion = useRef<Motion>({ pointerX: 0, pointerY: 0 });
   const target = useRef({ x: 0, y: 0 });
   const light = useRef<PointLight>(null);
+  const touching = useRef(false);
+  const coarse = useMemo(() => window.matchMedia("(pointer: coarse)").matches, []);
   const frames = useRef(0);
 
   useEffect(() => {
@@ -177,8 +179,9 @@ function Scene({ geometries, field, onReady }: { geometries: { reflejo: BufferGe
       const rect = field.current?.getBoundingClientRect();
       if (!touch || !rect || touch.clientY < rect.top || touch.clientY > rect.bottom) return;
       target.current = { x: (touch.clientX - rect.left) / rect.width * 2 - 1, y: (touch.clientY - rect.top) / rect.height * 2 - 1 };
+      touching.current = true;
     };
-    const release = () => { target.current = { x: 0, y: 0 }; };
+    const release = () => { target.current = { x: 0, y: 0 }; touching.current = false; };
     window.addEventListener("touchstart", onTouch, { passive: true });
     window.addEventListener("touchmove", onTouch, { passive: true });
     window.addEventListener("touchend", release, { passive: true });
@@ -197,11 +200,18 @@ function Scene({ geometries, field, onReady }: { geometries: { reflejo: BufferGe
     };
   }, [field]);
 
-  useFrame((_, rawDelta) => {
+  useFrame((state, rawDelta) => {
     const delta = Math.min(rawDelta, .05);
     motion.current.pointerX = MathUtils.damp(motion.current.pointerX, target.current.x, 4, delta);
     motion.current.pointerY = MathUtils.damp(motion.current.pointerY, target.current.y, 4, delta);
-    if (light.current) light.current.position.set(motion.current.pointerX * width * .55, -motion.current.pointerY * height * .55, 2.4);
+    if (light.current) {
+      // Without a mouse, the light sweeps the metal by itself so it keeps shining; a finger takes it over.
+      const time = state.clock.elapsedTime;
+      const auto = coarse && !touching.current;
+      const x = auto ? Math.sin(time * .55) * .9 : motion.current.pointerX;
+      const y = auto ? Math.cos(time * .4) * .6 : motion.current.pointerY;
+      light.current.position.set(x * width * .55, -y * height * .55, 2.4);
+    }
     frames.current += 1;
     if (frames.current === 2) onReady();
   });
